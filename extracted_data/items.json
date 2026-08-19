@@ -1,0 +1,3752 @@
+[
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "MASTER_BALL",
+    "name": "MASTER BALL",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The best BALL with the ultimate performance. It will catch any wild POKéMON without fail.",
+    "pocket": "POKE_BALLS",
+    "battle_usage": 2
+  },
+  {
+    "id": "ULTRA_BALL",
+    "name": "ULTRA BALL",
+    "price": 1200,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A very high-grade BALL that offers a higher POKéMON catch rate than a GREAT BALL.",
+    "pocket": "POKE_BALLS",
+    "battle_usage": 2
+  },
+  {
+    "id": "GREAT_BALL",
+    "name": "GREAT BALL",
+    "price": 600,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A good, quality BALL that offers a higher POKéMON catch rate than a standard POKé BALL.",
+    "pocket": "POKE_BALLS",
+    "battle_usage": 2
+  },
+  {
+    "id": "POKE_BALL",
+    "name": "POKé BALL",
+    "price": 200,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A BALL thrown to catch a wild POKéMON. It is designed in a capsule style.",
+    "pocket": "POKE_BALLS",
+    "battle_usage": 2
+  },
+  {
+    "id": "SAFARI_BALL",
+    "name": "SAFARI BALL",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A special BALL that is used only in the SAFARI ZONE. It is finished in a camouflage pattern.",
+    "pocket": "POKE_BALLS",
+    "battle_usage": 2
+  },
+  {
+    "id": "NET_BALL",
+    "name": "NET BALL",
+    "price": 1000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A somewhat different BALL that works especially well on WATER- and BUG-type POKéMON.",
+    "pocket": "POKE_BALLS",
+    "battle_usage": 2
+  },
+  {
+    "id": "DIVE_BALL",
+    "name": "DIVE BALL",
+    "price": 1000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A somewhat different BALL that works especially well on POKéMON deep in the sea.",
+    "pocket": "POKE_BALLS",
+    "battle_usage": 2
+  },
+  {
+    "id": "NEST_BALL",
+    "name": "NEST BALL",
+    "price": 1000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A somewhat different BALL that works especially well on weaker POKéMON.",
+    "pocket": "POKE_BALLS",
+    "battle_usage": 2
+  },
+  {
+    "id": "REPEAT_BALL",
+    "name": "REPEAT BALL",
+    "price": 1000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A somewhat different BALL that works especially well on POKéMON caught before.",
+    "pocket": "POKE_BALLS",
+    "battle_usage": 2
+  },
+  {
+    "id": "TIMER_BALL",
+    "name": "TIMER BALL",
+    "price": 1000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A somewhat different BALL that becomes progressively better the more turns there are in a battle.",
+    "pocket": "POKE_BALLS",
+    "battle_usage": 2
+  },
+  {
+    "id": "LUXURY_BALL",
+    "name": "LUXURY BALL",
+    "price": 1000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A comfortable BALL that makes a captured wild POKéMON quickly grow friendly.",
+    "pocket": "POKE_BALLS",
+    "battle_usage": 2
+  },
+  {
+    "id": "PREMIER_BALL",
+    "name": "PREMIER BALL",
+    "price": 200,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A rare BALL that has been specially made to commemorate an event of some sort.",
+    "pocket": "POKE_BALLS",
+    "battle_usage": 2
+  },
+  {
+    "id": "POTION",
+    "name": "POTION",
+    "price": 300,
+    "hold_effect": "NONE",
+    "hold_effect_param": 20,
+    "description": "A spray-type wound medicine. It restores the HP of one POKéMON by 20 points.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "ANTIDOTE",
+    "name": "ANTIDOTE",
+    "price": 100,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A spray-type medicine. It heals one POKéMON from a poisoning.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "BURN_HEAL",
+    "name": "BURN HEAL",
+    "price": 250,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A spray-type medicine. It heals one POKéMON of a burn.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "ICE_HEAL",
+    "name": "ICE HEAL",
+    "price": 250,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A spray-type medicine. It defrosts a frozen POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "AWAKENING",
+    "name": "AWAKENING",
+    "price": 250,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A spray-type medicine. It awakens a sleeping POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "PARALYZE_HEAL",
+    "name": "PARLYZ HEAL",
+    "price": 200,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A spray-type medicine. It heals one POKéMON from paralysis.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "FULL_RESTORE",
+    "name": "FULL RESTORE",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 255,
+    "description": "A medicine that fully restores the HP and heals any status problems of one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "MAX_POTION",
+    "name": "MAX POTION",
+    "price": 2500,
+    "hold_effect": "NONE",
+    "hold_effect_param": 255,
+    "description": "A spray-type wound medicine. It fully restores the HP of one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "HYPER_POTION",
+    "name": "HYPER POTION",
+    "price": 1200,
+    "hold_effect": "NONE",
+    "hold_effect_param": 200,
+    "description": "A spray-type wound medicine. It restores the HP of one POKéMON by 200 points.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "SUPER_POTION",
+    "name": "SUPER POTION",
+    "price": 700,
+    "hold_effect": "NONE",
+    "hold_effect_param": 50,
+    "description": "A spray-type wound medicine. It restores the HP of one POKéMON by 50 points.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "FULL_HEAL",
+    "name": "FULL HEAL",
+    "price": 600,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A spray-type medicine. It heals all the status problems of one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "REVIVE",
+    "name": "REVIVE",
+    "price": 1500,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A medicine that revives a fainted POKéMON, restoring HP by half the maximum amount.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "MAX_REVIVE",
+    "name": "MAX REVIVE",
+    "price": 4000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A medicine that revives a fainted POKéMON, restoring HP fully.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "FRESH_WATER",
+    "name": "FRESH WATER",
+    "price": 200,
+    "hold_effect": "NONE",
+    "hold_effect_param": 50,
+    "description": "Water with a high mineral content. It restores the HP of one POKéMON by 50 points.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "SODA_POP",
+    "name": "SODA POP",
+    "price": 300,
+    "hold_effect": "NONE",
+    "hold_effect_param": 60,
+    "description": "A fizzy soda drink. It restores the HP of one POKéMON by 60 points.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "LEMONADE",
+    "name": "LEMONADE",
+    "price": 350,
+    "hold_effect": "NONE",
+    "hold_effect_param": 80,
+    "description": "A very sweet drink. It restores the HP of one POKéMON by 80 points.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "MOOMOO_MILK",
+    "name": "MOOMOO MILK",
+    "price": 500,
+    "hold_effect": "NONE",
+    "hold_effect_param": 100,
+    "description": "Highly nutritious milk. It restores the HP of one POKéMON by 100 points.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "ENERGY_POWDER",
+    "name": "ENERGYPOWDER",
+    "price": 500,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A very bitter medicine powder. It restores the HP of one POKéMON by 50 points.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "ENERGY_ROOT",
+    "name": "ENERGY ROOT",
+    "price": 800,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A very bitter root. It restores the HP of one POKéMON by 200 points.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "HEAL_POWDER",
+    "name": "HEAL POWDER",
+    "price": 450,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A very bitter medicine powder. It heals all the status problems of one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "REVIVAL_HERB",
+    "name": "REVIVAL HERB",
+    "price": 2800,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A very bitter medicinal herb. It revives a fainted POKéMON, restoring HP fully.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "ETHER",
+    "name": "ETHER",
+    "price": 1200,
+    "hold_effect": "NONE",
+    "hold_effect_param": 10,
+    "description": "Restores a selected move's PP by 10 points for one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "MAX_ETHER",
+    "name": "MAX ETHER",
+    "price": 2000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 255,
+    "description": "Fully restores a selected move's PP for one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "ELIXIR",
+    "name": "ELIXIR",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 10,
+    "description": "Restores the PP of all moves for one POKéMON by 10 points each.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "MAX_ELIXIR",
+    "name": "MAX ELIXIR",
+    "price": 4500,
+    "hold_effect": "NONE",
+    "hold_effect_param": 255,
+    "description": "Fully restores the PP of all moves for one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "LAVA_COOKIE",
+    "name": "LAVA COOKIE",
+    "price": 200,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "LAVARIDGE TOWN's local specialty. It heals all the status problems of one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "BLUE_FLUTE",
+    "name": "BLUE FLUTE",
+    "price": 100,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A blue glass flute that awakens a sleeping POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "YELLOW_FLUTE",
+    "name": "YELLOW FLUTE",
+    "price": 200,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A yellow glass flute that snaps one POKéMON out of confusion.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "RED_FLUTE",
+    "name": "RED FLUTE",
+    "price": 300,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A red glass flute that snaps one POKéMON out of infatuation.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "BLACK_FLUTE",
+    "name": "BLACK FLUTE",
+    "price": 400,
+    "hold_effect": "NONE",
+    "hold_effect_param": 50,
+    "description": "A black glass flute. When blown, it makes wild POKéMON less likely to appear.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "WHITE_FLUTE",
+    "name": "WHITE FLUTE",
+    "price": 500,
+    "hold_effect": "NONE",
+    "hold_effect_param": 150,
+    "description": "A white glass flute. When blown, it makes wild POKéMON more likely to appear.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "BERRY_JUICE",
+    "name": "BERRY JUICE",
+    "price": 100,
+    "hold_effect": "RESTORE_HP",
+    "hold_effect_param": 20,
+    "description": "A 100% pure juice. It restores the HP of one POKéMON by 20 points.",
+    "pocket": "ITEMS",
+    "battle_usage": 1
+  },
+  {
+    "id": "SACRED_ASH",
+    "name": "SACRED ASH",
+    "price": 200,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Revives all fainted POKéMON, restoring HP fully.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SHOAL_SALT",
+    "name": "SHOAL SALT",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Pure salt obtained from deep inside the SHOAL CAVE. It is extremely salty.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SHOAL_SHELL",
+    "name": "SHOAL SHELL",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A pretty seashell found deep inside the SHOAL CAVE. It is striped in blue and white.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "RED_SHARD",
+    "name": "RED SHARD",
+    "price": 200,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A small red shard. It appears to be from some sort of a tool made long ago.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "BLUE_SHARD",
+    "name": "BLUE SHARD",
+    "price": 200,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A small blue shard. It appears to be from some sort of a tool made long ago.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "YELLOW_SHARD",
+    "name": "YELLOW SHARD",
+    "price": 200,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A small yellow shard. It appears to be from some sort of a tool made long ago.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "GREEN_SHARD",
+    "name": "GREEN SHARD",
+    "price": 200,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A small green shard. It appears to be from some sort of a tool made long ago.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "HP_UP",
+    "name": "HP UP",
+    "price": 9800,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A nutritious drink for POKéMON. It raises the base HP of one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "PROTEIN",
+    "name": "PROTEIN",
+    "price": 9800,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A nutritious drink for POKéMON. It raises the base ATTACK stat of one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "IRON",
+    "name": "IRON",
+    "price": 9800,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A nutritious drink for POKéMON. It raises the base DEFENSE stat of one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "CARBOS",
+    "name": "CARBOS",
+    "price": 9800,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A nutritious drink for POKéMON. It raises the base SPEED stat of one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "CALCIUM",
+    "name": "CALCIUM",
+    "price": 9800,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A nutritious drink for POKéMON. It raises the base SP. ATK stat of one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "RARE_CANDY",
+    "name": "RARE CANDY",
+    "price": 4800,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A candy that is packed with energy. It raises the level of a POKéMON by one.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "PP_UP",
+    "name": "PP UP",
+    "price": 9800,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Slightly raises the maximum PP of a selected move for one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "ZINC",
+    "name": "ZINC",
+    "price": 9800,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A nutritious drink for POKéMON. It raises the base SP. DEF stat of one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "PP_MAX",
+    "name": "PP MAX",
+    "price": 9800,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Raises the PP of a selected move to its maximum level for one POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "GUARD_SPEC",
+    "name": "GUARD SPEC.",
+    "price": 700,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An item that prevents stat reduction among party POKéMON for five turns after use.",
+    "pocket": "ITEMS",
+    "battle_usage": 2
+  },
+  {
+    "id": "DIRE_HIT",
+    "name": "DIRE HIT",
+    "price": 650,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Raises the critical-hit ratio of POKéMON in battle. Wears off if the POKéMON is withdrawn.",
+    "pocket": "ITEMS",
+    "battle_usage": 2
+  },
+  {
+    "id": "X_ATTACK",
+    "name": "X ATTACK",
+    "price": 500,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Raises the ATTACK stat of POKéMON in battle. Wears off if the POKéMON is withdrawn.",
+    "pocket": "ITEMS",
+    "battle_usage": 2
+  },
+  {
+    "id": "X_DEFEND",
+    "name": "X DEFEND",
+    "price": 550,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Raises the DEFENSE stat of POKéMON in battle. Wears off if the POKéMON is withdrawn.",
+    "pocket": "ITEMS",
+    "battle_usage": 2
+  },
+  {
+    "id": "X_SPEED",
+    "name": "X SPEED",
+    "price": 350,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Raises the SPEED stat of POKéMON in battle. Wears off if the POKéMON is withdrawn.",
+    "pocket": "ITEMS",
+    "battle_usage": 2
+  },
+  {
+    "id": "X_ACCURACY",
+    "name": "X ACCURACY",
+    "price": 950,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Raises the accuracy stat of POKéMON in battle. Wears off if the POKéMON is withdrawn.",
+    "pocket": "ITEMS",
+    "battle_usage": 2
+  },
+  {
+    "id": "X_SPECIAL",
+    "name": "X SPECIAL",
+    "price": 350,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Raises the SP. ATK stat of POKéMON in battle. Wears off if the POKéMON is withdrawn.",
+    "pocket": "ITEMS",
+    "battle_usage": 2
+  },
+  {
+    "id": "POKE_DOLL",
+    "name": "POKé DOLL",
+    "price": 1000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An attractive doll. Use it to flee from any battle with a wild POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 2
+  },
+  {
+    "id": "FLUFFY_TAIL",
+    "name": "FLUFFY TAIL",
+    "price": 1000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An attractive item. Use it to flee from any battle with a wild POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 2
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SUPER_REPEL",
+    "name": "SUPER REPEL",
+    "price": 500,
+    "hold_effect": "NONE",
+    "hold_effect_param": 200,
+    "description": "Prevents weak wild POKéMON from appearing for 200 steps.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "MAX_REPEL",
+    "name": "MAX REPEL",
+    "price": 700,
+    "hold_effect": "NONE",
+    "hold_effect_param": 250,
+    "description": "Prevents weak wild POKéMON from appearing for 250 steps.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "ESCAPE_ROPE",
+    "name": "ESCAPE ROPE",
+    "price": 550,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A long, durable rope. Use it to escape instantly from a cave or a dungeon.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "REPEL",
+    "name": "REPEL",
+    "price": 350,
+    "hold_effect": "NONE",
+    "hold_effect_param": 100,
+    "description": "Prevents weak wild POKéMON from appearing for 100 steps.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SUN_STONE",
+    "name": "SUN STONE",
+    "price": 2100,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A peculiar stone that makes certain species of POKéMON evolve. It is as red as the sun.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "MOON_STONE",
+    "name": "MOON STONE",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A peculiar stone that makes certain species of POKéMON evolve. It is as black as the night sky.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "FIRE_STONE",
+    "name": "FIRE STONE",
+    "price": 2100,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A peculiar stone that makes certain species of POKéMON evolve. It is colored orange.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "THUNDER_STONE",
+    "name": "THUNDERSTONE",
+    "price": 2100,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A peculiar stone that makes certain species of POKéMON evolve. It has a thunderbolt pattern.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "WATER_STONE",
+    "name": "WATER STONE",
+    "price": 2100,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A peculiar stone that makes certain species of POKéMON evolve. It is a clear light blue.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "LEAF_STONE",
+    "name": "LEAF STONE",
+    "price": 2100,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A peculiar stone that makes certain species of POKéMON evolve. It has a leaf pattern.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "TINY_MUSHROOM",
+    "name": "TINYMUSHROOM",
+    "price": 500,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A small and rare mushroom. It is quite popular among certain people.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "BIG_MUSHROOM",
+    "name": "BIG MUSHROOM",
+    "price": 5000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A large and rare mushroom. It is very popular among certain people.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "PEARL",
+    "name": "PEARL",
+    "price": 1400,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A relatively small pearl that sparkles in a pretty silver color. It can be sold cheaply.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "BIG_PEARL",
+    "name": "BIG PEARL",
+    "price": 7500,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A quite-large pearl that sparkles in a pretty silver color. It can be sold at a high price.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "STARDUST",
+    "name": "STARDUST",
+    "price": 2000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A pretty red sand with a loose, silky feel. It can be sold at a high price.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "STAR_PIECE",
+    "name": "STAR PIECE",
+    "price": 9800,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A shard of a pretty gem that sparkles in a red color. It can be sold at a high price.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NUGGET",
+    "name": "NUGGET",
+    "price": 10000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A nugget of pure gold that gives off a lustrous gleam. It can be sold at a high price.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "HEART_SCALE",
+    "name": "HEART SCALE",
+    "price": 100,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A pretty, heart-shaped scale that is extremely rare. It glows faintly in the colors of a rainbow.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "ORANGE_MAIL",
+    "name": "ORANGE MAIL",
+    "price": 50,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A piece of MAIL featuring a cute ZIGZAGOON print. It is to be held by a POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "HARBOR_MAIL",
+    "name": "HARBOR MAIL",
+    "price": 50,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A piece of MAIL featuring a cute WINGULL print. It is to be held by a POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "GLITTER_MAIL",
+    "name": "GLITTER MAIL",
+    "price": 50,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A piece of MAIL featuring a cute PIKACHU print. It is to be held by a POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "MECH_MAIL",
+    "name": "MECH MAIL",
+    "price": 50,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A piece of MAIL featuring a cute MAGNEMITE print. It is to be held by a POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "WOOD_MAIL",
+    "name": "WOOD MAIL",
+    "price": 50,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A piece of MAIL featuring a cute SLAKOTH print. It is to be held by a POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "WAVE_MAIL",
+    "name": "WAVE MAIL",
+    "price": 50,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A piece of MAIL featuring a cute WAILMER print. It is to be held by a POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "BEAD_MAIL",
+    "name": "BEAD MAIL",
+    "price": 50,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A piece of MAIL to be held by a POKéMON. It will bear the print of the POKéMON holding it.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SHADOW_MAIL",
+    "name": "SHADOW MAIL",
+    "price": 50,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A piece of MAIL featuring a cute DUSKULL print. It is to be held by a POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "TROPIC_MAIL",
+    "name": "TROPIC MAIL",
+    "price": 50,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A piece of MAIL featuring a cute BELLOSSOM print. It is to be held by a POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "DREAM_MAIL",
+    "name": "DREAM MAIL",
+    "price": 50,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A piece of MAIL to be held by a POKéMON. It will bear the print of the POKéMON holding it.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "FAB_MAIL",
+    "name": "FAB MAIL",
+    "price": 50,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A piece of MAIL featuring a gorgeous, extravagant print. It is to be held by a POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "RETRO_MAIL",
+    "name": "RETRO MAIL",
+    "price": 50,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A piece of MAIL featuring a print of three cute POKéMON. It is to be held by a POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "CHERI_BERRY",
+    "name": "CHERI BERRY",
+    "price": 20,
+    "hold_effect": "CURE_PAR",
+    "hold_effect_param": 0,
+    "description": "When held by a POKéMON, it will be used in battle to heal paralysis.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 1
+  },
+  {
+    "id": "CHESTO_BERRY",
+    "name": "CHESTO BERRY",
+    "price": 20,
+    "hold_effect": "CURE_SLP",
+    "hold_effect_param": 0,
+    "description": "When held by a POKéMON, it will be used in battle to wake up.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 1
+  },
+  {
+    "id": "PECHA_BERRY",
+    "name": "PECHA BERRY",
+    "price": 20,
+    "hold_effect": "CURE_PSN",
+    "hold_effect_param": 0,
+    "description": "When held by a POKéMON, it will be used in battle to cure poison.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 1
+  },
+  {
+    "id": "RAWST_BERRY",
+    "name": "RAWST BERRY",
+    "price": 20,
+    "hold_effect": "CURE_BRN",
+    "hold_effect_param": 0,
+    "description": "When held by a POKéMON, it will be used in battle to heal a burn.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 1
+  },
+  {
+    "id": "ASPEAR_BERRY",
+    "name": "ASPEAR BERRY",
+    "price": 20,
+    "hold_effect": "CURE_FRZ",
+    "hold_effect_param": 0,
+    "description": "When held by a POKéMON, it will be used in battle for defrosting.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 1
+  },
+  {
+    "id": "LEPPA_BERRY",
+    "name": "LEPPA BERRY",
+    "price": 20,
+    "hold_effect": "RESTORE_PP",
+    "hold_effect_param": 10,
+    "description": "When held by a POKéMON, it will be used in battle to restore 10 PP.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 1
+  },
+  {
+    "id": "ORAN_BERRY",
+    "name": "ORAN BERRY",
+    "price": 20,
+    "hold_effect": "RESTORE_HP",
+    "hold_effect_param": 10,
+    "description": "When held by a POKéMON, it will be used in battle to restore 10 HP.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 1
+  },
+  {
+    "id": "PERSIM_BERRY",
+    "name": "PERSIM BERRY",
+    "price": 20,
+    "hold_effect": "CURE_CONFUSION",
+    "hold_effect_param": 0,
+    "description": "When held by a POKéMON, it will be used in battle to lift confusion.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 1
+  },
+  {
+    "id": "LUM_BERRY",
+    "name": "LUM BERRY",
+    "price": 20,
+    "hold_effect": "CURE_STATUS",
+    "hold_effect_param": 0,
+    "description": "When held by a POKéMON, it will be used in battle to heal any problem.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 1
+  },
+  {
+    "id": "SITRUS_BERRY",
+    "name": "SITRUS BERRY",
+    "price": 20,
+    "hold_effect": "RESTORE_HP",
+    "hold_effect_param": 30,
+    "description": "When held by a POKéMON, it will be used in battle to restore 30 HP.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 1
+  },
+  {
+    "id": "FIGY_BERRY",
+    "name": "FIGY BERRY",
+    "price": 20,
+    "hold_effect": "CONFUSE_SPICY",
+    "hold_effect_param": 8,
+    "description": "A hold item that restores HP but may cause confusion when used.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "WIKI_BERRY",
+    "name": "WIKI BERRY",
+    "price": 20,
+    "hold_effect": "CONFUSE_DRY",
+    "hold_effect_param": 8,
+    "description": "A hold item that restores HP but may cause confusion when used.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "MAGO_BERRY",
+    "name": "MAGO BERRY",
+    "price": 20,
+    "hold_effect": "CONFUSE_SWEET",
+    "hold_effect_param": 8,
+    "description": "A hold item that restores HP but may cause confusion when used.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "AGUAV_BERRY",
+    "name": "AGUAV BERRY",
+    "price": 20,
+    "hold_effect": "CONFUSE_BITTER",
+    "hold_effect_param": 8,
+    "description": "A hold item that restores HP but may cause confusion when used.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "IAPAPA_BERRY",
+    "name": "IAPAPA BERRY",
+    "price": 20,
+    "hold_effect": "CONFUSE_SOUR",
+    "hold_effect_param": 8,
+    "description": "A hold item that restores HP but may cause confusion when used.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "RAZZ_BERRY",
+    "name": "RAZZ BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "BLUK_BERRY",
+    "name": "BLUK BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "NANAB_BERRY",
+    "name": "NANAB BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "WEPEAR_BERRY",
+    "name": "WEPEAR BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "PINAP_BERRY",
+    "name": "PINAP BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "POMEG_BERRY",
+    "name": "POMEG BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "KELPSY_BERRY",
+    "name": "KELPSY BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "QUALOT_BERRY",
+    "name": "QUALOT BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "HONDEW_BERRY",
+    "name": "HONDEW BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "GREPA_BERRY",
+    "name": "GREPA BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "TAMATO_BERRY",
+    "name": "TAMATO BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "CORNN_BERRY",
+    "name": "CORNN BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "MAGOST_BERRY",
+    "name": "MAGOST BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "RABUTA_BERRY",
+    "name": "RABUTA BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "NOMEL_BERRY",
+    "name": "NOMEL BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "SPELON_BERRY",
+    "name": "SPELON BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "PAMTRE_BERRY",
+    "name": "PAMTRE BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "WATMEL_BERRY",
+    "name": "WATMEL BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "DURIN_BERRY",
+    "name": "DURIN BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "BELUE_BERRY",
+    "name": "BELUE BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "LIECHI_BERRY",
+    "name": "LIECHI BERRY",
+    "price": 20,
+    "hold_effect": "ATTACK_UP",
+    "hold_effect_param": 4,
+    "description": "When held by a POKéMON, it raises the ATTACK stat in a pinch.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "GANLON_BERRY",
+    "name": "GANLON BERRY",
+    "price": 20,
+    "hold_effect": "DEFENSE_UP",
+    "hold_effect_param": 4,
+    "description": "When held by a POKéMON, it raises the DEFENSE stat in a pinch.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "SALAC_BERRY",
+    "name": "SALAC BERRY",
+    "price": 20,
+    "hold_effect": "SPEED_UP",
+    "hold_effect_param": 4,
+    "description": "When held by a POKéMON, it raises the SPEED stat in a pinch.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "PETAYA_BERRY",
+    "name": "PETAYA BERRY",
+    "price": 20,
+    "hold_effect": "SP_ATTACK_UP",
+    "hold_effect_param": 4,
+    "description": "When held by a POKéMON, it raises the SP. ATK stat in a pinch.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "APICOT_BERRY",
+    "name": "APICOT BERRY",
+    "price": 20,
+    "hold_effect": "SP_DEFENSE_UP",
+    "hold_effect_param": 4,
+    "description": "When held by a POKéMON, it raises the SP. DEF stat in a pinch.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "LANSAT_BERRY",
+    "name": "LANSAT BERRY",
+    "price": 20,
+    "hold_effect": "CRITICAL_UP",
+    "hold_effect_param": 4,
+    "description": "When held by a POKéMON, it raises the critical-hit ratio in a pinch.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "STARF_BERRY",
+    "name": "STARF BERRY",
+    "price": 20,
+    "hold_effect": "RANDOM_STAT_UP",
+    "hold_effect_param": 4,
+    "description": "When held by a POKéMON, it sharply raises one stat in a pinch.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 0
+  },
+  {
+    "id": "ENIGMA_BERRY",
+    "name": "ENIGMA BERRY",
+    "price": 20,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Can be ground up into a powder as an ingredient for medicine.",
+    "pocket": "BERRY_POUCH",
+    "battle_usage": 1
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "BRIGHT_POWDER",
+    "name": "BRIGHTPOWDER",
+    "price": 10,
+    "hold_effect": "EVASION_UP",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. It casts a tricky glare that lowers the opponent's accuracy.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "WHITE_HERB",
+    "name": "WHITE HERB",
+    "price": 100,
+    "hold_effect": "RESTORE_STATS",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. It restores any lowered stat in battle. It can be used only once.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "MACHO_BRACE",
+    "name": "MACHO BRACE",
+    "price": 3000,
+    "hold_effect": "MACHO_BRACE",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. It promotes strong growth but lowers SPEED while it is held.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "EXP_SHARE",
+    "name": "EXP. SHARE",
+    "price": 3000,
+    "hold_effect": "EXP_SHARE",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. The holder gets a share of EXP. points without having to battle.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "QUICK_CLAW",
+    "name": "QUICK CLAW",
+    "price": 100,
+    "hold_effect": "QUICK_CLAW",
+    "hold_effect_param": 20,
+    "description": "An item to be held by a POKéMON. A light and sharp claw. The holder may be able to strike first.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SOOTHE_BELL",
+    "name": "SOOTHE BELL",
+    "price": 100,
+    "hold_effect": "FRIENDSHIP_UP",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. A bell with a comforting chime that makes the holder calm and friendly.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "MENTAL_HERB",
+    "name": "MENTAL HERB",
+    "price": 100,
+    "hold_effect": "CURE_ATTRACT",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. It snaps the holder out of infatuation. It can be used once.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "CHOICE_BAND",
+    "name": "CHOICE BAND",
+    "price": 100,
+    "hold_effect": "CHOICE_BAND",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. It powers up one move, which becomes the only usable one.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "KINGS_ROCK",
+    "name": "KING'S ROCK",
+    "price": 100,
+    "hold_effect": "FLINCH",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. It may cause the foe to flinch upon taking damage.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SILVER_POWDER",
+    "name": "SILVERPOWDER",
+    "price": 100,
+    "hold_effect": "BUG_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A shiny silver powder that boosts the power of BUG-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "AMULET_COIN",
+    "name": "AMULET COIN",
+    "price": 100,
+    "hold_effect": "DOUBLE_PRIZE",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. It doubles the battle money if the holding POKéMON takes part.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "CLEANSE_TAG",
+    "name": "CLEANSE TAG",
+    "price": 200,
+    "hold_effect": "REPEL",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. It repels wild POKéMON if the holder is first in the party.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SOUL_DEW",
+    "name": "SOUL DEW",
+    "price": 200,
+    "hold_effect": "SOUL_DEW",
+    "hold_effect_param": 0,
+    "description": "An orb to be held by a LATIOS or LATIAS. It raises the SP. ATK and SP. DEF stats.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "DEEP_SEA_TOOTH",
+    "name": "DEEPSEATOOTH",
+    "price": 200,
+    "hold_effect": "DEEP_SEA_TOOTH",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. A fang that gleams a sharp silver. It raises the SP. ATK stat.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "DEEP_SEA_SCALE",
+    "name": "DEEPSEASCALE",
+    "price": 200,
+    "hold_effect": "DEEP_SEA_SCALE",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. A scale that shines a faint pink. It raises the SP. DEF stat.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SMOKE_BALL",
+    "name": "SMOKE BALL",
+    "price": 200,
+    "hold_effect": "CAN_ALWAYS_RUN",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. The holding POKéMON can flee from any wild POKéMON for sure.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "EVERSTONE",
+    "name": "EVERSTONE",
+    "price": 200,
+    "hold_effect": "PREVENT_EVOLVE",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. The holding POKéMON is prevented from evolving.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "FOCUS_BAND",
+    "name": "FOCUS BAND",
+    "price": 200,
+    "hold_effect": "FOCUS_BAND",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. The holding POKéMON may endure an attack, leaving just 1 HP.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "LUCKY_EGG",
+    "name": "LUCKY EGG",
+    "price": 200,
+    "hold_effect": "LUCKY_EGG",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. An egg filled with happiness that earns extra EXP. points in battle.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SCOPE_LENS",
+    "name": "SCOPE LENS",
+    "price": 200,
+    "hold_effect": "SCOPE_LENS",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. A lens that boosts the critical-hit ratio of the holding POKéMON.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "METAL_COAT",
+    "name": "METAL COAT",
+    "price": 100,
+    "hold_effect": "STEEL_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A special metallic film that boosts the power of STEEL-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "LEFTOVERS",
+    "name": "LEFTOVERS",
+    "price": 200,
+    "hold_effect": "LEFTOVERS",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. The holding POKéMON gradually regains HP during battle.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "DRAGON_SCALE",
+    "name": "DRAGON SCALE",
+    "price": 2100,
+    "hold_effect": "DRAGON_SCALE",
+    "hold_effect_param": 10,
+    "description": "A thick and tough scale. A DRAGON-type POKéMON may be holding it.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "LIGHT_BALL",
+    "name": "LIGHT BALL",
+    "price": 100,
+    "hold_effect": "LIGHT_BALL",
+    "hold_effect_param": 0,
+    "description": "An orb to be held by a PIKACHU that raises the SP. ATK stat. Touching it may cause a shock.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SOFT_SAND",
+    "name": "SOFT SAND",
+    "price": 100,
+    "hold_effect": "GROUND_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A loose, silky sand that boosts the power of GROUND-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "HARD_STONE",
+    "name": "HARD STONE",
+    "price": 100,
+    "hold_effect": "ROCK_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. An unbreakable stone that boosts the power of ROCK-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "MIRACLE_SEED",
+    "name": "MIRACLE SEED",
+    "price": 100,
+    "hold_effect": "GRASS_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A seed imbued with life that boosts the power of GRASS-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "BLACK_GLASSES",
+    "name": "BLACKGLASSES",
+    "price": 100,
+    "hold_effect": "DARK_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A shady-looking pair of glasses that boosts DARK-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "BLACK_BELT",
+    "name": "BLACK BELT",
+    "price": 100,
+    "hold_effect": "FIGHTING_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A belt that boosts determination and FIGHTING-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "MAGNET",
+    "name": "MAGNET",
+    "price": 100,
+    "hold_effect": "ELECTRIC_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A powerful magnet that boosts the power of ELECTRIC-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "MYSTIC_WATER",
+    "name": "MYSTIC WATER",
+    "price": 100,
+    "hold_effect": "WATER_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A teardrop-shaped gem that boosts the power of WATER-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SHARP_BEAK",
+    "name": "SHARP BEAK",
+    "price": 100,
+    "hold_effect": "FLYING_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A long, sharp beak that boosts the power of FLYING-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "POISON_BARB",
+    "name": "POISON BARB",
+    "price": 100,
+    "hold_effect": "POISON_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A small, poisonous barb that boosts the power of POISON-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NEVER_MELT_ICE",
+    "name": "NEVERMELTICE",
+    "price": 100,
+    "hold_effect": "ICE_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A piece of ice that repels heat and boosts ICE-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SPELL_TAG",
+    "name": "SPELL TAG",
+    "price": 100,
+    "hold_effect": "GHOST_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A sinister, eerie tag that boosts GHOST-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "TWISTED_SPOON",
+    "name": "TWISTEDSPOON",
+    "price": 100,
+    "hold_effect": "PSYCHIC_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A spoon imbued with telekinetic power boosts PSYCHIC-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "CHARCOAL",
+    "name": "CHARCOAL",
+    "price": 9800,
+    "hold_effect": "FIRE_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A combustible fuel that boosts the power of FIRE-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "DRAGON_FANG",
+    "name": "DRAGON FANG",
+    "price": 100,
+    "hold_effect": "DRAGON_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A hard and sharp fang that boosts the power of DRAGON-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SILK_SCARF",
+    "name": "SILK SCARF",
+    "price": 100,
+    "hold_effect": "NORMAL_POWER",
+    "hold_effect_param": 10,
+    "description": "An item to be held by a POKéMON. A sumptuous scarf that boosts the power of NORMAL-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "UP_GRADE",
+    "name": "UP-GRADE",
+    "price": 2100,
+    "hold_effect": "UP_GRADE",
+    "hold_effect_param": 0,
+    "description": "A transparent device filled with all sorts of data. It is made by SILPH CO.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SHELL_BELL",
+    "name": "SHELL BELL",
+    "price": 200,
+    "hold_effect": "SHELL_BELL",
+    "hold_effect_param": 8,
+    "description": "An item to be held by a POKéMON. The holding POKéMON regains some HP upon striking the foe.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SEA_INCENSE",
+    "name": "SEA INCENSE",
+    "price": 9600,
+    "hold_effect": "WATER_POWER",
+    "hold_effect_param": 5,
+    "description": "An item to be held by a POKéMON. It slightly boosts the power of WATER-type moves.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "LAX_INCENSE",
+    "name": "LAX INCENSE",
+    "price": 9600,
+    "hold_effect": "EVASION_UP",
+    "hold_effect_param": 5,
+    "description": "An item to be held by a POKéMON. Its tricky aroma slightly reduces the foe's accuracy.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "LUCKY_PUNCH",
+    "name": "LUCKY PUNCH",
+    "price": 10,
+    "hold_effect": "LUCKY_PUNCH",
+    "hold_effect_param": 0,
+    "description": "A glove to be held by a CHANSEY. It raises CHANSEY's critical-hit ratio.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "METAL_POWDER",
+    "name": "METAL POWDER",
+    "price": 10,
+    "hold_effect": "METAL_POWDER",
+    "hold_effect_param": 0,
+    "description": "A fine, hard powder to be held by a DITTO. It raises DITTO's DEFENSE stat.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "THICK_CLUB",
+    "name": "THICK CLUB",
+    "price": 500,
+    "hold_effect": "THICK_CLUB",
+    "hold_effect_param": 0,
+    "description": "A hard bone of some sort to be held by a CUBONE or MAROWAK. It raises the ATTACK stat.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "STICK",
+    "name": "STICK",
+    "price": 200,
+    "hold_effect": "STICK",
+    "hold_effect_param": 0,
+    "description": "A stick of leek to be held by a FARFETCH'D. It raises FARFETCH'D's critical-hit ratio.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "RED_SCARF",
+    "name": "RED SCARF",
+    "price": 100,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. It boosts the holding POKéMON's COOL condition in CONTESTS.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "BLUE_SCARF",
+    "name": "BLUE SCARF",
+    "price": 100,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. It boosts the holding POKéMON's BEAUTY condition in CONTESTS.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "PINK_SCARF",
+    "name": "PINK SCARF",
+    "price": 100,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. It boosts the holding POKéMON's CUTE condition in CONTESTS.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "GREEN_SCARF",
+    "name": "GREEN SCARF",
+    "price": 100,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. It boosts the holding POKéMON's SMART condition in CONTESTS.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "YELLOW_SCARF",
+    "name": "YELLOW SCARF",
+    "price": 100,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An item to be held by a POKéMON. It boosts the holding POKéMON's TOUGH condition in CONTESTS.",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "MACH_BIKE",
+    "name": "MACH BIKE",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A folding bicycle that is at least twice as fast as walking.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "COIN_CASE",
+    "name": "COIN CASE",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A case for holding COINS obtained at the GAME CORNER. It holds up to 9,999 COINS.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "ITEMFINDER",
+    "name": "ITEMFINDER",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A device used for finding items. If there is a hidden item nearby when it is used, it emits a signal.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "OLD_ROD",
+    "name": "OLD ROD",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An old and beat-up fishing rod. Use it by any body of water to  fish for wild POKéMON.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "GOOD_ROD",
+    "name": "GOOD ROD",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A new, good-quality fishing rod. Use it by any body of water to  fish for wild POKéMON.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SUPER_ROD",
+    "name": "SUPER ROD",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An awesome, high-tech fishing rod. Use it by any body of water to fish for wild POKéMON.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SS_TICKET",
+    "name": "S.S. TICKET",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The ticket required for sailing on the ferry S.S. ANNE. It has a drawing of a ship on it.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "CONTEST_PASS",
+    "name": "CONTEST PASS",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The pass required for entering POKéMON CONTESTS. It has a drawing of an award ribbon on it.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "WAILMER_PAIL",
+    "name": "WAILMER PAIL",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A nifty watering pail. Use it to promote strong growth in BERRIES planted in soft soil.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "DEVON_GOODS",
+    "name": "DEVON GOODS",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A package that contains mechanical parts of some sort made by the DEVON CORPORATION.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SOOT_SACK",
+    "name": "SOOT SACK",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A sack used to collect volcanic ash automatically during walks over deep ash.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "BASEMENT_KEY",
+    "name": "BASEMENT KEY",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The key to NEW MAUVILLE, which was constructed beneath MAUVILLE CITY.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "ACRO_BIKE",
+    "name": "ACRO BIKE",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A folding bicycle that is capable of stunts like jumps and wheelies.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "POKEBLOCK_CASE",
+    "name": "{POKEBLOCK} CASE",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A case for holding {POKEBLOCK}S made with a BERRY BLENDER. It releases one {POKEBLOCK} when shaken.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "LETTER",
+    "name": "LETTER",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An extremely important letter to STEVEN from the PRESIDENT of the DEVON CORPORATION.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "EON_TICKET",
+    "name": "EON TICKET",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The ticket required for sailing on a ferry to a distant southern island. It features a drawing of an island.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "RED_ORB",
+    "name": "RED ORB",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An orb that glows red. It is said to contain an incredible power from ancient times.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "BLUE_ORB",
+    "name": "BLUE ORB",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An orb that glows blue. It is said to contain an incredible power from ancient times.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SCANNER",
+    "name": "SCANNER",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A device used to search for life-forms in water. It looks too difficult to use.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "GO_GOGGLES",
+    "name": "GO-GOGGLES",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A pair of protective goggles. They enable a TRAINER to travel through even desert sandstorms.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "METEORITE",
+    "name": "METEORITE",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A meteorite that fell from space onto MT. MOON long ago. It is very lumpy and hard.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "ROOM_1_KEY",
+    "name": "RM. 1 KEY",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A key that opens the door to Room 1 inside the ABANDONED SHIP. It is old and looks easily broken.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "ROOM_2_KEY",
+    "name": "RM. 2 KEY",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A key that opens the door to Room 2 inside the ABANDONED SHIP. It is old and looks easily broken.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "ROOM_4_KEY",
+    "name": "RM. 4 KEY",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A key that opens the door to Room 4 inside the ABANDONED SHIP. It is old and looks easily broken.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "ROOM_6_KEY",
+    "name": "RM. 6 KEY",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A key that opens the door to Room 6 inside the ABANDONED SHIP. It is old and looks easily broken.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "STORAGE_KEY",
+    "name": "STORAGE KEY",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A key that opens the storage hold inside the ABANDONED SHIP. It is old and looks easily broken.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "ROOT_FOSSIL",
+    "name": "ROOT FOSSIL",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A fossil of an ancient, seafloor- dwelling POKéMON. It appears to be part of a plant root.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "CLAW_FOSSIL",
+    "name": "CLAW FOSSIL",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A fossil of an ancient, seafloor- dwelling POKéMON. It appears to be part of a claw.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "DEVON_SCOPE",
+    "name": "DEVON SCOPE",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A scope that signals the presence of any unseeable POKéMON. It is made by the DEVON CORP.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM01",
+    "name": "TM01",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An extremely powerful attack. However, if the user is hit before using the move, they will flinch.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM02",
+    "name": "TM02",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Sharp, huge claws hook and slash the foe quickly and with great power.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM03",
+    "name": "TM03",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The foe is hit with a pulsing blast of water. It may also confuse the target.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM04",
+    "name": "TM04",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The user calms its spirit and focuses its mind to raise its SP. ATK and SP. DEF stats.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM05",
+    "name": "TM05",
+    "price": 1000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A savage roar that causes the foe to switch out of battle. In the wild, ROAR ends the battle.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM06",
+    "name": "TM06",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A move that leaves the foe badly poisoned. Its poison damage worsens every turn.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM07",
+    "name": "TM07",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Summons a hailstorm that lasts for five turns. The hailstorm damages all types except the ICE type.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM08",
+    "name": "TM08",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The user tightens all its muscles and bulks up, boosting both its ATTACK and DEFENSE stats.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM09",
+    "name": "TM09",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The user shoots seeds at the foe in rapid succession. Two to five seeds are shot at once.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM10",
+    "name": "TM10",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A variable move that changes type and power depending on the POKéMON using it.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM11",
+    "name": "TM11",
+    "price": 2000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The weather is turned sunny for five turns. Over that time, FIRE- type moves are powered up.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM12",
+    "name": "TM12",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A taunted foe may become enraged. It will then only be able to use attack moves.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM13",
+    "name": "TM13",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An icy-cold beam is shot at the foe. It may leave the target frozen.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM14",
+    "name": "TM14",
+    "price": 5500,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A vicious snow-and-wind attack that strikes all foes in battle. It may cause freezing.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM15",
+    "name": "TM15",
+    "price": 7500,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A harsh attack that inflicts severe damage on the foe. However, the user must rest the next turn.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM16",
+    "name": "TM16",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A wall of light is created over five turns. It reduces damage from SP. ATK attacks.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM17",
+    "name": "TM17",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The user is completely protected from attack in the turn it is used. It may fail if used in succession.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM18",
+    "name": "TM18",
+    "price": 2000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A heavy rain is summoned for five turns. Over that time, WATER-type moves are powered up.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM19",
+    "name": "TM19",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The user strikes the foe with tentacles or roots, stealing the target's HP and healing itself.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM20",
+    "name": "TM20",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Protects the party with a shield against all status problems over five turns.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM21",
+    "name": "TM21",
+    "price": 1000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "This attack move grows more powerful the more the POKéMON dislikes its TRAINER.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM22",
+    "name": "TM22",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A 2-turn attack that uses the first turn for absorbing sunlight, then blasting the foe in the next turn.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM23",
+    "name": "TM23",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The foe is slammed with a sturdy tail of steel. It may lower the target's DEFENSE stat.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM24",
+    "name": "TM24",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A massive jolt of electricity is launched at the foe. It may cause paralysis.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM25",
+    "name": "TM25",
+    "price": 5500,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Strikes the foe with a huge thunderbolt. It may cause paralysis.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM26",
+    "name": "TM26",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Causes an earthquake that strikes all POKéMON in battle, excluding the user.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM27",
+    "name": "TM27",
+    "price": 1000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "This attack move grows more powerful the more the POKéMON likes its TRAINER.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM28",
+    "name": "TM28",
+    "price": 2000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A 2-turn attack in which the user digs underground, then strikes. It can be used to exit dungeons.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM29",
+    "name": "TM29",
+    "price": 2000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A powerful blast of telekinetic energy strikes the foe. It may lower the target's SP. DEF stat.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM30",
+    "name": "TM30",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The foe is attacked with a shadowy lump. It may lower the target's SP. DEF stat.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM31",
+    "name": "TM31",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Strikes the foe with a rock-hard fist, etc. It shatters barriers such as REFLECT and LIGHT SCREEN.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM32",
+    "name": "TM32",
+    "price": 2000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The user begins moving so quickly that it creates illusory copies to raise its evasiveness.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM33",
+    "name": "TM33",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A tough barrier is put up over five turns. It reduces damage from physical attacks over that time.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM34",
+    "name": "TM34",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A rapid jolt of electricity strikes the foe. This attack is impossible to evade.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM35",
+    "name": "TM35",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The foe is roasted with a heavy blast of fire. It may leave the target with a burn.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM36",
+    "name": "TM36",
+    "price": 1000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Toxic sludge is hurled at the foe with great force. It may also poison the target.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM37",
+    "name": "TM37",
+    "price": 2000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Summons a sandstorm that lasts for five turns. It damages all types except ROCK, GROUND, and STEEL.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM38",
+    "name": "TM38",
+    "price": 5500,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The foe is incinerated with an intense flame. It may leave the target with a burn.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM39",
+    "name": "TM39",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Boulders are hurled at the foe. It also lowers the target's SPEED stat if it hits.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM40",
+    "name": "TM40",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An extremely fast attack against one target. It is impossible to evade.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM41",
+    "name": "TM41",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "If enraged by this move, the target becomes incapable of using the same move twice in a row.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM42",
+    "name": "TM42",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An attack move that becomes very powerful if the user is poisoned, burned, or paralyzed.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM43",
+    "name": "TM43",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An attack move that may have an additional effect depending on the battle terrain.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM44",
+    "name": "TM44",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A move that makes the user fall asleep over two turns to restore HP and heal any status problems.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM45",
+    "name": "TM45",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The foe, if it is the opposite gender as the user, becomes infatuated and may not attack.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM46",
+    "name": "TM46",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An attack that gives the user an opportunity to steal the foe's hold item.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM47",
+    "name": "TM47",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The foe is struck with steel-hard wings. It may also raise the user's DEFENSE stat.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM48",
+    "name": "TM48",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A special power is transmitted to the foe, causing it to switch abilities with the user.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM49",
+    "name": "TM49",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A move that steals the effects of any status-changing or healing move that the foe tries to use.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM50",
+    "name": "TM50",
+    "price": 3000,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A maximum-power attack of great ferocity, but one that also sharply reduces the user's SP. ATK stat.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "HM01",
+    "name": "HM01",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Attacks the foe with sharp blades or claws. It can also cut down thin trees and grass outside of battle.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "HM02",
+    "name": "HM02",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The user flies up on the first turn, then attacks next turn. It can be used to fly to any known town.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "HM03",
+    "name": "HM03",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Creates a huge wave, then crashes it down on the foe. It can be used for traveling on water.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "HM04",
+    "name": "HM04",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The user builds enormous power, then slams the foe. It can be used for moving large, round boulders.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "HM05",
+    "name": "HM05",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Looses a powerful blast of light that reduces the foe's accuracy. It also lights up dark caves.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "HM06",
+    "name": "HM06",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Hits the foe with a rock-crushingly tough attack. It can smash cracked boulders.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "HM07",
+    "name": "HM07",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A powerful charge attack. It can be used for climbing a torrential waterfall.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "HM08",
+    "name": "HM08",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A 2-turn attack in which the user dives underwater on the first turn, then strikes in the next turn.",
+    "pocket": "TM_CASE",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "NONE",
+    "name": "????????",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "?????",
+    "pocket": "ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "OAKS_PARCEL",
+    "name": "OAK'S PARCEL",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A parcel to be delivered to PROF. OAK from VIRIDIAN CITY's POKéMON MART.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "POKE_FLUTE",
+    "name": "POKé FLUTE",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A flute that is said to instantly awaken any POKéMON. It has a lovely tone.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 2
+  },
+  {
+    "id": "SECRET_KEY",
+    "name": "SECRET KEY",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "The key to CINNABAR ISLAND GYM's front door. It is colored red and decorated.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "BIKE_VOUCHER",
+    "name": "BIKE VOUCHER",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "Take this voucher to the BIKE SHOP in CERULEAN CITY and exchange it for a bicycle.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "GOLD_TEETH",
+    "name": "GOLD TEETH",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A set of false teeth lost by the SAFARI ZONE'S WARDEN. It makes his smile sparkle.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "OLD_AMBER",
+    "name": "OLD AMBER",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A piece of amber that contains the genes of an ancient POKéMON. It is clear with a reddish tint.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "CARD_KEY",
+    "name": "CARD KEY",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A card-type key that unlocks doors in SILPH CO.'s HEAD OFFICE in SAFFRON CITY.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "LIFT_KEY",
+    "name": "LIFT KEY",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A key that operates the elevator in TEAM ROCKET's HIDEOUT. It bears the TEAM ROCKET logo.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "HELIX_FOSSIL",
+    "name": "HELIX FOSSIL",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A fossil of an ancient, seafloor- dwelling POKéMON. It appears to be part of a seashell.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "DOME_FOSSIL",
+    "name": "DOME FOSSIL",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A fossil of an ancient, seafloor- dwelling POKéMON. It appears to be part of a shell.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SILPH_SCOPE",
+    "name": "SILPH SCOPE",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A scope that makes unseeable POKéMON visible. It is made by SILPH CO.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "BICYCLE",
+    "name": "BICYCLE",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A folding bicycle that allows faster movement than the RUNNING SHOES.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "TOWN_MAP",
+    "name": "TOWN MAP",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A very convenient map that can be viewed anytime. It even shows your  present location.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "VS_SEEKER",
+    "name": "VS SEEKER",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A device that indicates TRAINERS who want to battle. The battery charges while traveling.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "FAME_CHECKER",
+    "name": "FAME CHECKER",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A device that enables you to recall what you've heard and seen about famous people.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "TM_CASE",
+    "name": "TM CASE",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A case that holds TMs and HMs. It is attached to the BAG's compartment for important items.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "BERRY_POUCH",
+    "name": "BERRY POUCH",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A pouch for carrying BERRIES. It is attached to the BAG's compartment for important items.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 3
+  },
+  {
+    "id": "TEACHY_TV",
+    "name": "TEACHY TV",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A television set that is tuned to a program with useful tips for novice TRAINERS.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "TRI_PASS",
+    "name": "TRI-PASS",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A pass for ferries between ONE, TWO, and THREE ISLAND. It has a drawing of three islands.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "RAINBOW_PASS",
+    "name": "RAINBOW PASS",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A pass for ferries between VERMILION and the SEVII ISLANDS. It features a drawing of a rainbow.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "TEA",
+    "name": "TEA",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An aromatic tea prepared by an old lady. It will slake even the worst thirst.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "MYSTIC_TICKET",
+    "name": "MYSTICTICKET",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A ticket required to board the ship to NAVEL ROCK. It glows with a mystic light.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "AURORA_TICKET",
+    "name": "AURORATICKET",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A ticket required to board the ship to BIRTH ISLAND. It glows beautifully.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "POWDER_JAR",
+    "name": "POWDER JAR",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "A jar for storing BERRY POWDER made using a BERRY CRUSHER.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "RUBY",
+    "name": "RUBY",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An exquisitely beautiful gem that has a red glow. It symbolizes passion.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  },
+  {
+    "id": "SAPPHIRE",
+    "name": "SAPPHIRE",
+    "price": 0,
+    "hold_effect": "NONE",
+    "hold_effect_param": 0,
+    "description": "An exquisitely beautiful gem that has a blue glow. It symbolizes honesty.",
+    "pocket": "KEY_ITEMS",
+    "battle_usage": 0
+  }
+]

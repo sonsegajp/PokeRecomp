@@ -1,0 +1,63 @@
+LilycoveCity_MoveDeletersHouse_MapScripts:: @ 8159AAD
+	.byte 0
+
+LilycoveCity_MoveDeletersHouse_EventScript_MoveDeleter:: @ 8159AAE
+	lockall
+	applymovement 1, Common_Movement_FacePlayer
+	waitmovement 0
+	msgbox LilycoveCity_MoveDeletersHouse_Text_ICanMakeMonForgetMove, MSGBOX_YESNO
+	switch VAR_RESULT
+	case YES, LilycoveCity_MoveDeletersHouse_EventScript_ChooseMonAndMoveToForget
+	case NO, LilycoveCity_MoveDeletersHouse_EventScript_ComeAgain
+	releaseall
+	end
+
+LilycoveCity_MoveDeletersHouse_EventScript_ChooseMonAndMoveToForget:: @ 8159ADE
+	msgbox LilycoveCity_MoveDeletersHouse_Text_WhichMonShouldForget, MSGBOX_DEFAULT
+	special SelectMonForNPCTrade
+	waitstate
+	compare VAR_0x8004, 255
+	goto_if_eq LilycoveCity_MoveDeletersHouse_EventScript_ComeAgain
+	special IsSelectedMonEgg
+	compare VAR_RESULT, 1
+	goto_if_eq LilycoveCity_MoveDeletersHouse_EventScript_EggCantForgetMoves
+	special ScrSpecial_CountPokemonMoves
+	compare VAR_RESULT, 1
+	goto_if_eq LilycoveCity_MoveDeletersHouse_EventScript_MonOnlyKnowsOneMove
+	msgbox LilycoveCity_MoveDeletersHouse_Text_WhichMoveShouldBeForgotten, MSGBOX_DEFAULT
+	fadescreen FADE_TO_BLACK
+	special SelectMove
+	fadescreen FADE_FROM_BLACK
+	compare VAR_0x8005, 4
+	goto_if_eq LilycoveCity_MoveDeletersHouse_EventScript_ChooseMonAndMoveToForget
+	special ScrSpecial_GetPokemonNicknameAndMoveName
+	msgbox LilycoveCity_MoveDeletersHouse_Text_MonsMoveShouldBeForgotten, MSGBOX_YESNO
+	switch VAR_RESULT
+	case YES, LilycoveCity_MoveDeletersHouse_EventScript_TryForgetMove
+	case NO, LilycoveCity_MoveDeletersHouse_EventScript_ComeAgain
+	releaseall
+	end
+
+LilycoveCity_MoveDeletersHouse_EventScript_TryForgetMove:: @ 8159B53
+	special DeleteMonMove
+	playfanfare MUS_MOVE_DELETED
+	waitfanfare
+	msgbox LilycoveCity_MoveDeletersHouse_Text_MonHasForgottenMove, MSGBOX_DEFAULT
+	releaseall
+	end
+
+LilycoveCity_MoveDeletersHouse_EventScript_MonOnlyKnowsOneMove:: @ 8159B64
+	special ScrSpecial_GetPokemonNicknameAndMoveName
+	msgbox LilycoveCity_MoveDeletersHouse_Text_MonOnlyKnowsOneMove, MSGBOX_DEFAULT
+	releaseall
+	end
+
+LilycoveCity_MoveDeletersHouse_EventScript_EggCantForgetMoves:: @ 8159B71
+	msgbox LilycoveCity_MoveDeletersHouse_Text_EggCantForgetMoves, MSGBOX_DEFAULT
+	releaseall
+	end
+
+LilycoveCity_MoveDeletersHouse_EventScript_ComeAgain:: @ 8159B7B
+	msgbox LilycoveCity_MoveDeletersHouse_Text_ComeAgain, MSGBOX_DEFAULT
+	releaseall
+	end

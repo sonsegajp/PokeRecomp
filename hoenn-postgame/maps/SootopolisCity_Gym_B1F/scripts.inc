@@ -1,0 +1,42 @@
+SootopolisCity_Gym_B1F_MapScripts:: @ 815B0D7
+	.byte 0
+
+SootopolisCity_Gym_B1F_EventScript_Andrea:: @ 815B0D8
+	trainerbattle_single TRAINER_ANDREA, SootopolisCity_Gym_B1F_Text_AndreaIntro, SootopolisCity_Gym_B1F_Text_AndreaDefeat
+	msgbox SootopolisCity_Gym_B1F_Text_AndreaPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+SootopolisCity_Gym_B1F_EventScript_Crissy:: @ 815B0EF
+	trainerbattle_single TRAINER_CRISSY, SootopolisCity_Gym_B1F_Text_CrissyIntro, SootopolisCity_Gym_B1F_Text_CrissyDefeat
+	msgbox SootopolisCity_Gym_B1F_Text_CrissyPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+SootopolisCity_Gym_B1F_EventScript_Brianna:: @ 815B106
+	trainerbattle_single TRAINER_BRIANNA_2, SootopolisCity_Gym_B1F_Text_BriannaIntro, SootopolisCity_Gym_B1F_Text_BriannaDefeat
+	msgbox SootopolisCity_Gym_B1F_Text_BriannaPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+SootopolisCity_Gym_B1F_EventScript_Connie:: @ 815B11D
+	trainerbattle_single TRAINER_CONNIE, SootopolisCity_Gym_1F_Text_ConnieIntro, SootopolisCity_Gym_1F_Text_ConnieDefeat
+	msgbox SootopolisCity_Gym_B1F_Text_ConniePostBattle, MSGBOX_AUTOCLOSE
+	end
+
+SootopolisCity_Gym_B1F_EventScript_Bridget:: @ 815B134
+	trainerbattle_single TRAINER_BRIDGET, SootopolisCity_Gym_1F_Text_BridgetIntro, SootopolisCity_Gym_1F_Text_BridgetDefeat
+	msgbox SootopolisCity_Gym_1F_Text_BridgetPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+SootopolisCity_Gym_B1F_EventScript_Olivia:: @ 815B14B
+	trainerbattle_single TRAINER_OLIVIA, SootopolisCity_Gym_1F_Text_OliviaIntro, SootopolisCity_Gym_1F_Text_OliviaDefeat
+	msgbox SootopolisCity_Gym_1F_Text_OliviaPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+SootopolisCity_Gym_B1F_EventScript_Tiffany:: @ 815B162
+	trainerbattle_single TRAINER_TIFFANY, SootopolisCity_Gym_1F_Text_TiffanyIntro, SootopolisCity_Gym_1F_Text_TiffanyDefeat
+	msgbox SootopolisCity_Gym_1F_Text_TiffanyPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+SootopolisCity_Gym_B1F_EventScript_Marissa:: @ 815B179
+	trainerbattle_single TRAINER_MARISSA, SootopolisCity_Gym_1F_Text_MarissaIntro, SootopolisCity_Gym_1F_Text_MarissaDefeat
+	msgbox SootopolisCity_Gym_1F_Text_MarissaPostBattle, MSGBOX_AUTOCLOSE
+	end

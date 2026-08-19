@@ -1,0 +1,11 @@
+AbandonedShip_Corridors_1F_MapScripts:: @ 815E964
+	.byte 0
+
+AbandonedShip_Corridors_1F_EventScript_Youngster:: @ 815E965
+	msgbox AbandonedShip_Corridors_1F_Text_IsntItFunHere, MSGBOX_NPC
+	end
+
+AbandonedShip_Corridors_1F_EventScript_Charlie:: @ 815E96E
+	trainerbattle_single TRAINER_CHARLIE, AbandonedShip_Corridors_1F_Text_CharlieIntro, AbandonedShip_Corridors_1F_Text_CharlieDefeat
+	msgbox AbandonedShip_Corridors_1F_Text_CharliePostBattle, MSGBOX_AUTOCLOSE
+	end

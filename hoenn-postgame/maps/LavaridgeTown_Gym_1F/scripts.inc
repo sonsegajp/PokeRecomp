@@ -1,0 +1,157 @@
+LavaridgeTown_Gym_1F_MapScripts:: @ 815368E
+	map_script MAP_SCRIPT_ON_TRANSITION, LavaridgeTown_Gym_1F_OnTransition
+	.byte 0
+
+LavaridgeTown_Gym_1F_OnTransition:: @ 8153694
+	call LavaridgeTown_Gym_1F_EventScript_SetTrainerTempVars
+	call LavaridgeTown_Gym_1F_EventScript_CheckBuryTrainers
+	end
+
+LavaridgeTown_Gym_1F_EventScript_SetTrainerTempVars:: @ 815369F
+	setvar VAR_TEMP_B, 0
+	setvar VAR_TEMP_C, 0
+	setvar VAR_TEMP_D, 0
+	setvar VAR_TEMP_E, 0
+	setvar VAR_TEMP_F, 0
+	goto_if_defeated TRAINER_COLE, LavaridgeTown_Gym_1F_EventScript_SetZaneTempVar
+	setvar VAR_TEMP_B, 1
+
+LavaridgeTown_Gym_1F_EventScript_SetZaneTempVar:: @ 81536C6
+	goto_if_defeated TRAINER_ZANE, LavaridgeTown_Gym_1F_EventScript_SetAxleTempVar
+	setvar VAR_TEMP_C, 1
+
+LavaridgeTown_Gym_1F_EventScript_SetAxleTempVar:: @ 81536D4
+	goto_if_defeated TRAINER_AXLE, LavaridgeTown_Gym_1F_EventScript_SetSadieTempVar
+	setvar VAR_TEMP_D, 1
+
+LavaridgeTown_Gym_1F_EventScript_SetSadieTempVar:: @ 81536E2
+	goto_if_defeated TRAINER_SADIE, LavaridgeTown_Gym_1F_EventScript_SetAndyTempVar
+	setvar VAR_TEMP_E, 1
+
+LavaridgeTown_Gym_1F_EventScript_SetAndyTempVar:: @ 81536F0
+	goto_if_defeated TRAINER_ANDY, LavaridgeTown_Gym_1F_EventScript_EndSetTrainerTempVars
+	setvar VAR_TEMP_F, 1
+
+LavaridgeTown_Gym_1F_EventScript_EndSetTrainerTempVars:: @ 81536FE
+	return
+
+LavaridgeTown_Gym_1F_EventScript_CheckBuryTrainers:: @ 81536FF
+	goto_if_defeated TRAINER_COLE, LavaridgeTown_Gym_1F_EventScript_CheckBuryZane
+	setobjectmovementtype 2, 63
+
+LavaridgeTown_Gym_1F_EventScript_CheckBuryZane:: @ 815370C
+	goto_if_defeated TRAINER_ZANE, LavaridgeTown_Gym_1F_EventScript_CheckBuryAxle
+	setobjectmovementtype 3, 63
+
+LavaridgeTown_Gym_1F_EventScript_CheckBuryAxle:: @ 8153719
+	goto_if_defeated TRAINER_AXLE, LavaridgeTown_Gym_1F_EventScript_CheckBurySadie
+	setobjectmovementtype 4, 63
+
+LavaridgeTown_Gym_1F_EventScript_CheckBurySadie:: @ 8153726
+	goto_if_defeated TRAINER_SADIE, LavaridgeTown_Gym_1F_EventScript_CheckBuryAndy
+	setobjectmovementtype 5, 63
+
+LavaridgeTown_Gym_1F_EventScript_CheckBuryAndy:: @ 8153733
+	goto_if_defeated TRAINER_ANDY, LavaridgeTown_Gym_1F_EventScript_EndCheckBuryTrainers
+	setobjectmovementtype 7, 63
+
+LavaridgeTown_Gym_1F_EventScript_EndCheckBuryTrainers:: @ 8153740
+	return
+
+LavaridgeTown_Gym_1F_EventScript_Flannery:: @ 8153741
+	trainerbattle_single TRAINER_FLANNERY, LavaridgeTown_Gym_1F_Text_FlanneryIntro, LavaridgeTown_Gym_1F_Text_FlanneryDefeat, LavaridgeTown_Gym_1F_EventScript_FlanneryDefeated, NO_MUSIC
+	goto_if_unset FLAG_RECEIVED_TM_OVERHEAT, LavaridgeTown_Gym_1F_EventScript_GiveOverheat
+	msgbox LavaridgeTown_Gym_1F_Text_FlanneryPostBattle, MSGBOX_DEFAULT
+	release
+	end
+
+LavaridgeTown_Gym_1F_EventScript_FlanneryDefeated:: @ 8153766
+	message LavaridgeTown_Gym_1F_Text_ReceivedHeatBadge
+	waitmessage
+	call Common_EventScript_PlayGymBadgeFanfare
+	msgbox LavaridgeTown_Gym_1F_Text_ExplainHeatBadgeTakeThis, MSGBOX_DEFAULT
+	setflag FLAG_DEFEATED_LAVARIDGE_GYM
+	setflag FLAG_BADGE04_GET
+	addvar VAR_PETALBURG_GYM_STATE, 1
+	compare VAR_PETALBURG_GYM_STATE, 6
+	call_if_eq Common_EventScript_ReadyPetalburgGymForBattle
+	setvar VAR_0x8008, 4
+	call Common_EventScript_SetGymTrainers
+	setflag FLAG_HIDE_WALLY_WANDAS_HOUSE
+	setvar VAR_LAVARIDGE_RIVAL_STATE, 1
+	goto LavaridgeTown_Gym_1F_EventScript_GiveOverheat
+	end
+
+LavaridgeTown_Gym_1F_EventScript_GiveOverheat:: @ 81537A7
+	giveitem ITEM_TM50_OVERHEAT
+	compare VAR_RESULT, 0
+	goto_if_eq Common_EventScript_ShowBagIsFull
+	msgbox LavaridgeTown_Gym_1F_Text_ExplainOverheat, MSGBOX_DEFAULT
+	setflag FLAG_RECEIVED_TM_OVERHEAT
+	release
+	end
+
+LavaridgeTown_Gym_1F_EventScript_Cole:: @ 81537CB
+	trainerbattle TRAINER_BATTLE_CONTINUE_SCRIPT, TRAINER_COLE, 2, LavaridgeTown_Gym_1F_Text_ColeIntro, LavaridgeTown_Gym_1F_Text_ColeDefeat, LavaridgeTown_Gym_EventScript_CheckTrainerScript
+	msgbox LavaridgeTown_Gym_1F_Text_ColePostBattle, MSGBOX_AUTOCLOSE
+	end
+
+LavaridgeTown_Gym_EventScript_CheckTrainerScript:: @ 81537E6
+	call LavaridgeTown_Gym_1F_EventScript_SetTrainerTempVars
+	release
+	end
+
+LavaridgeTown_Gym_1F_EventScript_Axle:: @ 81537ED
+	trainerbattle TRAINER_BATTLE_CONTINUE_SCRIPT, TRAINER_AXLE, 4, LavaridgeTown_Gym_1F_Text_AxleIntro, LavaridgeTown_Gym_1F_Text_AxleDefeat, LavaridgeTown_Gym_EventScript_CheckTrainerScript
+	msgbox LavaridgeTown_Gym_1F_Text_AxlePostBattle, MSGBOX_AUTOCLOSE
+	end
+
+LavaridgeTown_Gym_1F_EventScript_Andy:: @ 8153808
+	trainerbattle TRAINER_BATTLE_CONTINUE_SCRIPT, TRAINER_ANDY, 7, LavaridgeTown_Gym_B1F_Text_AndyIntro, LavaridgeTown_Gym_B1F_Text_AndyDefeat, LavaridgeTown_Gym_EventScript_CheckTrainerScript
+	msgbox LavaridgeTown_Gym_B1F_Text_AndyPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+LavaridgeTown_Gym_1F_EventScript_Sadie:: @ 8153823
+	trainerbattle TRAINER_BATTLE_CONTINUE_SCRIPT, TRAINER_SADIE, 5, LavaridgeTown_Gym_1F_Text_SadieIntro, LavaridgeTown_Gym_1F_Text_SadieDefeat, LavaridgeTown_Gym_EventScript_CheckTrainerScript
+	msgbox LavaridgeTown_Gym_1F_Text_SadiePostBattle, MSGBOX_AUTOCLOSE
+	end
+
+LavaridgeTown_Gym_1F_EventScript_Zane:: @ 815383E
+	trainerbattle TRAINER_BATTLE_CONTINUE_SCRIPT, TRAINER_ZANE, 3, LavaridgeTown_Gym_1F_Text_ZaneIntro, LavaridgeTown_Gym_1F_Text_ZaneDefeat, LavaridgeTown_Gym_EventScript_CheckTrainerScript
+	msgbox LavaridgeTown_Gym_1F_Text_ZanePostBattle, MSGBOX_AUTOCLOSE
+	end
+
+LavaridgeTown_Gym_1F_EventScript_GymGuide:: @ 8153859
+	lock
+	faceplayer
+	goto_if_set FLAG_DEFEATED_LAVARIDGE_GYM, LavaridgeTown_Gym_1F_EventScript_GymGuidePostVictory
+	msgbox LavaridgeTown_Gym_1F_Text_GymGuideAdvice, MSGBOX_DEFAULT
+	release
+	end
+
+LavaridgeTown_Gym_1F_EventScript_GymGuidePostVictory:: @ 815386E
+	msgbox LavaridgeTown_Gym_1F_Text_GymGuidePostVictory, MSGBOX_DEFAULT
+	release
+	end
+
+LavaridgeTown_Gym_1F_EventScript_LeftGymStatue:: @ 8153878
+	lockall
+	goto_if_set FLAG_BADGE04_GET, LavaridgeTown_Gym_1F_EventScript_GymStatueCertified
+	goto LavaridgeTown_Gym_1F_EventScript_GymStatue
+	end
+
+LavaridgeTown_Gym_1F_EventScript_RightGymStatue:: @ 8153888
+	lockall
+	goto_if_set FLAG_BADGE04_GET, LavaridgeTown_Gym_1F_EventScript_GymStatueCertified
+	goto LavaridgeTown_Gym_1F_EventScript_GymStatue
+	end
+
+LavaridgeTown_Gym_1F_EventScript_GymStatueCertified:: @ 8153898
+	msgbox LavaridgeTown_Gym_1F_Text_GymStatueCertified, MSGBOX_DEFAULT
+	releaseall
+	end
+
+LavaridgeTown_Gym_1F_EventScript_GymStatue:: @ 81538A2
+	msgbox LavaridgeTown_Gym_1F_Text_GymStatue, MSGBOX_DEFAULT
+	releaseall
+	end

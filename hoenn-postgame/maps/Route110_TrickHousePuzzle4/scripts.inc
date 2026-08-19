@@ -1,0 +1,29 @@
+Route110_TrickHousePuzzle4_MapScripts:: @ 816274D
+	.byte 0
+
+Route110_TrickHousePuzzle4_EventScript_Scroll:: @ 816274E
+	lockall
+	compare VAR_TRICK_HOUSE_PUZZLE_4_STATE, 0
+	goto_if_eq Route110_TrickHousePuzzle4_EventScript_ReadScroll
+	goto Route110_TrickHousePuzzle4_EventScript_ReadScrollAgain
+	end
+
+Route110_TrickHousePuzzle4_EventScript_ReadScroll:: @ 8162760
+	setvar VAR_TRICK_HOUSE_PUZZLE_4_STATE, 1
+	goto Route110_TrickHousePuzzle4_EventScript_FoundScroll
+	end
+
+Route110_TrickHousePuzzle4_EventScript_Cora:: @ 816276B
+	trainerbattle_single TRAINER_CORA, Route110_TrickHousePuzzle4_Text_CoraIntro, Route110_TrickHousePuzzle4_Text_CoraDefeat
+	msgbox Route110_TrickHousePuzzle4_Text_CoraPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+Route110_TrickHousePuzzle4_EventScript_Yuji:: @ 8162782
+	trainerbattle_single TRAINER_YUJI, Route110_TrickHousePuzzle4_Text_YujiIntro, Route110_TrickHousePuzzle4_Text_YujiDefeat
+	msgbox Route110_TrickHousePuzzle4_Text_YujiPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+Route110_TrickHousePuzzle4_EventScript_Jill:: @ 8162799
+	trainerbattle_single TRAINER_JILL, Route110_TrickHousePuzzle4_Text_JillIntro, Route110_TrickHousePuzzle4_Text_JillDefeat
+	msgbox Route110_TrickHousePuzzle4_Text_JillPostBattle, MSGBOX_AUTOCLOSE
+	end

@@ -1,0 +1,53 @@
+LilycoveCity_CoveLilyMotel_2F_MapScripts:: @ 81583A0
+	.byte 0
+
+LilycoveCity_CoveLilyMotel_2F_EventScript_GameDesigner:: @ 81583A1
+	lock
+	faceplayer
+	call_if_unset FLAG_TEMP_2, LilycoveCity_CoveLilyMotel_2F_EventScript_ShowMeCompletedDex
+	call_if_set FLAG_TEMP_2, LilycoveCity_CoveLilyMotel_2F_EventScript_ShowDiploma
+	specialvar VAR_RESULT, CompletedHoennPokedex
+	compare VAR_RESULT, 1
+	goto_if_eq LilycoveCity_CoveLilyMotel_2F_EventScript_AllHoennMonsFanfare
+	release
+	end
+
+LilycoveCity_CoveLilyMotel_2F_EventScript_ShowMeCompletedDex:: @ 81583C7
+	msgbox LilycoveCity_CoveLilyMotel_2F_Text_ShowMeCompletedDex, MSGBOX_DEFAULT
+	return
+
+LilycoveCity_CoveLilyMotel_2F_EventScript_AllHoennMonsFanfare:: @ 81583D0
+	setflag FLAG_TEMP_2
+	playfanfare MUS_OBTAIN_ITEM
+	waitfanfare
+	goto LilycoveCity_CoveLilyMotel_2F_EventScript_ShowDiploma
+	end
+
+LilycoveCity_CoveLilyMotel_2F_EventScript_ShowDiploma:: @ 81583DD
+	message LilycoveCity_CoveLilyMotel_2F_Text_FilledPokedexGiveYouThis
+	waitmessage
+	call Common_EventScript_PlayGymBadgeFanfare
+	special ScrSpecial_ShowDiploma
+	waitstate
+	release
+	end
+
+LilycoveCity_CoveLilyMotel_2F_EventScript_Programmer:: @ 81583EE
+	msgbox LilycoveCity_CoveLilyMotel_2F_Text_ImTheProgrammer, MSGBOX_NPC
+	end
+
+LilycoveCity_CoveLilyMotel_2F_EventScript_GraphicArtist:: @ 81583F7
+	msgbox LilycoveCity_CoveLilyMotel_2F_Text_ImTheGraphicArtist, MSGBOX_NPC
+	end
+
+LilycoveCity_CoveLilyMotel_2F_EventScript_FatMan:: @ 8158400
+	msgbox LilycoveCity_CoveLilyMotel_2F_Text_GirlsAreCute, MSGBOX_NPC
+	end
+
+LilycoveCity_CoveLilyMotel_2F_EventScript_Woman:: @ 8158409
+	msgbox LilycoveCity_CoveLilyMotel_2F_Text_SeaBreezeTicklesHeart, MSGBOX_NPC
+	end
+
+LilycoveCity_CoveLilyMotel_2F_EventScript_GameBoyKid:: @ 8158412
+	msgbox LilycoveCity_CoveLilyMotel_2F_Text_NeverLeaveWithoutGameBoy, MSGBOX_NPC
+	end

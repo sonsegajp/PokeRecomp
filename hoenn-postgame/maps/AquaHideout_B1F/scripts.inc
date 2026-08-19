@@ -1,0 +1,44 @@
+AquaHideout_B1F_MapScripts:: @ 815D831
+	map_script MAP_SCRIPT_ON_RESUME, AquaHideout_B1F_MapScript1_15D83C
+	map_script MAP_SCRIPT_ON_TRANSITION, AquaHideout_B1F_MapScript1_15D84A
+	.byte 0
+
+AquaHideout_B1F_MapScript1_15D83C:: @ 815D83C
+	call_if_set FLAG_SYS_CTRL_OBJ_DELETE, AquaHideout_B1F_EventScript_15D846
+	end
+
+AquaHideout_B1F_EventScript_15D846:: @ 815D846
+	removeobject VAR_LAST_TALKED
+	return
+
+AquaHideout_B1F_MapScript1_15D84A:: @ 815D84A
+	call Common_EventScript_SetupEvilTeamGfxIds
+	end
+
+AquaHideout_B1F_EventScript_15D850:: @ 815D850
+MagmaHideout_B1F_EventScript_15D850:: @ 815D850
+	trainerbattle_single TRAINER_HIDEOUT_B1F_GRUNT_1, AquaHideout_B1F_Text_196E6F, AquaHideout_B1F_Text_196EB6, AquaHideout_B1F_EventScript_15D86B
+	msgbox AquaHideout_B1F_Text_196ECC, MSGBOX_AUTOCLOSE
+	end
+
+AquaHideout_B1F_EventScript_15D86B:: @ 815D86B
+	msgbox AquaHideout_B1F_Text_196ECC, MSGBOX_DEFAULT
+	release
+	end
+
+AquaHideout_B1F_EventScript_15D875:: @ 815D875
+MagmaHideout_B1F_EventScript_15D875:: @ 815D875
+	trainerbattle_single TRAINER_HIDEOUT_B1F_GRUNT_2, AquaHideout_B1F_Text_196F39, AquaHideout_B1F_Text_196F9B, AquaHideout_B1F_EventScript_15D890
+	msgbox AquaHideout_B1F_Text_196FB5, MSGBOX_AUTOCLOSE
+	end
+
+AquaHideout_B1F_EventScript_15D890:: @ 815D890
+	msgbox AquaHideout_B1F_Text_196FB5, MSGBOX_DEFAULT
+	release
+	end
+
+AquaHideout_B1F_EventScript_15D89A:: @ 815D89A
+MagmaHideout_B1F_EventScript_15D89A:: @ 815D89A
+	trainerbattle_single TRAINER_HIDEOUT_B1F_GRUNT_3, AquaHideout_B1F_Text_196FFD, AquaHideout_B1F_Text_197040
+	msgbox AquaHideout_B1F_Text_197056, MSGBOX_AUTOCLOSE
+	end

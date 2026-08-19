@@ -1,0 +1,100 @@
+# ---------------------------------------------------------------------------
+# Copyrighted material — MUST NEVER be committed
+# ---------------------------------------------------------------------------
+# ROM images and anything derived from them.
+*.gba
+*.gb
+*.gbc
+*.nds
+*.pkmn
+*.sav
+*.srm
+*.sa1
+*.sa2
+
+# Assets extracted from a user's ROM at build/run time.
+extracted_assets/
+deploy/assets/
+deploy/extracted_assets/
+deploy/graphics/
+custom_assets/gen3/
+
+# ---------------------------------------------------------------------------
+# Release archives and shipped builds
+# ---------------------------------------------------------------------------
+*.rar
+*.zip
+*.7z
+ship/
+deploy/
+deploy_backup_*/
+build/release/
+
+# ---------------------------------------------------------------------------
+# Build output
+# ---------------------------------------------------------------------------
+build/
+*.o
+*.d
+*.elf
+*.map
+*.exe
+*.dll
+link_objs.txt
+linker_errors.txt
+build_log.txt
+
+# Built host tools
+tools/bin2c/bin2c
+tools/gbagfx/gbagfx
+tools/preproc/preproc
+tools/scaninc/scaninc
+tools/rsfont/rsfont
+tools/ramscrgen/ramscrgen
+tools/mid2agb/mid2agb
+tools/wav2agb/wav2agb
+tools/gbafix/gbafix
+tools/jsonproc/jsonproc
+tools/mapjson/mapjson
+tools/pkmn_extract/pkmn_extract
+tools/dist/
+tools/build/
+
+# ---------------------------------------------------------------------------
+# User data / runtime state — private, never commit
+# ---------------------------------------------------------------------------
+accounts/
+saves/
+*.dat
+
+# ---------------------------------------------------------------------------
+# Logs and debug dumps
+# ---------------------------------------------------------------------------
+*.log
+crash.log
+crash_debug.log
+*_debug.txt
+box_debug.txt
+gbc_save_debug.txt
+gbc_shader_debug.txt
+rb_battle_debug.txt
+stdout.txt
+stderr.txt
+
+# ---------------------------------------------------------------------------
+# Python tooling
+# ---------------------------------------------------------------------------
+__pycache__/
+*.pyc
+*.spec.bak
+
+# ---------------------------------------------------------------------------
+# Editor / OS
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*~
+Thumbs.db
+desktop.ini
+.DS_Store

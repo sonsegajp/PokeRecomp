@@ -1,0 +1,252 @@
+SlateportCity_PokemonFanClub_MapScripts:: @ 8155764
+	map_script MAP_SCRIPT_ON_TRANSITION, SlateportCity_PokemonFanClub_EventScript_OnTransition
+	.byte 0
+
+SlateportCity_PokemonFanClub_EventScript_OnTransition:: @ 815576A
+	end
+
+SlateportCity_PokemonFanClub_EventScript_Chairman:: @ 815576B
+	lock
+	faceplayer
+	switch VAR_SLATEPORT_FAN_CLUB_STATE
+	case 0, SlateportCity_PokemonFanClub_EventScript_ChairmanFirstAssessment
+	case 1, SlateportCity_PokemonFanClub_EventScript_ChairmanTryAssessPokemon
+	case 2, SlateportCity_PokemonFanClub_EventScript_NoMoreScarves
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_ChairmanFirstAssessment:: @ 8155795
+	setvar VAR_SLATEPORT_FAN_CLUB_STATE, 1
+	msgbox SlateportCity_PokemonFanClub_Text_MeetChairman, MSGBOX_DEFAULT
+	goto SlateportCity_PokemonFanClub_EventScript_ChairmanAssessLeadMon
+	end
+
+SlateportCity_PokemonFanClub_EventScript_ChairmanTryAssessPokemon:: @ 81557A8
+	setvar VAR_TEMP_2, 0
+	call_if_set FLAG_RECEIVED_YELLOW_SCARF, SlateportCity_PokemonFanClub_EventScript_CountReceivedScarf
+	call_if_set FLAG_RECEIVED_GREEN_SCARF, SlateportCity_PokemonFanClub_EventScript_CountReceivedScarf
+	call_if_set FLAG_RECEIVED_PINK_SCARF, SlateportCity_PokemonFanClub_EventScript_CountReceivedScarf
+	call_if_set FLAG_RECEIVED_BLUE_SCARF, SlateportCity_PokemonFanClub_EventScript_CountReceivedScarf
+	call_if_set FLAG_RECEIVED_RED_SCARF, SlateportCity_PokemonFanClub_EventScript_CountReceivedScarf
+	compare VAR_TEMP_2, 5
+	call_if_eq SlateportCity_PokemonFanClub_EventScript_ReceivedAllScarves
+	compare VAR_SLATEPORT_FAN_CLUB_STATE, 2
+	goto_if_eq SlateportCity_PokemonFanClub_EventScript_NoMoreScarves
+	msgbox SlateportCity_PokemonFanClub_Text_HowIsYourPokemonGrowing, MSGBOX_DEFAULT
+	goto SlateportCity_PokemonFanClub_EventScript_ChairmanAssessLeadMon
+	end
+
+SlateportCity_PokemonFanClub_EventScript_NoMoreScarves:: @ 81557FE
+	msgbox SlateportCity_PokemonFanClub_Text_NothingElseToGiveYou, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_ChairmanAssessLeadMon:: @ 8155808
+	msgbox SlateportCity_PokemonFanClub_Text_HmHmISee, MSGBOX_DEFAULT
+	setvar VAR_TEMP_1, 0
+	call_if_unset FLAG_RECEIVED_YELLOW_SCARF, SlateportCity_PokemonFanClub_EventScript_CheckMonTough
+	call_if_unset FLAG_RECEIVED_GREEN_SCARF, SlateportCity_PokemonFanClub_EventScript_CheckMonSmart
+	call_if_unset FLAG_RECEIVED_PINK_SCARF, SlateportCity_PokemonFanClub_EventScript_CheckMonCute
+	call_if_unset FLAG_RECEIVED_BLUE_SCARF, SlateportCity_PokemonFanClub_EventScript_CheckMonBeauty
+	call_if_unset FLAG_RECEIVED_RED_SCARF, SlateportCity_PokemonFanClub_EventScript_CheckMonCool
+	bufferleadmonspeciesname 0
+	switch VAR_TEMP_1
+	case 0, SlateportCity_PokemonFanClub_EventScript_NoHighConditions
+	case 1, SlateportCity_PokemonFanClub_EventScript_GiveRedScarf
+	case 2, SlateportCity_PokemonFanClub_EventScript_GiveBlueScarf
+	case 3, SlateportCity_PokemonFanClub_EventScript_GivePinkScarf
+	case 4, SlateportCity_PokemonFanClub_EventScript_GiveGreenScarf
+	case 5, SlateportCity_PokemonFanClub_EventScript_GiveYellowScarf
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_ReceivedAllScarves:: @ 815588D
+	setvar VAR_SLATEPORT_FAN_CLUB_STATE, 2
+	return
+
+SlateportCity_PokemonFanClub_EventScript_CountReceivedScarf:: @ 8155893
+	addvar VAR_TEMP_2, 1
+	return
+
+SlateportCity_PokemonFanClub_EventScript_NoHighConditions:: @ 8155899
+	msgbox SlateportCity_PokemonFanClub_Text_GiveMonMorePokeblocks, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_GiveRedScarf:: @ 81558A3
+	checkitemspace ITEM_RED_SCARF, 1
+	compare VAR_RESULT, 0
+	goto_if_eq SlateportCity_PokemonFanClub_EventScript_NoRoomForScarf
+	msgbox SlateportCity_PokemonFanClub_Text_MonMostImpressiveGiveItThis, MSGBOX_DEFAULT
+	setflag FLAG_RECEIVED_RED_SCARF
+	giveitem ITEM_RED_SCARF
+	msgbox SlateportCity_PokemonFanClub_Text_ExplainRedScarf, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_GiveBlueScarf:: @ 81558D4
+	checkitemspace ITEM_BLUE_SCARF, 1
+	compare VAR_RESULT, 0
+	goto_if_eq SlateportCity_PokemonFanClub_EventScript_NoRoomForScarf
+	msgbox SlateportCity_PokemonFanClub_Text_MonMostImpressiveGiveItThis, MSGBOX_DEFAULT
+	setflag FLAG_RECEIVED_BLUE_SCARF
+	giveitem ITEM_BLUE_SCARF
+	msgbox SlateportCity_PokemonFanClub_Text_ExplainBlueScarf, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_GivePinkScarf:: @ 8155905
+	checkitemspace ITEM_PINK_SCARF, 1
+	compare VAR_RESULT, 0
+	goto_if_eq SlateportCity_PokemonFanClub_EventScript_NoRoomForScarf
+	msgbox SlateportCity_PokemonFanClub_Text_MonMostImpressiveGiveItThis, MSGBOX_DEFAULT
+	setflag FLAG_RECEIVED_PINK_SCARF
+	giveitem ITEM_PINK_SCARF
+	msgbox SlateportCity_PokemonFanClub_Text_ExplainPinkScarf, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_GiveGreenScarf:: @ 8155936
+	checkitemspace ITEM_GREEN_SCARF, 1
+	compare VAR_RESULT, 0
+	goto_if_eq SlateportCity_PokemonFanClub_EventScript_NoRoomForScarf
+	msgbox SlateportCity_PokemonFanClub_Text_MonMostImpressiveGiveItThis, MSGBOX_DEFAULT
+	setflag FLAG_RECEIVED_GREEN_SCARF
+	giveitem ITEM_GREEN_SCARF
+	msgbox SlateportCity_PokemonFanClub_Text_ExplainGreenScarf, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_GiveYellowScarf:: @ 8155967
+	checkitemspace ITEM_YELLOW_SCARF, 1
+	compare VAR_RESULT, 0
+	goto_if_eq SlateportCity_PokemonFanClub_EventScript_NoRoomForScarf
+	msgbox SlateportCity_PokemonFanClub_Text_MonMostImpressiveGiveItThis, MSGBOX_DEFAULT
+	setflag FLAG_RECEIVED_YELLOW_SCARF
+	giveitem ITEM_YELLOW_SCARF
+	msgbox SlateportCity_PokemonFanClub_Text_ExplainYellowScarf, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_NoRoomForScarf:: @ 8155998
+	msgbox SlateportCity_PokemonFanClub_Text_NoSpaceForReward, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_CheckMonCool:: @ 81559A2
+	specialvar VAR_RESULT, CheckLeadMonCool
+	compare VAR_RESULT, 1
+	call_if_eq SlateportCity_PokemonFanClub_EventScript_SetMonCool
+	return
+
+SlateportCity_PokemonFanClub_EventScript_SetMonCool:: @ 81559B3
+	setvar VAR_TEMP_1, 1
+	return
+
+SlateportCity_PokemonFanClub_EventScript_CheckMonBeauty:: @ 81559B9
+	specialvar VAR_RESULT, CheckLeadMonBeauty
+	compare VAR_RESULT, 1
+	call_if_eq SlateportCity_PokemonFanClub_EventScript_SetMonBeauty
+	return
+
+SlateportCity_PokemonFanClub_EventScript_SetMonBeauty:: @ 81559CA
+	setvar VAR_TEMP_1, 2
+	return
+
+SlateportCity_PokemonFanClub_EventScript_CheckMonCute:: @ 81559D0
+	specialvar VAR_RESULT, CheckLeadMonCute
+	compare VAR_RESULT, 1
+	call_if_eq SlateportCity_PokemonFanClub_EventScript_SetMonCute
+	return
+
+SlateportCity_PokemonFanClub_EventScript_SetMonCute:: @ 81559E1
+	setvar VAR_TEMP_1, 3
+	return
+
+SlateportCity_PokemonFanClub_EventScript_CheckMonSmart:: @ 81559E7
+	specialvar VAR_RESULT, CheckLeadMonSmart
+	compare VAR_RESULT, 1
+	call_if_eq SlateportCity_PokemonFanClub_EventScript_SetMonSmart
+	return
+
+SlateportCity_PokemonFanClub_EventScript_SetMonSmart:: @ 81559F8
+	setvar VAR_TEMP_1, 4
+	return
+
+SlateportCity_PokemonFanClub_EventScript_CheckMonTough:: @ 81559FE
+	specialvar VAR_RESULT, CheckLeadMonTough
+	compare VAR_RESULT, 1
+	call_if_eq SlateportCity_PokemonFanClub_EventScript_SetMonTough
+	return
+
+SlateportCity_PokemonFanClub_EventScript_SetMonTough:: @ 8155A0F
+	setvar VAR_TEMP_1, 5
+	return
+
+SlateportCity_PokemonFanClub_EventScript_SootheBellWoman:: @ 8155A15
+	lock
+	faceplayer
+	goto_if_set FLAG_RECEIVED_SOOTHE_BELL, SlateportCity_PokemonFanClub_EventScript_ReceivedSootheBell
+	msgbox SlateportCity_PokemonFanClub_Text_ShowMePokemonThatLoveYou, MSGBOX_DEFAULT
+	specialvar VAR_RESULT, GetLeadMonFriendshipScore
+	compare VAR_RESULT, 4
+	goto_if_ge SlateportCity_PokemonFanClub_EventScript_GiveSootheBell
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_GiveSootheBell:: @ 8155A3A
+	playse SE_PIN
+	applymovement VAR_LAST_TALKED, Common_Movement_ExclamationMark
+	waitmovement 0
+	applymovement VAR_LAST_TALKED, Common_Movement_Delay48
+	waitmovement 0
+	msgbox SlateportCity_PokemonFanClub_Text_PokemonAdoresYou, MSGBOX_DEFAULT
+	giveitem ITEM_SOOTHE_BELL
+	compare VAR_RESULT, 0
+	goto_if_eq Common_EventScript_ShowBagIsFull
+	setflag FLAG_RECEIVED_SOOTHE_BELL
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_ReceivedSootheBell:: @ 8155A75
+	msgbox SlateportCity_PokemonFanClub_Text_TreatPokemonWithLove, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_Man:: @ 8155A7F
+	msgbox SlateportCity_PokemonFanClub_Text_PokemonDontLikeFainting, MSGBOX_NPC
+	end
+
+SlateportCity_PokemonFanClub_EventScript_Twin:: @ 8155A88
+	msgbox SlateportCity_PokemonFanClub_Text_MonEnjoyedProtein, MSGBOX_NPC
+	end
+
+SlateportCity_PokemonFanClub_EventScript_Skitty:: @ 8155A91
+	lock
+	faceplayer
+	waitse
+	playmoncry SPECIES_SKITTY, 0
+	msgbox SlateportCity_PokemonFanClub_Text_Skitty, MSGBOX_DEFAULT
+	waitmoncry
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_Zigzagoon:: @ 8155AA4
+	lock
+	faceplayer
+	waitse
+	playmoncry SPECIES_ZIGZAGOON, 0
+	msgbox SlateportCity_PokemonFanClub_Text_Zigzagoon, MSGBOX_DEFAULT
+	waitmoncry
+	release
+	end
+
+SlateportCity_PokemonFanClub_EventScript_Azumarill:: @ 8155AB7
+	lock
+	faceplayer
+	waitse
+	playmoncry SPECIES_AZUMARILL, 0
+	msgbox SlateportCity_PokemonFanClub_Text_Azumarill, MSGBOX_DEFAULT
+	waitmoncry
+	release
+	end

@@ -1,0 +1,1313 @@
+﻿// === ADD TO EXTERNS SECTION ===
+extern const u16 gHoennTilesetTiles_Rustboro[];
+extern const u16 gHoennTilesetPalettes_Rustboro[][16];
+extern const u16 gHoennMetatiles_Rustboro[];
+extern const u16 gHoennRawMetatileAttrs_Rustboro[];
+extern const u16 gHoennTilesetTiles_Dewford[];
+extern const u16 gHoennTilesetPalettes_Dewford[][16];
+extern const u16 gHoennMetatiles_Dewford[];
+extern const u16 gHoennRawMetatileAttrs_Dewford[];
+extern const u16 gHoennTilesetTiles_Slateport[];
+extern const u16 gHoennTilesetPalettes_Slateport[][16];
+extern const u16 gHoennMetatiles_Slateport[];
+extern const u16 gHoennRawMetatileAttrs_Slateport[];
+extern const u16 gHoennTilesetTiles_Mauville[];
+extern const u16 gHoennTilesetPalettes_Mauville[][16];
+extern const u16 gHoennMetatiles_Mauville[];
+extern const u16 gHoennRawMetatileAttrs_Mauville[];
+extern const u16 gHoennTilesetTiles_Fortree[];
+extern const u16 gHoennTilesetPalettes_Fortree[][16];
+extern const u16 gHoennMetatiles_Fortree[];
+extern const u16 gHoennRawMetatileAttrs_Fortree[];
+extern const u16 gHoennTilesetTiles_Lilycove[];
+extern const u16 gHoennTilesetPalettes_Lilycove[][16];
+extern const u16 gHoennMetatiles_Lilycove[];
+extern const u16 gHoennRawMetatileAttrs_Lilycove[];
+extern const u16 gHoennTilesetTiles_Mossdeep[];
+extern const u16 gHoennTilesetPalettes_Mossdeep[][16];
+extern const u16 gHoennMetatiles_Mossdeep[];
+extern const u16 gHoennRawMetatileAttrs_Mossdeep[];
+extern const u16 gHoennTilesetTiles_Sootopolis[];
+extern const u16 gHoennTilesetPalettes_Sootopolis[][16];
+extern const u16 gHoennMetatiles_Sootopolis[];
+extern const u16 gHoennRawMetatileAttrs_Sootopolis[];
+extern const u16 gHoennTilesetTiles_EverGrande[];
+extern const u16 gHoennTilesetPalettes_EverGrande[][16];
+extern const u16 gHoennMetatiles_EverGrande[];
+extern const u16 gHoennRawMetatileAttrs_EverGrande[];
+extern const u16 gHoennTilesetTiles_Fallarbor[];
+extern const u16 gHoennTilesetPalettes_Fallarbor[][16];
+extern const u16 gHoennMetatiles_Fallarbor[];
+extern const u16 gHoennRawMetatileAttrs_Fallarbor[];
+extern const u16 gHoennTilesetTiles_Lavaridge[];
+extern const u16 gHoennTilesetPalettes_Lavaridge[][16];
+extern const u16 gHoennMetatiles_Lavaridge[];
+extern const u16 gHoennRawMetatileAttrs_Lavaridge[];
+extern const u16 gHoennTilesetTiles_Pacifidlog[];
+extern const u16 gHoennTilesetPalettes_Pacifidlog[][16];
+extern const u16 gHoennMetatiles_Pacifidlog[];
+extern const u16 gHoennRawMetatileAttrs_Pacifidlog[];
+
+extern const u16 gHoennLayout_Route104_Border[];
+extern const u16 gHoennLayout_Route104_Map[];
+extern const u16 gHoennLayout_Route105_Border[];
+extern const u16 gHoennLayout_Route105_Map[];
+extern const u16 gHoennLayout_Route106_Border[];
+extern const u16 gHoennLayout_Route106_Map[];
+extern const u16 gHoennLayout_Route107_Border[];
+extern const u16 gHoennLayout_Route107_Map[];
+extern const u16 gHoennLayout_Route108_Border[];
+extern const u16 gHoennLayout_Route108_Map[];
+extern const u16 gHoennLayout_Route109_Border[];
+extern const u16 gHoennLayout_Route109_Map[];
+extern const u16 gHoennLayout_Route110_Border[];
+extern const u16 gHoennLayout_Route110_Map[];
+extern const u16 gHoennLayout_Route111_Border[];
+extern const u16 gHoennLayout_Route111_Map[];
+extern const u16 gHoennLayout_Route112_Border[];
+extern const u16 gHoennLayout_Route112_Map[];
+extern const u16 gHoennLayout_Route113_Border[];
+extern const u16 gHoennLayout_Route113_Map[];
+extern const u16 gHoennLayout_Route114_Border[];
+extern const u16 gHoennLayout_Route114_Map[];
+extern const u16 gHoennLayout_Route115_Border[];
+extern const u16 gHoennLayout_Route115_Map[];
+extern const u16 gHoennLayout_Route116_Border[];
+extern const u16 gHoennLayout_Route116_Map[];
+extern const u16 gHoennLayout_Route117_Border[];
+extern const u16 gHoennLayout_Route117_Map[];
+extern const u16 gHoennLayout_Route118_Border[];
+extern const u16 gHoennLayout_Route118_Map[];
+extern const u16 gHoennLayout_Route119_Border[];
+extern const u16 gHoennLayout_Route119_Map[];
+extern const u16 gHoennLayout_Route120_Border[];
+extern const u16 gHoennLayout_Route120_Map[];
+extern const u16 gHoennLayout_Route121_Border[];
+extern const u16 gHoennLayout_Route121_Map[];
+extern const u16 gHoennLayout_Route122_Border[];
+extern const u16 gHoennLayout_Route122_Map[];
+extern const u16 gHoennLayout_Route123_Border[];
+extern const u16 gHoennLayout_Route123_Map[];
+extern const u16 gHoennLayout_Route124_Border[];
+extern const u16 gHoennLayout_Route124_Map[];
+extern const u16 gHoennLayout_Route125_Border[];
+extern const u16 gHoennLayout_Route125_Map[];
+extern const u16 gHoennLayout_Route126_Border[];
+extern const u16 gHoennLayout_Route126_Map[];
+extern const u16 gHoennLayout_Route127_Border[];
+extern const u16 gHoennLayout_Route127_Map[];
+extern const u16 gHoennLayout_Route128_Border[];
+extern const u16 gHoennLayout_Route128_Map[];
+extern const u16 gHoennLayout_Route129_Border[];
+extern const u16 gHoennLayout_Route129_Map[];
+extern const u16 gHoennLayout_Route130_Border[];
+extern const u16 gHoennLayout_Route130_Map[];
+extern const u16 gHoennLayout_Route131_Border[];
+extern const u16 gHoennLayout_Route131_Map[];
+extern const u16 gHoennLayout_Route132_Border[];
+extern const u16 gHoennLayout_Route132_Map[];
+extern const u16 gHoennLayout_Route133_Border[];
+extern const u16 gHoennLayout_Route133_Map[];
+extern const u16 gHoennLayout_Route134_Border[];
+extern const u16 gHoennLayout_Route134_Map[];
+extern const u16 gHoennLayout_SlateportCity_Border[];
+extern const u16 gHoennLayout_SlateportCity_Map[];
+extern const u16 gHoennLayout_MauvilleCity_Border[];
+extern const u16 gHoennLayout_MauvilleCity_Map[];
+extern const u16 gHoennLayout_RustboroCity_Border[];
+extern const u16 gHoennLayout_RustboroCity_Map[];
+extern const u16 gHoennLayout_FortreeCity_Border[];
+extern const u16 gHoennLayout_FortreeCity_Map[];
+extern const u16 gHoennLayout_LilycoveCity_Border[];
+extern const u16 gHoennLayout_LilycoveCity_Map[];
+extern const u16 gHoennLayout_MossdeepCity_Border[];
+extern const u16 gHoennLayout_MossdeepCity_Map[];
+extern const u16 gHoennLayout_SootopolisCity_Border[];
+extern const u16 gHoennLayout_SootopolisCity_Map[];
+extern const u16 gHoennLayout_EverGrandeCity_Border[];
+extern const u16 gHoennLayout_EverGrandeCity_Map[];
+extern const u16 gHoennLayout_DewfordTown_Border[];
+extern const u16 gHoennLayout_DewfordTown_Map[];
+extern const u16 gHoennLayout_LavaridgeTown_Border[];
+extern const u16 gHoennLayout_LavaridgeTown_Map[];
+extern const u16 gHoennLayout_FallarborTown_Border[];
+extern const u16 gHoennLayout_FallarborTown_Map[];
+extern const u16 gHoennLayout_VerdanturfTown_Border[];
+extern const u16 gHoennLayout_VerdanturfTown_Map[];
+extern const u16 gHoennLayout_PacifidlogTown_Border[];
+extern const u16 gHoennLayout_PacifidlogTown_Map[];
+
+// === ADD TO DEFINES ===
+#define RUSTBORO_METATILE_COUNT 350
+#define DEWFORD_METATILE_COUNT 144
+#define SLATEPORT_METATILE_COUNT 364
+#define MAUVILLE_METATILE_COUNT 434
+#define FORTREE_METATILE_COUNT 267
+#define LILYCOVE_METATILE_COUNT 351
+#define MOSSDEEP_METATILE_COUNT 363
+#define SOOTOPOLIS_METATILE_COUNT 254
+#define EVERGRANDE_METATILE_COUNT 168
+#define FALLARBOR_METATILE_COUNT 338
+#define LAVARIDGE_METATILE_COUNT 286
+#define PACIFIDLOG_METATILE_COUNT 191
+
+// === ADD TO STATIC ARRAYS ===
+static u32 sAttrs_Rustboro[NUM_METATILES_TOTAL - NUM_METATILES_IN_PRIMARY];
+static u16 sMeta_Rustboro[350 * TILES_PER_METATILE];
+static u16 sPals_Rustboro[16][16];
+static u32 sAttrs_Dewford[NUM_METATILES_TOTAL - NUM_METATILES_IN_PRIMARY];
+static u16 sMeta_Dewford[144 * TILES_PER_METATILE];
+static u16 sPals_Dewford[16][16];
+static u32 sAttrs_Slateport[NUM_METATILES_TOTAL - NUM_METATILES_IN_PRIMARY];
+static u16 sMeta_Slateport[364 * TILES_PER_METATILE];
+static u16 sPals_Slateport[16][16];
+static u32 sAttrs_Mauville[NUM_METATILES_TOTAL - NUM_METATILES_IN_PRIMARY];
+static u16 sMeta_Mauville[434 * TILES_PER_METATILE];
+static u16 sPals_Mauville[16][16];
+static u32 sAttrs_Fortree[NUM_METATILES_TOTAL - NUM_METATILES_IN_PRIMARY];
+static u16 sMeta_Fortree[267 * TILES_PER_METATILE];
+static u16 sPals_Fortree[16][16];
+static u32 sAttrs_Lilycove[NUM_METATILES_TOTAL - NUM_METATILES_IN_PRIMARY];
+static u16 sMeta_Lilycove[351 * TILES_PER_METATILE];
+static u16 sPals_Lilycove[16][16];
+static u32 sAttrs_Mossdeep[NUM_METATILES_TOTAL - NUM_METATILES_IN_PRIMARY];
+static u16 sMeta_Mossdeep[363 * TILES_PER_METATILE];
+static u16 sPals_Mossdeep[16][16];
+static u32 sAttrs_Sootopolis[NUM_METATILES_TOTAL - NUM_METATILES_IN_PRIMARY];
+static u16 sMeta_Sootopolis[254 * TILES_PER_METATILE];
+static u16 sPals_Sootopolis[16][16];
+static u32 sAttrs_EverGrande[NUM_METATILES_TOTAL - NUM_METATILES_IN_PRIMARY];
+static u16 sMeta_EverGrande[168 * TILES_PER_METATILE];
+static u16 sPals_EverGrande[16][16];
+static u32 sAttrs_Fallarbor[NUM_METATILES_TOTAL - NUM_METATILES_IN_PRIMARY];
+static u16 sMeta_Fallarbor[338 * TILES_PER_METATILE];
+static u16 sPals_Fallarbor[16][16];
+static u32 sAttrs_Lavaridge[NUM_METATILES_TOTAL - NUM_METATILES_IN_PRIMARY];
+static u16 sMeta_Lavaridge[286 * TILES_PER_METATILE];
+static u16 sPals_Lavaridge[16][16];
+static u32 sAttrs_Pacifidlog[NUM_METATILES_TOTAL - NUM_METATILES_IN_PRIMARY];
+static u16 sMeta_Pacifidlog[191 * TILES_PER_METATILE];
+static u16 sPals_Pacifidlog[16][16];
+
+static u16 sMap_Route104[40 * 80];
+static u16 sMap_Route105[20 * 80];
+static u16 sMap_Route106[30 * 20];
+static u16 sMap_Route107[40 * 20];
+static u16 sMap_Route108[40 * 20];
+static u16 sMap_Route109[20 * 60];
+static u16 sMap_Route110[20 * 100];
+static u16 sMap_Route111[20 * 140];
+static u16 sMap_Route112[20 * 60];
+static u16 sMap_Route113[40 * 20];
+static u16 sMap_Route114[20 * 80];
+static u16 sMap_Route115[20 * 80];
+static u16 sMap_Route116[80 * 20];
+static u16 sMap_Route117[60 * 20];
+static u16 sMap_Route118[40 * 20];
+static u16 sMap_Route119[20 * 140];
+static u16 sMap_Route120[20 * 100];
+static u16 sMap_Route121[80 * 20];
+static u16 sMap_Route122[20 * 40];
+static u16 sMap_Route123[80 * 20];
+static u16 sMap_Route124[40 * 80];
+static u16 sMap_Route125[20 * 40];
+static u16 sMap_Route126[40 * 80];
+static u16 sMap_Route127[40 * 80];
+static u16 sMap_Route128[80 * 40];
+static u16 sMap_Route129[40 * 40];
+static u16 sMap_Route130[40 * 40];
+static u16 sMap_Route131[40 * 40];
+static u16 sMap_Route132[40 * 40];
+static u16 sMap_Route133[60 * 40];
+static u16 sMap_Route134[80 * 40];
+static u16 sMap_SlateportCity[30 * 30];
+static u16 sMap_MauvilleCity[30 * 30];
+static u16 sMap_RustboroCity[30 * 30];
+static u16 sMap_FortreeCity[30 * 20];
+static u16 sMap_LilycoveCity[40 * 30];
+static u16 sMap_MossdeepCity[30 * 30];
+static u16 sMap_SootopolisCity[30 * 30];
+static u16 sMap_EverGrandeCity[30 * 40];
+static u16 sMap_DewfordTown[20 * 20];
+static u16 sMap_LavaridgeTown[20 * 20];
+static u16 sMap_FallarborTown[20 * 20];
+static u16 sMap_VerdanturfTown[20 * 20];
+static u16 sMap_PacifidlogTown[20 * 20];
+
+// === ADD TO TILESET STRUCT DECLARATIONS ===
+struct Tileset gHoennTileset_Rustboro;
+struct Tileset gHoennTileset_Dewford;
+struct Tileset gHoennTileset_Slateport;
+struct Tileset gHoennTileset_Mauville;
+struct Tileset gHoennTileset_Fortree;
+struct Tileset gHoennTileset_Lilycove;
+struct Tileset gHoennTileset_Mossdeep;
+struct Tileset gHoennTileset_Sootopolis;
+struct Tileset gHoennTileset_EverGrande;
+struct Tileset gHoennTileset_Fallarbor;
+struct Tileset gHoennTileset_Lavaridge;
+struct Tileset gHoennTileset_Pacifidlog;
+
+// === ADD TO Hoenn_IsHoennTileset ===
+    if (ts == &gHoennTileset_Rustboro) return 1;
+    if (ts == &gHoennTileset_Dewford) return 1;
+    if (ts == &gHoennTileset_Slateport) return 1;
+    if (ts == &gHoennTileset_Mauville) return 1;
+    if (ts == &gHoennTileset_Fortree) return 1;
+    if (ts == &gHoennTileset_Lilycove) return 1;
+    if (ts == &gHoennTileset_Mossdeep) return 1;
+    if (ts == &gHoennTileset_Sootopolis) return 1;
+    if (ts == &gHoennTileset_EverGrande) return 1;
+    if (ts == &gHoennTileset_Fallarbor) return 1;
+    if (ts == &gHoennTileset_Lavaridge) return 1;
+    if (ts == &gHoennTileset_Pacifidlog) return 1;
+
+// === ADD TO Hoenn_GetTileCount ===
+    if (ts == &gHoennTileset_Rustboro) return 498;
+    if (ts == &gHoennTileset_Dewford) return 343;
+    if (ts == &gHoennTileset_Slateport) return 504;
+    if (ts == &gHoennTileset_Mauville) return 450;
+    if (ts == &gHoennTileset_Fortree) return 493;
+    if (ts == &gHoennTileset_Lilycove) return 432;
+    if (ts == &gHoennTileset_Mossdeep) return 499;
+    if (ts == &gHoennTileset_Sootopolis) return 180;
+    if (ts == &gHoennTileset_EverGrande) return 320;
+    if (ts == &gHoennTileset_Fallarbor) return 374;
+    if (ts == &gHoennTileset_Lavaridge) return 348;
+    if (ts == &gHoennTileset_Pacifidlog) return 504;
+
+// === ADD TO Hoenn_InitTilesets (conversion) ===
+    for (int i = 0; i < 350; i++) {
+        u16 r = gHoennRawMetatileAttrs_Rustboro[i];
+        sAttrs_Rustboro[i] = (r & 0xFF) | (((r >> 12) & 3) << 29);
+    }
+    for (int i = 0; i < 350 * TILES_PER_METATILE; i++)
+        sMeta_Rustboro[i] = ShiftTile(gHoennMetatiles_Rustboro[i]);
+    memset(sPals_Rustboro, 0, sizeof(sPals_Rustboro));
+    for (int i = 0; i < 6; i++)
+        memcpy(sPals_Rustboro[i + NUM_PALS_IN_PRIMARY],
+               gHoennTilesetPalettes_Rustboro[i + RUBY_PALS_PRIMARY], 32);
+
+    for (int i = 0; i < 144; i++) {
+        u16 r = gHoennRawMetatileAttrs_Dewford[i];
+        sAttrs_Dewford[i] = (r & 0xFF) | (((r >> 12) & 3) << 29);
+    }
+    for (int i = 0; i < 144 * TILES_PER_METATILE; i++)
+        sMeta_Dewford[i] = ShiftTile(gHoennMetatiles_Dewford[i]);
+    memset(sPals_Dewford, 0, sizeof(sPals_Dewford));
+    for (int i = 0; i < 6; i++)
+        memcpy(sPals_Dewford[i + NUM_PALS_IN_PRIMARY],
+               gHoennTilesetPalettes_Dewford[i + RUBY_PALS_PRIMARY], 32);
+
+    for (int i = 0; i < 364; i++) {
+        u16 r = gHoennRawMetatileAttrs_Slateport[i];
+        sAttrs_Slateport[i] = (r & 0xFF) | (((r >> 12) & 3) << 29);
+    }
+    for (int i = 0; i < 364 * TILES_PER_METATILE; i++)
+        sMeta_Slateport[i] = ShiftTile(gHoennMetatiles_Slateport[i]);
+    memset(sPals_Slateport, 0, sizeof(sPals_Slateport));
+    for (int i = 0; i < 6; i++)
+        memcpy(sPals_Slateport[i + NUM_PALS_IN_PRIMARY],
+               gHoennTilesetPalettes_Slateport[i + RUBY_PALS_PRIMARY], 32);
+
+    for (int i = 0; i < 434; i++) {
+        u16 r = gHoennRawMetatileAttrs_Mauville[i];
+        sAttrs_Mauville[i] = (r & 0xFF) | (((r >> 12) & 3) << 29);
+    }
+    for (int i = 0; i < 434 * TILES_PER_METATILE; i++)
+        sMeta_Mauville[i] = ShiftTile(gHoennMetatiles_Mauville[i]);
+    memset(sPals_Mauville, 0, sizeof(sPals_Mauville));
+    for (int i = 0; i < 6; i++)
+        memcpy(sPals_Mauville[i + NUM_PALS_IN_PRIMARY],
+               gHoennTilesetPalettes_Mauville[i + RUBY_PALS_PRIMARY], 32);
+
+    for (int i = 0; i < 267; i++) {
+        u16 r = gHoennRawMetatileAttrs_Fortree[i];
+        sAttrs_Fortree[i] = (r & 0xFF) | (((r >> 12) & 3) << 29);
+    }
+    for (int i = 0; i < 267 * TILES_PER_METATILE; i++)
+        sMeta_Fortree[i] = ShiftTile(gHoennMetatiles_Fortree[i]);
+    memset(sPals_Fortree, 0, sizeof(sPals_Fortree));
+    for (int i = 0; i < 6; i++)
+        memcpy(sPals_Fortree[i + NUM_PALS_IN_PRIMARY],
+               gHoennTilesetPalettes_Fortree[i + RUBY_PALS_PRIMARY], 32);
+
+    for (int i = 0; i < 351; i++) {
+        u16 r = gHoennRawMetatileAttrs_Lilycove[i];
+        sAttrs_Lilycove[i] = (r & 0xFF) | (((r >> 12) & 3) << 29);
+    }
+    for (int i = 0; i < 351 * TILES_PER_METATILE; i++)
+        sMeta_Lilycove[i] = ShiftTile(gHoennMetatiles_Lilycove[i]);
+    memset(sPals_Lilycove, 0, sizeof(sPals_Lilycove));
+    for (int i = 0; i < 6; i++)
+        memcpy(sPals_Lilycove[i + NUM_PALS_IN_PRIMARY],
+               gHoennTilesetPalettes_Lilycove[i + RUBY_PALS_PRIMARY], 32);
+
+    for (int i = 0; i < 363; i++) {
+        u16 r = gHoennRawMetatileAttrs_Mossdeep[i];
+        sAttrs_Mossdeep[i] = (r & 0xFF) | (((r >> 12) & 3) << 29);
+    }
+    for (int i = 0; i < 363 * TILES_PER_METATILE; i++)
+        sMeta_Mossdeep[i] = ShiftTile(gHoennMetatiles_Mossdeep[i]);
+    memset(sPals_Mossdeep, 0, sizeof(sPals_Mossdeep));
+    for (int i = 0; i < 6; i++)
+        memcpy(sPals_Mossdeep[i + NUM_PALS_IN_PRIMARY],
+               gHoennTilesetPalettes_Mossdeep[i + RUBY_PALS_PRIMARY], 32);
+
+    for (int i = 0; i < 254; i++) {
+        u16 r = gHoennRawMetatileAttrs_Sootopolis[i];
+        sAttrs_Sootopolis[i] = (r & 0xFF) | (((r >> 12) & 3) << 29);
+    }
+    for (int i = 0; i < 254 * TILES_PER_METATILE; i++)
+        sMeta_Sootopolis[i] = ShiftTile(gHoennMetatiles_Sootopolis[i]);
+    memset(sPals_Sootopolis, 0, sizeof(sPals_Sootopolis));
+    for (int i = 0; i < 6; i++)
+        memcpy(sPals_Sootopolis[i + NUM_PALS_IN_PRIMARY],
+               gHoennTilesetPalettes_Sootopolis[i + RUBY_PALS_PRIMARY], 32);
+
+    for (int i = 0; i < 168; i++) {
+        u16 r = gHoennRawMetatileAttrs_EverGrande[i];
+        sAttrs_EverGrande[i] = (r & 0xFF) | (((r >> 12) & 3) << 29);
+    }
+    for (int i = 0; i < 168 * TILES_PER_METATILE; i++)
+        sMeta_EverGrande[i] = ShiftTile(gHoennMetatiles_EverGrande[i]);
+    memset(sPals_EverGrande, 0, sizeof(sPals_EverGrande));
+    for (int i = 0; i < 6; i++)
+        memcpy(sPals_EverGrande[i + NUM_PALS_IN_PRIMARY],
+               gHoennTilesetPalettes_EverGrande[i + RUBY_PALS_PRIMARY], 32);
+
+    for (int i = 0; i < 338; i++) {
+        u16 r = gHoennRawMetatileAttrs_Fallarbor[i];
+        sAttrs_Fallarbor[i] = (r & 0xFF) | (((r >> 12) & 3) << 29);
+    }
+    for (int i = 0; i < 338 * TILES_PER_METATILE; i++)
+        sMeta_Fallarbor[i] = ShiftTile(gHoennMetatiles_Fallarbor[i]);
+    memset(sPals_Fallarbor, 0, sizeof(sPals_Fallarbor));
+    for (int i = 0; i < 6; i++)
+        memcpy(sPals_Fallarbor[i + NUM_PALS_IN_PRIMARY],
+               gHoennTilesetPalettes_Fallarbor[i + RUBY_PALS_PRIMARY], 32);
+
+    for (int i = 0; i < 286; i++) {
+        u16 r = gHoennRawMetatileAttrs_Lavaridge[i];
+        sAttrs_Lavaridge[i] = (r & 0xFF) | (((r >> 12) & 3) << 29);
+    }
+    for (int i = 0; i < 286 * TILES_PER_METATILE; i++)
+        sMeta_Lavaridge[i] = ShiftTile(gHoennMetatiles_Lavaridge[i]);
+    memset(sPals_Lavaridge, 0, sizeof(sPals_Lavaridge));
+    for (int i = 0; i < 6; i++)
+        memcpy(sPals_Lavaridge[i + NUM_PALS_IN_PRIMARY],
+               gHoennTilesetPalettes_Lavaridge[i + RUBY_PALS_PRIMARY], 32);
+
+    for (int i = 0; i < 191; i++) {
+        u16 r = gHoennRawMetatileAttrs_Pacifidlog[i];
+        sAttrs_Pacifidlog[i] = (r & 0xFF) | (((r >> 12) & 3) << 29);
+    }
+    for (int i = 0; i < 191 * TILES_PER_METATILE; i++)
+        sMeta_Pacifidlog[i] = ShiftTile(gHoennMetatiles_Pacifidlog[i]);
+    memset(sPals_Pacifidlog, 0, sizeof(sPals_Pacifidlog));
+    for (int i = 0; i < 6; i++)
+        memcpy(sPals_Pacifidlog[i + NUM_PALS_IN_PRIMARY],
+               gHoennTilesetPalettes_Pacifidlog[i + RUBY_PALS_PRIMARY], 32);
+
+// === ADD TO Hoenn_InitTilesets (struct setup) ===
+    gHoennTileset_Rustboro.isCompressed = FALSE;
+    gHoennTileset_Rustboro.isSecondary = TRUE;
+    gHoennTileset_Rustboro.tiles = (const u32 *)gHoennTilesetTiles_Rustboro;
+    gHoennTileset_Rustboro.palettes = sPals_Rustboro;
+    gHoennTileset_Rustboro.metatiles = sMeta_Rustboro;
+    gHoennTileset_Rustboro.callback = NULL;
+    gHoennTileset_Rustboro.metatileAttributes = sAttrs_Rustboro;
+
+    gHoennTileset_Dewford.isCompressed = FALSE;
+    gHoennTileset_Dewford.isSecondary = TRUE;
+    gHoennTileset_Dewford.tiles = (const u32 *)gHoennTilesetTiles_Dewford;
+    gHoennTileset_Dewford.palettes = sPals_Dewford;
+    gHoennTileset_Dewford.metatiles = sMeta_Dewford;
+    gHoennTileset_Dewford.callback = NULL;
+    gHoennTileset_Dewford.metatileAttributes = sAttrs_Dewford;
+
+    gHoennTileset_Slateport.isCompressed = FALSE;
+    gHoennTileset_Slateport.isSecondary = TRUE;
+    gHoennTileset_Slateport.tiles = (const u32 *)gHoennTilesetTiles_Slateport;
+    gHoennTileset_Slateport.palettes = sPals_Slateport;
+    gHoennTileset_Slateport.metatiles = sMeta_Slateport;
+    gHoennTileset_Slateport.callback = NULL;
+    gHoennTileset_Slateport.metatileAttributes = sAttrs_Slateport;
+
+    gHoennTileset_Mauville.isCompressed = FALSE;
+    gHoennTileset_Mauville.isSecondary = TRUE;
+    gHoennTileset_Mauville.tiles = (const u32 *)gHoennTilesetTiles_Mauville;
+    gHoennTileset_Mauville.palettes = sPals_Mauville;
+    gHoennTileset_Mauville.metatiles = sMeta_Mauville;
+    gHoennTileset_Mauville.callback = NULL;
+    gHoennTileset_Mauville.metatileAttributes = sAttrs_Mauville;
+
+    gHoennTileset_Fortree.isCompressed = FALSE;
+    gHoennTileset_Fortree.isSecondary = TRUE;
+    gHoennTileset_Fortree.tiles = (const u32 *)gHoennTilesetTiles_Fortree;
+    gHoennTileset_Fortree.palettes = sPals_Fortree;
+    gHoennTileset_Fortree.metatiles = sMeta_Fortree;
+    gHoennTileset_Fortree.callback = NULL;
+    gHoennTileset_Fortree.metatileAttributes = sAttrs_Fortree;
+
+    gHoennTileset_Lilycove.isCompressed = FALSE;
+    gHoennTileset_Lilycove.isSecondary = TRUE;
+    gHoennTileset_Lilycove.tiles = (const u32 *)gHoennTilesetTiles_Lilycove;
+    gHoennTileset_Lilycove.palettes = sPals_Lilycove;
+    gHoennTileset_Lilycove.metatiles = sMeta_Lilycove;
+    gHoennTileset_Lilycove.callback = NULL;
+    gHoennTileset_Lilycove.metatileAttributes = sAttrs_Lilycove;
+
+    gHoennTileset_Mossdeep.isCompressed = FALSE;
+    gHoennTileset_Mossdeep.isSecondary = TRUE;
+    gHoennTileset_Mossdeep.tiles = (const u32 *)gHoennTilesetTiles_Mossdeep;
+    gHoennTileset_Mossdeep.palettes = sPals_Mossdeep;
+    gHoennTileset_Mossdeep.metatiles = sMeta_Mossdeep;
+    gHoennTileset_Mossdeep.callback = NULL;
+    gHoennTileset_Mossdeep.metatileAttributes = sAttrs_Mossdeep;
+
+    gHoennTileset_Sootopolis.isCompressed = FALSE;
+    gHoennTileset_Sootopolis.isSecondary = TRUE;
+    gHoennTileset_Sootopolis.tiles = (const u32 *)gHoennTilesetTiles_Sootopolis;
+    gHoennTileset_Sootopolis.palettes = sPals_Sootopolis;
+    gHoennTileset_Sootopolis.metatiles = sMeta_Sootopolis;
+    gHoennTileset_Sootopolis.callback = NULL;
+    gHoennTileset_Sootopolis.metatileAttributes = sAttrs_Sootopolis;
+
+    gHoennTileset_EverGrande.isCompressed = FALSE;
+    gHoennTileset_EverGrande.isSecondary = TRUE;
+    gHoennTileset_EverGrande.tiles = (const u32 *)gHoennTilesetTiles_EverGrande;
+    gHoennTileset_EverGrande.palettes = sPals_EverGrande;
+    gHoennTileset_EverGrande.metatiles = sMeta_EverGrande;
+    gHoennTileset_EverGrande.callback = NULL;
+    gHoennTileset_EverGrande.metatileAttributes = sAttrs_EverGrande;
+
+    gHoennTileset_Fallarbor.isCompressed = FALSE;
+    gHoennTileset_Fallarbor.isSecondary = TRUE;
+    gHoennTileset_Fallarbor.tiles = (const u32 *)gHoennTilesetTiles_Fallarbor;
+    gHoennTileset_Fallarbor.palettes = sPals_Fallarbor;
+    gHoennTileset_Fallarbor.metatiles = sMeta_Fallarbor;
+    gHoennTileset_Fallarbor.callback = NULL;
+    gHoennTileset_Fallarbor.metatileAttributes = sAttrs_Fallarbor;
+
+    gHoennTileset_Lavaridge.isCompressed = FALSE;
+    gHoennTileset_Lavaridge.isSecondary = TRUE;
+    gHoennTileset_Lavaridge.tiles = (const u32 *)gHoennTilesetTiles_Lavaridge;
+    gHoennTileset_Lavaridge.palettes = sPals_Lavaridge;
+    gHoennTileset_Lavaridge.metatiles = sMeta_Lavaridge;
+    gHoennTileset_Lavaridge.callback = NULL;
+    gHoennTileset_Lavaridge.metatileAttributes = sAttrs_Lavaridge;
+
+    gHoennTileset_Pacifidlog.isCompressed = FALSE;
+    gHoennTileset_Pacifidlog.isSecondary = TRUE;
+    gHoennTileset_Pacifidlog.tiles = (const u32 *)gHoennTilesetTiles_Pacifidlog;
+    gHoennTileset_Pacifidlog.palettes = sPals_Pacifidlog;
+    gHoennTileset_Pacifidlog.metatiles = sMeta_Pacifidlog;
+    gHoennTileset_Pacifidlog.callback = NULL;
+    gHoennTileset_Pacifidlog.metatileAttributes = sAttrs_Pacifidlog;
+
+// === ADD TO Hoenn_InitTilesets (ShiftBlocks) ===
+    ShiftBlocks(gHoennLayout_Route104_Map, sMap_Route104, 40*80);
+    ShiftBlocks(gHoennLayout_Route105_Map, sMap_Route105, 20*80);
+    ShiftBlocks(gHoennLayout_Route106_Map, sMap_Route106, 30*20);
+    ShiftBlocks(gHoennLayout_Route107_Map, sMap_Route107, 40*20);
+    ShiftBlocks(gHoennLayout_Route108_Map, sMap_Route108, 40*20);
+    ShiftBlocks(gHoennLayout_Route109_Map, sMap_Route109, 20*60);
+    ShiftBlocks(gHoennLayout_Route110_Map, sMap_Route110, 20*100);
+    ShiftBlocks(gHoennLayout_Route111_Map, sMap_Route111, 20*140);
+    ShiftBlocks(gHoennLayout_Route112_Map, sMap_Route112, 20*60);
+    ShiftBlocks(gHoennLayout_Route113_Map, sMap_Route113, 40*20);
+    ShiftBlocks(gHoennLayout_Route114_Map, sMap_Route114, 20*80);
+    ShiftBlocks(gHoennLayout_Route115_Map, sMap_Route115, 20*80);
+    ShiftBlocks(gHoennLayout_Route116_Map, sMap_Route116, 80*20);
+    ShiftBlocks(gHoennLayout_Route117_Map, sMap_Route117, 60*20);
+    ShiftBlocks(gHoennLayout_Route118_Map, sMap_Route118, 40*20);
+    ShiftBlocks(gHoennLayout_Route119_Map, sMap_Route119, 20*140);
+    ShiftBlocks(gHoennLayout_Route120_Map, sMap_Route120, 20*100);
+    ShiftBlocks(gHoennLayout_Route121_Map, sMap_Route121, 80*20);
+    ShiftBlocks(gHoennLayout_Route122_Map, sMap_Route122, 20*40);
+    ShiftBlocks(gHoennLayout_Route123_Map, sMap_Route123, 80*20);
+    ShiftBlocks(gHoennLayout_Route124_Map, sMap_Route124, 40*80);
+    ShiftBlocks(gHoennLayout_Route125_Map, sMap_Route125, 20*40);
+    ShiftBlocks(gHoennLayout_Route126_Map, sMap_Route126, 40*80);
+    ShiftBlocks(gHoennLayout_Route127_Map, sMap_Route127, 40*80);
+    ShiftBlocks(gHoennLayout_Route128_Map, sMap_Route128, 80*40);
+    ShiftBlocks(gHoennLayout_Route129_Map, sMap_Route129, 40*40);
+    ShiftBlocks(gHoennLayout_Route130_Map, sMap_Route130, 40*40);
+    ShiftBlocks(gHoennLayout_Route131_Map, sMap_Route131, 40*40);
+    ShiftBlocks(gHoennLayout_Route132_Map, sMap_Route132, 40*40);
+    ShiftBlocks(gHoennLayout_Route133_Map, sMap_Route133, 60*40);
+    ShiftBlocks(gHoennLayout_Route134_Map, sMap_Route134, 80*40);
+    ShiftBlocks(gHoennLayout_SlateportCity_Map, sMap_SlateportCity, 30*30);
+    ShiftBlocks(gHoennLayout_MauvilleCity_Map, sMap_MauvilleCity, 30*30);
+    ShiftBlocks(gHoennLayout_RustboroCity_Map, sMap_RustboroCity, 30*30);
+    ShiftBlocks(gHoennLayout_FortreeCity_Map, sMap_FortreeCity, 30*20);
+    ShiftBlocks(gHoennLayout_LilycoveCity_Map, sMap_LilycoveCity, 40*30);
+    ShiftBlocks(gHoennLayout_MossdeepCity_Map, sMap_MossdeepCity, 30*30);
+    ShiftBlocks(gHoennLayout_SootopolisCity_Map, sMap_SootopolisCity, 30*30);
+    ShiftBlocks(gHoennLayout_EverGrandeCity_Map, sMap_EverGrandeCity, 30*40);
+    ShiftBlocks(gHoennLayout_DewfordTown_Map, sMap_DewfordTown, 20*20);
+    ShiftBlocks(gHoennLayout_LavaridgeTown_Map, sMap_LavaridgeTown, 20*20);
+    ShiftBlocks(gHoennLayout_FallarborTown_Map, sMap_FallarborTown, 20*20);
+    ShiftBlocks(gHoennLayout_VerdanturfTown_Map, sMap_VerdanturfTown, 20*20);
+    ShiftBlocks(gHoennLayout_PacifidlogTown_Map, sMap_PacifidlogTown, 20*20);
+
+// === ADD LAYOUT STRUCTS ===
+const struct MapLayout gHoennLayout_Route104 = {
+    .width = 40, .height = 80, .border = gHoennLayout_Route104_Border,
+    .map = sMap_Route104, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Rustboro, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route105 = {
+    .width = 20, .height = 80, .border = gHoennLayout_Route105_Border,
+    .map = sMap_Route105, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Dewford, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route106 = {
+    .width = 30, .height = 20, .border = gHoennLayout_Route106_Border,
+    .map = sMap_Route106, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Dewford, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route107 = {
+    .width = 40, .height = 20, .border = gHoennLayout_Route107_Border,
+    .map = sMap_Route107, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Dewford, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route108 = {
+    .width = 40, .height = 20, .border = gHoennLayout_Route108_Border,
+    .map = sMap_Route108, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Slateport, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route109 = {
+    .width = 20, .height = 60, .border = gHoennLayout_Route109_Border,
+    .map = sMap_Route109, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Slateport, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route110 = {
+    .width = 20, .height = 100, .border = gHoennLayout_Route110_Border,
+    .map = sMap_Route110, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Mauville, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route111 = {
+    .width = 20, .height = 140, .border = gHoennLayout_Route111_Border,
+    .map = sMap_Route111, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Mauville, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route112 = {
+    .width = 20, .height = 60, .border = gHoennLayout_Route112_Border,
+    .map = sMap_Route112, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Lavaridge, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route113 = {
+    .width = 40, .height = 20, .border = gHoennLayout_Route113_Border,
+    .map = sMap_Route113, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Fallarbor, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route114 = {
+    .width = 20, .height = 80, .border = gHoennLayout_Route114_Border,
+    .map = sMap_Route114, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Fallarbor, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route115 = {
+    .width = 20, .height = 80, .border = gHoennLayout_Route115_Border,
+    .map = sMap_Route115, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Fallarbor, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route116 = {
+    .width = 80, .height = 20, .border = gHoennLayout_Route116_Border,
+    .map = sMap_Route116, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Rustboro, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route117 = {
+    .width = 60, .height = 20, .border = gHoennLayout_Route117_Border,
+    .map = sMap_Route117, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Mauville, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route118 = {
+    .width = 40, .height = 20, .border = gHoennLayout_Route118_Border,
+    .map = sMap_Route118, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Mauville, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route119 = {
+    .width = 20, .height = 140, .border = gHoennLayout_Route119_Border,
+    .map = sMap_Route119, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Fortree, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route120 = {
+    .width = 20, .height = 100, .border = gHoennLayout_Route120_Border,
+    .map = sMap_Route120, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Fortree, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route121 = {
+    .width = 80, .height = 20, .border = gHoennLayout_Route121_Border,
+    .map = sMap_Route121, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Lilycove, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route122 = {
+    .width = 20, .height = 40, .border = gHoennLayout_Route122_Border,
+    .map = sMap_Route122, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Lilycove, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route123 = {
+    .width = 80, .height = 20, .border = gHoennLayout_Route123_Border,
+    .map = sMap_Route123, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Lilycove, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route124 = {
+    .width = 40, .height = 80, .border = gHoennLayout_Route124_Border,
+    .map = sMap_Route124, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Mossdeep, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route125 = {
+    .width = 20, .height = 40, .border = gHoennLayout_Route125_Border,
+    .map = sMap_Route125, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Mossdeep, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route126 = {
+    .width = 40, .height = 80, .border = gHoennLayout_Route126_Border,
+    .map = sMap_Route126, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Mossdeep, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route127 = {
+    .width = 40, .height = 80, .border = gHoennLayout_Route127_Border,
+    .map = sMap_Route127, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Mossdeep, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route128 = {
+    .width = 80, .height = 40, .border = gHoennLayout_Route128_Border,
+    .map = sMap_Route128, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Mossdeep, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route129 = {
+    .width = 40, .height = 40, .border = gHoennLayout_Route129_Border,
+    .map = sMap_Route129, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Mossdeep, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route130 = {
+    .width = 40, .height = 40, .border = gHoennLayout_Route130_Border,
+    .map = sMap_Route130, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Pacifidlog, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route131 = {
+    .width = 40, .height = 40, .border = gHoennLayout_Route131_Border,
+    .map = sMap_Route131, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Pacifidlog, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route132 = {
+    .width = 40, .height = 40, .border = gHoennLayout_Route132_Border,
+    .map = sMap_Route132, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Pacifidlog, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route133 = {
+    .width = 60, .height = 40, .border = gHoennLayout_Route133_Border,
+    .map = sMap_Route133, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Pacifidlog, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_Route134 = {
+    .width = 80, .height = 40, .border = gHoennLayout_Route134_Border,
+    .map = sMap_Route134, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Pacifidlog, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_SlateportCity = {
+    .width = 30, .height = 30, .border = gHoennLayout_SlateportCity_Border,
+    .map = sMap_SlateportCity, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Slateport, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_MauvilleCity = {
+    .width = 30, .height = 30, .border = gHoennLayout_MauvilleCity_Border,
+    .map = sMap_MauvilleCity, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Mauville, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_RustboroCity = {
+    .width = 30, .height = 30, .border = gHoennLayout_RustboroCity_Border,
+    .map = sMap_RustboroCity, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Rustboro, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_FortreeCity = {
+    .width = 30, .height = 20, .border = gHoennLayout_FortreeCity_Border,
+    .map = sMap_FortreeCity, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Fortree, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_LilycoveCity = {
+    .width = 40, .height = 30, .border = gHoennLayout_LilycoveCity_Border,
+    .map = sMap_LilycoveCity, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Lilycove, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_MossdeepCity = {
+    .width = 30, .height = 30, .border = gHoennLayout_MossdeepCity_Border,
+    .map = sMap_MossdeepCity, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Mossdeep, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_SootopolisCity = {
+    .width = 30, .height = 30, .border = gHoennLayout_SootopolisCity_Border,
+    .map = sMap_SootopolisCity, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Sootopolis, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_EverGrandeCity = {
+    .width = 30, .height = 40, .border = gHoennLayout_EverGrandeCity_Border,
+    .map = sMap_EverGrandeCity, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_EverGrande, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_DewfordTown = {
+    .width = 20, .height = 20, .border = gHoennLayout_DewfordTown_Border,
+    .map = sMap_DewfordTown, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Dewford, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_LavaridgeTown = {
+    .width = 20, .height = 20, .border = gHoennLayout_LavaridgeTown_Border,
+    .map = sMap_LavaridgeTown, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Lavaridge, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_FallarborTown = {
+    .width = 20, .height = 20, .border = gHoennLayout_FallarborTown_Border,
+    .map = sMap_FallarborTown, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Fallarbor, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_VerdanturfTown = {
+    .width = 20, .height = 20, .border = gHoennLayout_VerdanturfTown_Border,
+    .map = sMap_VerdanturfTown, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Mauville, .borderWidth = 2, .borderHeight = 2,
+};
+const struct MapLayout gHoennLayout_PacifidlogTown = {
+    .width = 20, .height = 20, .border = gHoennLayout_PacifidlogTown_Border,
+    .map = sMap_PacifidlogTown, .primaryTileset = &gHoennTileset_General,
+    .secondaryTileset = &gHoennTileset_Pacifidlog, .borderWidth = 2, .borderHeight = 2,
+};
+
+// === ADD TO Hoenn_GetMapLayout ===
+    case 306: return &gHoennLayout_Route104;
+    case 307: return &gHoennLayout_Route105;
+    case 308: return &gHoennLayout_Route106;
+    case 309: return &gHoennLayout_Route107;
+    case 310: return &gHoennLayout_Route108;
+    case 311: return &gHoennLayout_Route109;
+    case 312: return &gHoennLayout_Route110;
+    case 313: return &gHoennLayout_Route111;
+    case 314: return &gHoennLayout_Route112;
+    case 315: return &gHoennLayout_Route113;
+    case 316: return &gHoennLayout_Route114;
+    case 317: return &gHoennLayout_Route115;
+    case 318: return &gHoennLayout_Route116;
+    case 319: return &gHoennLayout_Route117;
+    case 320: return &gHoennLayout_Route118;
+    case 321: return &gHoennLayout_Route119;
+    case 322: return &gHoennLayout_Route120;
+    case 323: return &gHoennLayout_Route121;
+    case 324: return &gHoennLayout_Route122;
+    case 325: return &gHoennLayout_Route123;
+    case 326: return &gHoennLayout_Route124;
+    case 327: return &gHoennLayout_Route125;
+    case 328: return &gHoennLayout_Route126;
+    case 329: return &gHoennLayout_Route127;
+    case 330: return &gHoennLayout_Route128;
+    case 331: return &gHoennLayout_Route129;
+    case 332: return &gHoennLayout_Route130;
+    case 333: return &gHoennLayout_Route131;
+    case 334: return &gHoennLayout_Route132;
+    case 335: return &gHoennLayout_Route133;
+    case 336: return &gHoennLayout_Route134;
+    case 337: return &gHoennLayout_SlateportCity;
+    case 338: return &gHoennLayout_MauvilleCity;
+    case 339: return &gHoennLayout_RustboroCity;
+    case 340: return &gHoennLayout_FortreeCity;
+    case 341: return &gHoennLayout_LilycoveCity;
+    case 342: return &gHoennLayout_MossdeepCity;
+    case 343: return &gHoennLayout_SootopolisCity;
+    case 344: return &gHoennLayout_EverGrandeCity;
+    case 345: return &gHoennLayout_DewfordTown;
+    case 346: return &gHoennLayout_LavaridgeTown;
+    case 347: return &gHoennLayout_FallarborTown;
+    case 348: return &gHoennLayout_VerdanturfTown;
+    case 349: return &gHoennLayout_PacifidlogTown;
+
+// === ADD MAP HEADERS ===
+const struct MapHeader gHoennMapHeader_Route104 = {
+    .mapLayout = &gHoennLayout_Route104, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 306, .regionMapSectionId = 230,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route105 = {
+    .mapLayout = &gHoennLayout_Route105, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 307, .regionMapSectionId = 231,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route106 = {
+    .mapLayout = &gHoennLayout_Route106, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 308, .regionMapSectionId = 232,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route107 = {
+    .mapLayout = &gHoennLayout_Route107, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 309, .regionMapSectionId = 233,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route108 = {
+    .mapLayout = &gHoennLayout_Route108, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 310, .regionMapSectionId = 234,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route109 = {
+    .mapLayout = &gHoennLayout_Route109, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 311, .regionMapSectionId = 235,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route110 = {
+    .mapLayout = &gHoennLayout_Route110, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 312, .regionMapSectionId = 236,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route111 = {
+    .mapLayout = &gHoennLayout_Route111, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 313, .regionMapSectionId = 237,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route112 = {
+    .mapLayout = &gHoennLayout_Route112, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 314, .regionMapSectionId = 238,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route113 = {
+    .mapLayout = &gHoennLayout_Route113, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 315, .regionMapSectionId = 239,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route114 = {
+    .mapLayout = &gHoennLayout_Route114, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 316, .regionMapSectionId = 240,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route115 = {
+    .mapLayout = &gHoennLayout_Route115, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 317, .regionMapSectionId = 241,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route116 = {
+    .mapLayout = &gHoennLayout_Route116, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 318, .regionMapSectionId = 242,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route117 = {
+    .mapLayout = &gHoennLayout_Route117, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 319, .regionMapSectionId = 243,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route118 = {
+    .mapLayout = &gHoennLayout_Route118, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 320, .regionMapSectionId = 244,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route119 = {
+    .mapLayout = &gHoennLayout_Route119, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 321, .regionMapSectionId = 245,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route120 = {
+    .mapLayout = &gHoennLayout_Route120, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 322, .regionMapSectionId = 246,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route121 = {
+    .mapLayout = &gHoennLayout_Route121, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 323, .regionMapSectionId = 247,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route122 = {
+    .mapLayout = &gHoennLayout_Route122, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 324, .regionMapSectionId = 248,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route123 = {
+    .mapLayout = &gHoennLayout_Route123, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 325, .regionMapSectionId = 249,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route124 = {
+    .mapLayout = &gHoennLayout_Route124, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 326, .regionMapSectionId = 250,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route125 = {
+    .mapLayout = &gHoennLayout_Route125, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 327, .regionMapSectionId = 251,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route126 = {
+    .mapLayout = &gHoennLayout_Route126, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 328, .regionMapSectionId = 252,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route127 = {
+    .mapLayout = &gHoennLayout_Route127, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 329, .regionMapSectionId = 253,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route128 = {
+    .mapLayout = &gHoennLayout_Route128, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 330, .regionMapSectionId = 254,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route129 = {
+    .mapLayout = &gHoennLayout_Route129, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 331, .regionMapSectionId = 255,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route130 = {
+    .mapLayout = &gHoennLayout_Route130, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 332, .regionMapSectionId = 256,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route131 = {
+    .mapLayout = &gHoennLayout_Route131, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 333, .regionMapSectionId = 257,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route132 = {
+    .mapLayout = &gHoennLayout_Route132, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 334, .regionMapSectionId = 258,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route133 = {
+    .mapLayout = &gHoennLayout_Route133, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 335, .regionMapSectionId = 259,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route134 = {
+    .mapLayout = &gHoennLayout_Route134, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 336, .regionMapSectionId = 260,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_ROUTE,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_SlateportCity = {
+    .mapLayout = &gHoennLayout_SlateportCity, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 337, .regionMapSectionId = 261,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_CITY,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_MauvilleCity = {
+    .mapLayout = &gHoennLayout_MauvilleCity, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 338, .regionMapSectionId = 262,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_CITY,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_RustboroCity = {
+    .mapLayout = &gHoennLayout_RustboroCity, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 339, .regionMapSectionId = 263,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_CITY,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_FortreeCity = {
+    .mapLayout = &gHoennLayout_FortreeCity, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 340, .regionMapSectionId = 264,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_CITY,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_LilycoveCity = {
+    .mapLayout = &gHoennLayout_LilycoveCity, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 341, .regionMapSectionId = 265,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_CITY,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_MossdeepCity = {
+    .mapLayout = &gHoennLayout_MossdeepCity, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 342, .regionMapSectionId = 266,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_CITY,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_SootopolisCity = {
+    .mapLayout = &gHoennLayout_SootopolisCity, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 343, .regionMapSectionId = 267,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_CITY,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_EverGrandeCity = {
+    .mapLayout = &gHoennLayout_EverGrandeCity, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 344, .regionMapSectionId = 268,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_CITY,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_DewfordTown = {
+    .mapLayout = &gHoennLayout_DewfordTown, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 345, .regionMapSectionId = 269,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_TOWN,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_LavaridgeTown = {
+    .mapLayout = &gHoennLayout_LavaridgeTown, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 346, .regionMapSectionId = 270,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_TOWN,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_FallarborTown = {
+    .mapLayout = &gHoennLayout_FallarborTown, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 347, .regionMapSectionId = 271,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_TOWN,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_VerdanturfTown = {
+    .mapLayout = &gHoennLayout_VerdanturfTown, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 348, .regionMapSectionId = 272,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_TOWN,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_PacifidlogTown = {
+    .mapLayout = &gHoennLayout_PacifidlogTown, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 141, .mapLayoutId = 349, .regionMapSectionId = 273,
+    .cave = FALSE, .weather = WEATHER_SUNNY, .mapType = MAP_TYPE_TOWN,
+    .bikingAllowed = TRUE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 1,
+    .floorNum = 0, .battleType = 0,
+};
+
+// === MAPSEC NAMES (for hoenn_maps.c) ===
+    case 230: return sName_Route104;
+    case 231: return sName_Route105;
+    case 232: return sName_Route106;
+    case 233: return sName_Route107;
+    case 234: return sName_Route108;
+    case 235: return sName_Route109;
+    case 236: return sName_Route110;
+    case 237: return sName_Route111;
+    case 238: return sName_Route112;
+    case 239: return sName_Route113;
+    case 240: return sName_Route114;
+    case 241: return sName_Route115;
+    case 242: return sName_Route116;
+    case 243: return sName_Route117;
+    case 244: return sName_Route118;
+    case 245: return sName_Route119;
+    case 246: return sName_Route120;
+    case 247: return sName_Route121;
+    case 248: return sName_Route122;
+    case 249: return sName_Route123;
+    case 250: return sName_Route124;
+    case 251: return sName_Route125;
+    case 252: return sName_Route126;
+    case 253: return sName_Route127;
+    case 254: return sName_Route128;
+    case 255: return sName_Route129;
+    case 256: return sName_Route130;
+    case 257: return sName_Route131;
+    case 258: return sName_Route132;
+    case 259: return sName_Route133;
+    case 260: return sName_Route134;
+    case 261: return sName_SlateportCity;
+    case 262: return sName_MauvilleCity;
+    case 263: return sName_RustboroCity;
+    case 264: return sName_FortreeCity;
+    case 265: return sName_LilycoveCity;
+    case 266: return sName_MossdeepCity;
+    case 267: return sName_SootopolisCity;
+    case 268: return sName_EverGrandeCity;
+    case 269: return sName_DewfordTown;
+    case 270: return sName_LavaridgeTown;
+    case 271: return sName_FallarborTown;
+    case 272: return sName_VerdanturfTown;
+    case 273: return sName_PacifidlogTown;
+
+// === MAPSEC NAME STRINGS ===
+static const u8 sName_Route104[] = _("ROUTE 104");
+static const u8 sName_Route105[] = _("ROUTE 105");
+static const u8 sName_Route106[] = _("ROUTE 106");
+static const u8 sName_Route107[] = _("ROUTE 107");
+static const u8 sName_Route108[] = _("ROUTE 108");
+static const u8 sName_Route109[] = _("ROUTE 109");
+static const u8 sName_Route110[] = _("ROUTE 110");
+static const u8 sName_Route111[] = _("ROUTE 111");
+static const u8 sName_Route112[] = _("ROUTE 112");
+static const u8 sName_Route113[] = _("ROUTE 113");
+static const u8 sName_Route114[] = _("ROUTE 114");
+static const u8 sName_Route115[] = _("ROUTE 115");
+static const u8 sName_Route116[] = _("ROUTE 116");
+static const u8 sName_Route117[] = _("ROUTE 117");
+static const u8 sName_Route118[] = _("ROUTE 118");
+static const u8 sName_Route119[] = _("ROUTE 119");
+static const u8 sName_Route120[] = _("ROUTE 120");
+static const u8 sName_Route121[] = _("ROUTE 121");
+static const u8 sName_Route122[] = _("ROUTE 122");
+static const u8 sName_Route123[] = _("ROUTE 123");
+static const u8 sName_Route124[] = _("ROUTE 124");
+static const u8 sName_Route125[] = _("ROUTE 125");
+static const u8 sName_Route126[] = _("ROUTE 126");
+static const u8 sName_Route127[] = _("ROUTE 127");
+static const u8 sName_Route128[] = _("ROUTE 128");
+static const u8 sName_Route129[] = _("ROUTE 129");
+static const u8 sName_Route130[] = _("ROUTE 130");
+static const u8 sName_Route131[] = _("ROUTE 131");
+static const u8 sName_Route132[] = _("ROUTE 132");
+static const u8 sName_Route133[] = _("ROUTE 133");
+static const u8 sName_Route134[] = _("ROUTE 134");
+static const u8 sName_SlateportCity[] = _("SLATEPORT CITY");
+static const u8 sName_MauvilleCity[] = _("MAUVILLE CITY");
+static const u8 sName_RustboroCity[] = _("RUSTBORO CITY");
+static const u8 sName_FortreeCity[] = _("FORTREE CITY");
+static const u8 sName_LilycoveCity[] = _("LILYCOVE CITY");
+static const u8 sName_MossdeepCity[] = _("MOSSDEEP CITY");
+static const u8 sName_SootopolisCity[] = _("SOOTOPOLIS CITY");
+static const u8 sName_EverGrandeCity[] = _("EVER GRANDE CITY");
+static const u8 sName_DewfordTown[] = _("DEWFORD TOWN");
+static const u8 sName_LavaridgeTown[] = _("LAVARIDGE TOWN");
+static const u8 sName_FallarborTown[] = _("FALLARBOR TOWN");
+static const u8 sName_VerdanturfTown[] = _("VERDANTURF TOWN");
+static const u8 sName_PacifidlogTown[] = _("PACIFIDLOG TOWN");
+
+// === GROUP 43 ENTRIES ===
+    [19] = &gHoennMapHeader_Route104,
+    [20] = &gHoennMapHeader_Route105,
+    [21] = &gHoennMapHeader_Route106,
+    [22] = &gHoennMapHeader_Route107,
+    [23] = &gHoennMapHeader_Route108,
+    [24] = &gHoennMapHeader_Route109,
+    [25] = &gHoennMapHeader_Route110,
+    [26] = &gHoennMapHeader_Route111,
+    [27] = &gHoennMapHeader_Route112,
+    [28] = &gHoennMapHeader_Route113,
+    [29] = &gHoennMapHeader_Route114,
+    [30] = &gHoennMapHeader_Route115,
+    [31] = &gHoennMapHeader_Route116,
+    [32] = &gHoennMapHeader_Route117,
+    [33] = &gHoennMapHeader_Route118,
+    [34] = &gHoennMapHeader_Route119,
+    [35] = &gHoennMapHeader_Route120,
+    [36] = &gHoennMapHeader_Route121,
+    [37] = &gHoennMapHeader_Route122,
+    [38] = &gHoennMapHeader_Route123,
+    [39] = &gHoennMapHeader_Route124,
+    [40] = &gHoennMapHeader_Route125,
+    [41] = &gHoennMapHeader_Route126,
+    [42] = &gHoennMapHeader_Route127,
+    [43] = &gHoennMapHeader_Route128,
+    [44] = &gHoennMapHeader_Route129,
+    [45] = &gHoennMapHeader_Route130,
+    [46] = &gHoennMapHeader_Route131,
+    [47] = &gHoennMapHeader_Route132,
+    [48] = &gHoennMapHeader_Route133,
+    [49] = &gHoennMapHeader_Route134,
+    [1] = &gHoennMapHeader_SlateportCity,
+    [2] = &gHoennMapHeader_MauvilleCity,
+    [3] = &gHoennMapHeader_RustboroCity,
+    [4] = &gHoennMapHeader_FortreeCity,
+    [5] = &gHoennMapHeader_LilycoveCity,
+    [6] = &gHoennMapHeader_MossdeepCity,
+    [7] = &gHoennMapHeader_SootopolisCity,
+    [8] = &gHoennMapHeader_EverGrandeCity,
+    [11] = &gHoennMapHeader_DewfordTown,
+    [12] = &gHoennMapHeader_LavaridgeTown,
+    [13] = &gHoennMapHeader_FallarborTown,
+    [14] = &gHoennMapHeader_VerdanturfTown,
+    [15] = &gHoennMapHeader_PacifidlogTown,

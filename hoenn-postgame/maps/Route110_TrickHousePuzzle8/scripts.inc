@@ -1,0 +1,29 @@
+Route110_TrickHousePuzzle8_MapScripts:: @ 816341B
+	.byte 0
+
+Route110_TrickHousePuzzle8_EventScript_Scroll:: @ 816341C
+	lockall
+	compare VAR_TRICK_HOUSE_PUZZLE_8_STATE, 0
+	goto_if_eq Route110_TrickHousePuzzle8_EventScript_16342E
+	goto Route110_TrickHousePuzzle8_EventScript_ReadScrollAgain
+	end
+
+Route110_TrickHousePuzzle8_EventScript_16342E:: @ 816342E
+	setvar VAR_TRICK_HOUSE_PUZZLE_8_STATE, 1
+	goto Route110_TrickHousePuzzle8_EventScript_FoundScroll
+	end
+
+Route110_TrickHousePuzzle8_EventScript_Vincent:: @ 8163439
+	trainerbattle_single TRAINER_VINCENT, Route110_TrickHousePuzzle8_Text_VincentIntro, Route110_TrickHousePuzzle8_Text_VincentDefeat
+	msgbox Route110_TrickHousePuzzle8_Text_VincentPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+Route110_TrickHousePuzzle8_EventScript_Elaine:: @ 8163450
+	trainerbattle_single TRAINER_ELAINE, Route110_TrickHousePuzzle8_Text_ElaineIntro, Route110_TrickHousePuzzle8_Text_ElaineDefeat
+	msgbox Route110_TrickHousePuzzle8_Text_ElainePostBattle, MSGBOX_AUTOCLOSE
+	end
+
+Route110_TrickHousePuzzle8_EventScript_Leroy:: @ 8163467
+	trainerbattle_single TRAINER_LEROY, Route110_TrickHousePuzzle8_Text_LeroyIntro, Route110_TrickHousePuzzle8_Text_LeroyDefeat
+	msgbox Route110_TrickHousePuzzle8_Text_LeroyPostBattle, MSGBOX_AUTOCLOSE
+	end

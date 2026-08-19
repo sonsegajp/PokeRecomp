@@ -1,0 +1,259 @@
+	.include "MPlayDef.s"
+
+	.equ	se_m_sing_grp, voicegroup111
+	.equ	se_m_sing_pri, 4
+	.equ	se_m_sing_rev, reverb_set+50
+	.equ	se_m_sing_mvl, 95
+	.equ	se_m_sing_key, 0
+	.equ	se_m_sing_tbs, 1
+	.equ	se_m_sing_exg, 1
+	.equ	se_m_sing_cmp, 1
+
+	.section .rodata
+	.global	se_m_sing
+	.align	2
+
+@**************** Track 1 (Midi-Chn.1) ****************@
+
+se_m_sing_1:
+	.byte	KEYSH , se_m_sing_key+0
+@ 000   ----------------------------------------
+@ 001   ----------------------------------------
+	.byte	TEMPO , 100*se_m_sing_tbs/2
+	.byte		VOICE , 73
+	.byte		BENDR , 12
+	.byte		LFOS  , 40
+	.byte		PAN   , c_v+0
+	.byte		VOL   , 127*se_m_sing_mvl/mxv
+	.byte		BEND  , c_v+0
+	.byte		N44   , Gn4 , v112
+	.byte	W06
+@ 002   ----------------------------------------
+	.byte	W06
+@ 003   ----------------------------------------
+	.byte	W03
+	.byte		MOD   , 7
+	.byte	W03
+@ 004   ----------------------------------------
+	.byte	W03
+	.byte		VOL   , 111*se_m_sing_mvl/mxv
+	.byte	W03
+@ 005   ----------------------------------------
+	.byte	W03
+	.byte		        93*se_m_sing_mvl/mxv
+	.byte	W03
+@ 006   ----------------------------------------
+	.byte	W03
+	.byte		        67*se_m_sing_mvl/mxv
+	.byte	W03
+@ 007   ----------------------------------------
+	.byte	W03
+	.byte		        33*se_m_sing_mvl/mxv
+	.byte	W03
+@ 008   ----------------------------------------
+	.byte	W03
+	.byte		MOD   , 0
+	.byte	W03
+@ 009   ----------------------------------------
+	.byte		VOL   , 127*se_m_sing_mvl/mxv
+	.byte		N21   , Fn5 
+	.byte	W06
+@ 010   ----------------------------------------
+	.byte	W06
+@ 011   ----------------------------------------
+se_m_sing_1_011:
+	.byte		VOL   , 115*se_m_sing_mvl/mxv
+	.byte		MOD   , 7
+	.byte	W03
+	.byte		VOL   , 101*se_m_sing_mvl/mxv
+	.byte	W03
+	.byte	PEND
+@ 012   ----------------------------------------
+se_m_sing_1_012:
+	.byte		VOL   , 74*se_m_sing_mvl/mxv
+	.byte	W03
+	.byte		        35*se_m_sing_mvl/mxv
+	.byte		MOD   , 0
+	.byte	W03
+	.byte	PEND
+@ 013   ----------------------------------------
+	.byte		VOL   , 127*se_m_sing_mvl/mxv
+	.byte		N21   , Ds5 , v112
+	.byte	W06
+@ 014   ----------------------------------------
+	.byte	W06
+@ 015   ----------------------------------------
+	.byte	PATT
+	 .word	se_m_sing_1_011
+@ 016   ----------------------------------------
+	.byte	PATT
+	 .word	se_m_sing_1_012
+@ 017   ----------------------------------------
+	.byte		VOL   , 127*se_m_sing_mvl/mxv
+	.byte		N66   , Gn4 , v112
+	.byte	W06
+@ 018   ----------------------------------------
+	.byte	W06
+@ 019   ----------------------------------------
+	.byte	W06
+@ 020   ----------------------------------------
+	.byte	W06
+@ 021   ----------------------------------------
+	.byte		MOD   , 7
+	.byte	W06
+@ 022   ----------------------------------------
+	.byte	W06
+@ 023   ----------------------------------------
+	.byte	W06
+@ 024   ----------------------------------------
+	.byte		VOL   , 111*se_m_sing_mvl/mxv
+	.byte	W06
+@ 025   ----------------------------------------
+	.byte		        93*se_m_sing_mvl/mxv
+	.byte	W06
+@ 026   ----------------------------------------
+	.byte		        67*se_m_sing_mvl/mxv
+	.byte	W06
+@ 027   ----------------------------------------
+	.byte		        33*se_m_sing_mvl/mxv
+	.byte	W06
+@ 028   ----------------------------------------
+	.byte		MOD   , 0
+	.byte	W06
+@ 029   ----------------------------------------
+	.byte	W06
+@ 030   ----------------------------------------
+	.byte	FINE
+
+@**************** Track 2 (Midi-Chn.2) ****************@
+
+se_m_sing_2:
+	.byte	KEYSH , se_m_sing_key+0
+@ 000   ----------------------------------------
+	.byte		VOICE , 73
+	.byte		LFOS  , 40
+	.byte		VOL   , 127*se_m_sing_mvl/mxv
+	.byte		BEND  , c_v+9
+	.byte	W06
+@ 001   ----------------------------------------
+	.byte	W06
+@ 002   ----------------------------------------
+	.byte		PAN   , c_v+12
+	.byte		N44   , Gn4 , v060
+	.byte	W06
+@ 003   ----------------------------------------
+	.byte	W06
+@ 004   ----------------------------------------
+	.byte	W03
+	.byte		MOD   , 7
+	.byte	W03
+@ 005   ----------------------------------------
+	.byte	W03
+	.byte		VOL   , 111*se_m_sing_mvl/mxv
+	.byte	W03
+@ 006   ----------------------------------------
+	.byte	W03
+	.byte		        93*se_m_sing_mvl/mxv
+	.byte	W03
+@ 007   ----------------------------------------
+	.byte	W03
+	.byte		        67*se_m_sing_mvl/mxv
+	.byte	W03
+@ 008   ----------------------------------------
+	.byte	W03
+	.byte		        33*se_m_sing_mvl/mxv
+	.byte	W03
+@ 009   ----------------------------------------
+	.byte	W03
+	.byte		MOD   , 0
+	.byte	W03
+@ 010   ----------------------------------------
+	.byte		VOL   , 127*se_m_sing_mvl/mxv
+	.byte		PAN   , c_v-12
+	.byte		N21   , Fn5 
+	.byte	W06
+@ 011   ----------------------------------------
+	.byte	W06
+@ 012   ----------------------------------------
+se_m_sing_2_012:
+	.byte		VOL   , 115*se_m_sing_mvl/mxv
+	.byte		MOD   , 7
+	.byte	W03
+	.byte		VOL   , 101*se_m_sing_mvl/mxv
+	.byte	W03
+	.byte	PEND
+@ 013   ----------------------------------------
+se_m_sing_2_013:
+	.byte		VOL   , 74*se_m_sing_mvl/mxv
+	.byte	W03
+	.byte		        35*se_m_sing_mvl/mxv
+	.byte		MOD   , 0
+	.byte	W03
+	.byte	PEND
+@ 014   ----------------------------------------
+	.byte		VOL   , 127*se_m_sing_mvl/mxv
+	.byte		PAN   , c_v+12
+	.byte		N21   , Ds5 , v060
+	.byte	W06
+@ 015   ----------------------------------------
+	.byte	W06
+@ 016   ----------------------------------------
+	.byte	PATT
+	 .word	se_m_sing_2_012
+@ 017   ----------------------------------------
+	.byte	PATT
+	 .word	se_m_sing_2_013
+@ 018   ----------------------------------------
+	.byte		VOL   , 127*se_m_sing_mvl/mxv
+	.byte		PAN   , c_v-12
+	.byte		N66   , Gn4 , v060
+	.byte	W06
+@ 019   ----------------------------------------
+	.byte	W06
+@ 020   ----------------------------------------
+	.byte		PAN   , c_v-8
+	.byte	W06
+@ 021   ----------------------------------------
+	.byte	W06
+@ 022   ----------------------------------------
+	.byte		MOD   , 7
+	.byte		PAN   , c_v+0
+	.byte	W06
+@ 023   ----------------------------------------
+	.byte	W06
+@ 024   ----------------------------------------
+	.byte		        c_v+7
+	.byte	W06
+@ 025   ----------------------------------------
+	.byte		VOL   , 111*se_m_sing_mvl/mxv
+	.byte	W06
+@ 026   ----------------------------------------
+	.byte		        93*se_m_sing_mvl/mxv
+	.byte		PAN   , c_v+15
+	.byte	W06
+@ 027   ----------------------------------------
+	.byte		VOL   , 67*se_m_sing_mvl/mxv
+	.byte	W06
+@ 028   ----------------------------------------
+	.byte		        33*se_m_sing_mvl/mxv
+	.byte		PAN   , c_v+8
+	.byte	W06
+@ 029   ----------------------------------------
+	.byte		MOD   , 0
+	.byte	FINE
+
+@******************************************************@
+	.align	2
+
+se_m_sing:
+	.byte	2	@ NumTrks
+	.byte	0	@ NumBlks
+	.byte	se_m_sing_pri	@ Priority
+	.byte	se_m_sing_rev	@ Reverb.
+
+	.word	se_m_sing_grp
+
+	.word	se_m_sing_1
+	.word	se_m_sing_2
+
+	.end

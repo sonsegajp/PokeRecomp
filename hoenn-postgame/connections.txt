@@ -1,0 +1,309 @@
+﻿static const struct MapConnection sLittlerootTownConns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 16 },
+};
+static const struct MapConnections sLittlerootTownConnData = { 1, sLittlerootTownConns };
+
+static const struct MapConnection sOldaleTownConns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 18 },
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 16 },
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 17 },
+};
+static const struct MapConnections sOldaleTownConnData = { 3, sOldaleTownConns };
+
+static const struct MapConnection sPetalburgCityConns[] = {
+    { .direction = CONNECTION_WEST, .offset = -50, .mapGroup = 43, .mapNum = 19 },
+    { .direction = CONNECTION_EAST, .offset = 10, .mapGroup = 43, .mapNum = 17 },
+};
+static const struct MapConnections sPetalburgCityConnData = { 2, sPetalburgCityConns };
+
+static const struct MapConnection sRoute101Conns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 10 },
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 9 },
+};
+static const struct MapConnections sRoute101ConnData = { 2, sRoute101Conns };
+
+static const struct MapConnection sRoute102Conns[] = {
+    { .direction = CONNECTION_WEST, .offset = -10, .mapGroup = 43, .mapNum = 0 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 10 },
+};
+static const struct MapConnections sRoute102ConnData = { 2, sRoute102Conns };
+
+static const struct MapConnection sRoute103Conns[] = {
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 10 },
+    { .direction = CONNECTION_EAST, .offset = -60, .mapGroup = 43, .mapNum = 25 },
+};
+static const struct MapConnections sRoute103ConnData = { 2, sRoute103Conns };
+
+static const struct MapConnection sRoute104Conns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 3 },
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 20 },
+    { .direction = CONNECTION_EAST, .offset = 50, .mapGroup = 43, .mapNum = 0 },
+};
+static const struct MapConnections sRoute104ConnData = { 3, sRoute104Conns };
+
+static const struct MapConnection sRoute105Conns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 19 },
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 21 },
+};
+static const struct MapConnections sRoute105ConnData = { 2, sRoute105Conns };
+
+static const struct MapConnection sRoute106Conns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 20 },
+    { .direction = CONNECTION_SOUTH, .offset = 60, .mapGroup = 43, .mapNum = 11 },
+};
+static const struct MapConnections sRoute106ConnData = { 2, sRoute106Conns };
+
+static const struct MapConnection sRoute107Conns[] = {
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 11 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 23 },
+};
+static const struct MapConnections sRoute107ConnData = { 2, sRoute107Conns };
+
+static const struct MapConnection sRoute108Conns[] = {
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 22 },
+    { .direction = CONNECTION_EAST, .offset = -40, .mapGroup = 43, .mapNum = 24 },
+};
+static const struct MapConnections sRoute108ConnData = { 2, sRoute108Conns };
+
+static const struct MapConnection sRoute109Conns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 1 },
+    { .direction = CONNECTION_WEST, .offset = 40, .mapGroup = 43, .mapNum = 23 },
+};
+static const struct MapConnections sRoute109ConnData = { 2, sRoute109Conns };
+
+static const struct MapConnection sRoute110Conns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 2 },
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 1 },
+    { .direction = CONNECTION_WEST, .offset = 60, .mapGroup = 43, .mapNum = 18 },
+};
+static const struct MapConnections sRoute110ConnData = { 3, sRoute110Conns };
+
+static const struct MapConnection sRoute111Conns[] = {
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 2 },
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 28 },
+    { .direction = CONNECTION_WEST, .offset = 20, .mapGroup = 43, .mapNum = 27 },
+};
+static const struct MapConnections sRoute111ConnData = { 3, sRoute111Conns };
+
+static const struct MapConnection sRoute112Conns[] = {
+    { .direction = CONNECTION_NORTH, .offset = -60, .mapGroup = 43, .mapNum = 28 },
+    { .direction = CONNECTION_WEST, .offset = 40, .mapGroup = 43, .mapNum = 12 },
+    { .direction = CONNECTION_EAST, .offset = -20, .mapGroup = 43, .mapNum = 26 },
+};
+static const struct MapConnections sRoute112ConnData = { 3, sRoute112Conns };
+
+static const struct MapConnection sRoute113Conns[] = {
+    { .direction = CONNECTION_SOUTH, .offset = 60, .mapGroup = 43, .mapNum = 27 },
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 13 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 26 },
+};
+static const struct MapConnections sRoute113ConnData = { 3, sRoute113Conns };
+
+static const struct MapConnection sRoute114Conns[] = {
+    { .direction = CONNECTION_WEST, .offset = 40, .mapGroup = 43, .mapNum = 30 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 13 },
+};
+static const struct MapConnections sRoute114ConnData = { 2, sRoute114Conns };
+
+static const struct MapConnection sRoute115Conns[] = {
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 3 },
+    { .direction = CONNECTION_EAST, .offset = -40, .mapGroup = 43, .mapNum = 29 },
+};
+static const struct MapConnections sRoute115ConnData = { 2, sRoute115Conns };
+
+static const struct MapConnection sRoute116Conns[] = {
+    { .direction = CONNECTION_SOUTH, .offset = 80, .mapGroup = 43, .mapNum = 14 },
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 3 },
+};
+static const struct MapConnections sRoute116ConnData = { 2, sRoute116Conns };
+
+static const struct MapConnection sRoute117Conns[] = {
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 14 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 2 },
+};
+static const struct MapConnections sRoute117ConnData = { 2, sRoute117Conns };
+
+static const struct MapConnection sRoute118Conns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 40, .mapGroup = 43, .mapNum = 34 },
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 2 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 38 },
+};
+static const struct MapConnections sRoute118ConnData = { 3, sRoute118Conns };
+
+static const struct MapConnection sRoute119Conns[] = {
+    { .direction = CONNECTION_SOUTH, .offset = -40, .mapGroup = 43, .mapNum = 33 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 4 },
+};
+static const struct MapConnections sRoute119ConnData = { 2, sRoute119Conns };
+
+static const struct MapConnection sRoute120Conns[] = {
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 4 },
+    { .direction = CONNECTION_EAST, .offset = 80, .mapGroup = 43, .mapNum = 36 },
+};
+static const struct MapConnections sRoute120ConnData = { 2, sRoute120Conns };
+
+static const struct MapConnection sRoute121Conns[] = {
+    { .direction = CONNECTION_SOUTH, .offset = 20, .mapGroup = 43, .mapNum = 37 },
+    { .direction = CONNECTION_WEST, .offset = -80, .mapGroup = 43, .mapNum = 35 },
+    { .direction = CONNECTION_EAST, .offset = -10, .mapGroup = 43, .mapNum = 5 },
+};
+static const struct MapConnections sRoute121ConnData = { 3, sRoute121Conns };
+
+static const struct MapConnection sRoute122Conns[] = {
+    { .direction = CONNECTION_NORTH, .offset = -20, .mapGroup = 43, .mapNum = 36 },
+    { .direction = CONNECTION_SOUTH, .offset = -100, .mapGroup = 43, .mapNum = 38 },
+};
+static const struct MapConnections sRoute122ConnData = { 2, sRoute122Conns };
+
+static const struct MapConnection sRoute123Conns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 100, .mapGroup = 43, .mapNum = 37 },
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 33 },
+};
+static const struct MapConnections sRoute123ConnData = { 2, sRoute123Conns };
+
+static const struct MapConnection sRoute124Conns[] = {
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 41 },
+    { .direction = CONNECTION_WEST, .offset = 10, .mapGroup = 43, .mapNum = 5 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 40 },
+    { .direction = CONNECTION_EAST, .offset = 40, .mapGroup = 43, .mapNum = 6 },
+};
+static const struct MapConnections sRoute124ConnData = { 4, sRoute124Conns };
+
+static const struct MapConnection sRoute125Conns[] = {
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 6 },
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 39 },
+};
+static const struct MapConnections sRoute125ConnData = { 2, sRoute125Conns };
+
+static const struct MapConnection sRoute126Conns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 39 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 42 },
+};
+static const struct MapConnections sRoute126ConnData = { 2, sRoute126Conns };
+
+static const struct MapConnection sRoute127Conns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 6 },
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 43 },
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 41 },
+};
+static const struct MapConnections sRoute127ConnData = { 3, sRoute127Conns };
+
+static const struct MapConnection sRoute128Conns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 42 },
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 44 },
+    { .direction = CONNECTION_EAST, .offset = -40, .mapGroup = 43, .mapNum = 8 },
+};
+static const struct MapConnections sRoute128ConnData = { 3, sRoute128Conns };
+
+static const struct MapConnection sRoute129Conns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 43 },
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 45 },
+};
+static const struct MapConnections sRoute129ConnData = { 2, sRoute129Conns };
+
+static const struct MapConnection sRoute130Conns[] = {
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 46 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 44 },
+};
+static const struct MapConnections sRoute130ConnData = { 2, sRoute130Conns };
+
+static const struct MapConnection sRoute131Conns[] = {
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 15 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 45 },
+};
+static const struct MapConnections sRoute131ConnData = { 2, sRoute131Conns };
+
+static const struct MapConnection sRoute132Conns[] = {
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 48 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 15 },
+};
+static const struct MapConnections sRoute132ConnData = { 2, sRoute132Conns };
+
+static const struct MapConnection sRoute133Conns[] = {
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 49 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 47 },
+};
+static const struct MapConnections sRoute133ConnData = { 2, sRoute133Conns };
+
+static const struct MapConnection sRoute134Conns[] = {
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 1 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 48 },
+};
+static const struct MapConnections sRoute134ConnData = { 2, sRoute134Conns };
+
+static const struct MapConnection sSlateportCityConns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 25 },
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 24 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 49 },
+};
+static const struct MapConnections sSlateportCityConnData = { 3, sSlateportCityConns };
+
+static const struct MapConnection sMauvilleCityConns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 26 },
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 25 },
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 32 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 33 },
+};
+static const struct MapConnections sMauvilleCityConnData = { 4, sMauvilleCityConns };
+
+static const struct MapConnection sRustboroCityConns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 30 },
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 19 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 31 },
+};
+static const struct MapConnections sRustboroCityConnData = { 3, sRustboroCityConns };
+
+static const struct MapConnection sFortreeCityConns[] = {
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 34 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 35 },
+};
+static const struct MapConnections sFortreeCityConnData = { 2, sFortreeCityConns };
+
+static const struct MapConnection sLilycoveCityConns[] = {
+    { .direction = CONNECTION_WEST, .offset = 10, .mapGroup = 43, .mapNum = 36 },
+    { .direction = CONNECTION_EAST, .offset = -10, .mapGroup = 43, .mapNum = 39 },
+};
+static const struct MapConnections sLilycoveCityConnData = { 2, sLilycoveCityConns };
+
+static const struct MapConnection sMossdeepCityConns[] = {
+    { .direction = CONNECTION_NORTH, .offset = 0, .mapGroup = 43, .mapNum = 40 },
+    { .direction = CONNECTION_SOUTH, .offset = 0, .mapGroup = 43, .mapNum = 42 },
+    { .direction = CONNECTION_WEST, .offset = -40, .mapGroup = 43, .mapNum = 39 },
+};
+static const struct MapConnections sMossdeepCityConnData = { 3, sMossdeepCityConns };
+
+// SootopolisCity: no connections
+static const struct MapConnection sEverGrandeCityConns[] = {
+    { .direction = CONNECTION_WEST, .offset = 40, .mapGroup = 43, .mapNum = 43 },
+};
+static const struct MapConnections sEverGrandeCityConnData = { 1, sEverGrandeCityConns };
+
+static const struct MapConnection sDewfordTownConns[] = {
+    { .direction = CONNECTION_NORTH, .offset = -60, .mapGroup = 43, .mapNum = 21 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 22 },
+};
+static const struct MapConnections sDewfordTownConnData = { 2, sDewfordTownConns };
+
+static const struct MapConnection sLavaridgeTownConns[] = {
+    { .direction = CONNECTION_EAST, .offset = -40, .mapGroup = 43, .mapNum = 27 },
+};
+static const struct MapConnections sLavaridgeTownConnData = { 1, sLavaridgeTownConns };
+
+static const struct MapConnection sFallarborTownConns[] = {
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 29 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 28 },
+};
+static const struct MapConnections sFallarborTownConnData = { 2, sFallarborTownConns };
+
+static const struct MapConnection sVerdanturfTownConns[] = {
+    { .direction = CONNECTION_NORTH, .offset = -80, .mapGroup = 43, .mapNum = 31 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 32 },
+};
+static const struct MapConnections sVerdanturfTownConnData = { 2, sVerdanturfTownConns };
+
+static const struct MapConnection sPacifidlogTownConns[] = {
+    { .direction = CONNECTION_WEST, .offset = 0, .mapGroup = 43, .mapNum = 47 },
+    { .direction = CONNECTION_EAST, .offset = 0, .mapGroup = 43, .mapNum = 46 },
+};
+static const struct MapConnections sPacifidlogTownConnData = { 2, sPacifidlogTownConns };
+

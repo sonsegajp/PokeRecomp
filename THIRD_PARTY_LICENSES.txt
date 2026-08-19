@@ -1,0 +1,321 @@
+===========================================================================
+THIRD-PARTY LICENSES — PokeRecomp
+===========================================================================
+
+This file lists the third-party software distributed with, or linked into,
+PokeRecomp, together with the license each component is used under.
+
+The PokeRecomp port code itself is MIT licensed; see LICENSE.
+
+Nothing in this file applies to Pokemon game code, data, or assets. Those are
+(c) Nintendo / Creatures Inc. / GAME FREAK inc., are not licensed to this
+project, and are not distributed with it. Assets are extracted at runtime from
+a ROM supplied by the user.
+
+---------------------------------------------------------------------------
+SUMMARY
+---------------------------------------------------------------------------
+
+  Component                        License              Linkage
+  -------------------------------  -------------------  ------------------
+  Dear ImGui                       MIT                  static
+  stb_image / stb_image_write /
+    stb_truetype                   MIT / public domain  static
+  SDL2                             zlib                 dynamic (DLL)
+  SDL2_mixer                       zlib                 dynamic (DLL)
+  SDL2_ttf                         zlib                 dynamic (DLL)
+  FreeType                         FTL or GPLv2         dynamic (DLL)
+  libpng                           libpng/zlib          dynamic (DLL)
+  zlib                             zlib                 dynamic (DLL)
+  libogg / libvorbis / libopus /
+    opusfile / libFLAC             BSD 3-Clause         dynamic (DLL)
+  libmpg123                        LGPL v2.1            dynamic (DLL)
+  libmp3lame                       LGPL v2              dynamic (DLL)
+  libxmp                           LGPL v2.1            dynamic (DLL)
+  FluidSynth                       LGPL v2.1            dynamic (DLL)
+  GLib / GModule                   LGPL v2.1            dynamic (DLL)
+  libiconv / libintl (gettext)     LGPL v2.1            dynamic (DLL)
+  HarfBuzz                         MIT                  dynamic (DLL)
+  Graphite2                        LGPL v2.1 or MPL     dynamic (DLL)
+  Brotli                           MIT                  dynamic (DLL)
+  libsndfile                       LGPL v2.1            dynamic (DLL)
+  PortAudio                        MIT                  dynamic (DLL)
+  WavPack                          BSD 3-Clause         dynamic (DLL)
+  bzip2                            BSD-style            dynamic (DLL)
+  PCRE2                            BSD 3-Clause         dynamic (DLL)
+  libgcc / libstdc++ / winpthreads GPLv3 + GCC Runtime  static
+                                     Library Exception
+  pret build tools (bin2c, gbagfx,
+    preproc, scaninc, rsfont,
+    ramscrgen, mid2agb)            MIT                  build-time only
+  wav2agb                          MIT                  build-time only
+  gbafix                           GPLv3                build-time only,
+                                                        never linked
+
+NOTE ON LGPL COMPONENTS: every LGPL-licensed library above is used as an
+unmodified dynamically-linked DLL. Users may replace any of them with their
+own build by substituting the DLL in the program directory. No LGPL code is
+statically linked into PokeRecomp.exe.
+
+NOTE ON GCC RUNTIME: libgcc and libstdc++ are statically linked under the GCC
+Runtime Library Exception, which explicitly permits this without imposing GPL
+terms on the resulting binary.
+
+NOTE ON gbafix: gbafix is GPLv3 and is used only as a standalone build-time
+utility for producing GBA ROM images. It is never linked into, and is not
+distributed with, PokeRecomp.exe.
+
+
+===========================================================================
+FULL LICENSE TEXTS
+===========================================================================
+
+---------------------------------------------------------------------------
+Dear ImGui
+https://github.com/ocornut/imgui
+---------------------------------------------------------------------------
+
+The MIT License (MIT)
+
+Copyright (c) 2014-2026 Omar Cornut
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+---------------------------------------------------------------------------
+stb_image.h, stb_image_write.h, stb_truetype.h  (Sean Barrett)
+https://github.com/nothings/stb
+---------------------------------------------------------------------------
+
+These files are dual-licensed: public domain (Unlicense) or MIT. MIT text:
+
+Copyright (c) 2017 Sean Barrett
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+---------------------------------------------------------------------------
+SDL2, SDL2_mixer, SDL2_ttf
+https://www.libsdl.org/
+---------------------------------------------------------------------------
+
+Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+
+This software is provided 'as-is', without any express or implied warranty. In
+no event will the authors be held liable for any damages arising from the use
+of this software.
+
+Permission is granted to anyone to use this software for any purpose, including
+commercial applications, and to alter it and redistribute it freely, subject to
+the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim
+   that you wrote the original software. If you use this software in a product,
+   an acknowledgment in the product documentation would be appreciated but is
+   not required.
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+
+
+---------------------------------------------------------------------------
+pret build tools: bin2c, gbagfx, preproc, scaninc, rsfont, ramscrgen, mid2agb
+https://github.com/pret/
+---------------------------------------------------------------------------
+
+Copyright (c) 2015-2016 YamaArashi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+---------------------------------------------------------------------------
+wav2agb
+---------------------------------------------------------------------------
+
+The MIT License (MIT)
+
+Copyright (c) 2016 ipatix
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+---------------------------------------------------------------------------
+FreeType
+https://freetype.org/
+---------------------------------------------------------------------------
+
+Portions of this software are copyright (c) The FreeType Project
+(https://www.freetype.org). All rights reserved.
+
+FreeType is distributed under dual license: the FreeType License (FTL, a
+BSD-style license with a credit clause) or GPLv2. It is used here under the
+FreeType License. The credit requirement above satisfies that clause.
+
+
+---------------------------------------------------------------------------
+Ogg, Vorbis, Opus, opusfile, FLAC, WavPack
+---------------------------------------------------------------------------
+
+Copyright (c) Xiph.Org Foundation and contributors.
+Copyright (c) David Bryant (WavPack).
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+- Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+- Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+- Neither the name of the copyright holders nor the names of contributors may
+  be used to endorse or promote products derived from this software without
+  specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+---------------------------------------------------------------------------
+zlib and libpng
+---------------------------------------------------------------------------
+
+zlib: Copyright (C) 1995-2024 Jean-loup Gailly and Mark Adler.
+libpng: Copyright (c) 1995-2024 The PNG Reference Library Authors.
+
+Both are distributed under permissive zlib-style licenses which allow use,
+modification and redistribution in source and binary form, provided the origin
+is not misrepresented and altered versions are marked as such.
+
+
+---------------------------------------------------------------------------
+HarfBuzz, PortAudio, Brotli
+---------------------------------------------------------------------------
+
+Distributed under the MIT license (text as reproduced for Dear ImGui above,
+with copyright held by their respective authors: Behdad Esfahbod and HarfBuzz
+contributors; Ross Bencina and Phil Burk; the Brotli Authors / Google Inc.).
+
+
+---------------------------------------------------------------------------
+LGPL COMPONENTS
+FluidSynth, libmpg123, libmp3lame, libxmp, GLib/GModule, libiconv, libintl,
+libsndfile, Graphite2, PCRE2 (see summary table for exact license versions)
+---------------------------------------------------------------------------
+
+These libraries are licensed under the GNU Lesser General Public License,
+version 2 or 2.1 (or, for Graphite2, LGPL v2.1 / MPL / GPL at your option;
+PCRE2 is BSD-licensed and listed here only for completeness).
+
+They are distributed as unmodified dynamically-linked DLLs alongside
+PokeRecomp.exe. No source modifications have been made to any of them.
+
+Under LGPL section 6, you have the right to modify and replace these libraries.
+Because they are dynamically linked, you may do so simply by replacing the
+corresponding .dll file in the program directory with your own build.
+
+Full LGPL license texts:
+  LGPL v2.1 — https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+  LGPL v2   — https://www.gnu.org/licenses/old-licenses/lgpl-2.0.txt
+
+Upstream sources:
+  FluidSynth  https://github.com/FluidSynth/fluidsynth
+  mpg123      https://www.mpg123.de/
+  LAME        https://lame.sourceforge.io/
+  libxmp      https://github.com/libxmp/libxmp
+  GLib        https://gitlab.gnome.org/GNOME/glib
+  libiconv    https://www.gnu.org/software/libiconv/
+  gettext     https://www.gnu.org/software/gettext/
+  libsndfile  https://github.com/libsndfile/libsndfile
+  Graphite2   https://github.com/silnrsi/graphite
+
+Unmodified builds of these libraries were obtained from the MSYS2 mingw32
+package repository (https://www.msys2.org/). Corresponding sources for the
+exact versions shipped are available from MSYS2 and from the upstream projects
+listed above.
+
+
+---------------------------------------------------------------------------
+GCC RUNTIME (libgcc, libstdc++, winpthreads)
+---------------------------------------------------------------------------
+
+libgcc and libstdc++ are statically linked (-static-libgcc -static-libstdc++)
+under the GCC Runtime Library Exception version 3.1, which permits distribution
+of the resulting binary without GPL obligations when the code is compiled with
+a compliant compiler.
+
+  GCC Runtime Library Exception:
+  https://www.gnu.org/licenses/gcc-exception-3.1.html
+
+mingw-w64 winpthreads is distributed under a permissive MIT/BSD-style license.

@@ -1,0 +1,472 @@
+// Indoor map lookup — replace the if-chain in Hoenn_GetMapHeader
+    if (group == 44 && num == 0) return &gHoennMapHeader_LittlerootTown_BrendansHouse_1F;
+    if (group == 44 && num == 1) return &gHoennMapHeader_LittlerootTown_BrendansHouse_2F;
+    if (group == 44 && num == 2) return &gHoennMapHeader_LittlerootTown_MaysHouse_1F;
+    if (group == 44 && num == 3) return &gHoennMapHeader_LittlerootTown_MaysHouse_2F;
+    if (group == 44 && num == 4) return &gHoennMapHeader_LittlerootTown_ProfessorBirchsLab;
+    if (group == 46 && num == 3) return &gHoennMapHeader_DewfordTown_Gym;
+    if (group == 46 && num == 4) return &gHoennMapHeader_DewfordTown_Hall;
+    if (group == 47 && num == 0) return &gHoennMapHeader_LavaridgeTown_HerbShop;
+    if (group == 47 && num == 1) return &gHoennMapHeader_LavaridgeTown_Gym_1F;
+    if (group == 47 && num == 2) return &gHoennMapHeader_LavaridgeTown_Gym_B1F;
+    if (group == 47 && num == 5) return &gHoennMapHeader_LavaridgeTown_PokemonCenter_1F;
+    if (group == 49 && num == 5) return &gHoennMapHeader_VerdanturfTown_WandasHouse;
+    if (group == 50 && num == 2) return &gHoennMapHeader_PacifidlogTown_House1;
+    if (group == 50 && num == 3) return &gHoennMapHeader_PacifidlogTown_House2;
+    if (group == 51 && num == 1) return &gHoennMapHeader_PetalburgCity_Gym;
+    if (group == 52 && num == 0) return &gHoennMapHeader_SlateportCity_SternsShipyard_1F;
+    if (group == 52 && num == 1) return &gHoennMapHeader_SlateportCity_SternsShipyard_2F;
+    if (group == 52 && num == 5) return &gHoennMapHeader_SlateportCity_PokemonFanClub;
+    if (group == 52 && num == 6) return &gHoennMapHeader_SlateportCity_OceanicMuseum_1F;
+    if (group == 52 && num == 7) return &gHoennMapHeader_SlateportCity_OceanicMuseum_2F;
+    if (group == 53 && num == 0) return &gHoennMapHeader_MauvilleCity_Gym;
+    if (group == 53 && num == 1) return &gHoennMapHeader_MauvilleCity_BikeShop;
+    if (group == 53 && num == 3) return &gHoennMapHeader_MauvilleCity_GameCorner;
+    if (group == 54 && num == 0) return &gHoennMapHeader_RustboroCity_DevonCorp_1F;
+    if (group == 54 && num == 1) return &gHoennMapHeader_RustboroCity_DevonCorp_2F;
+    if (group == 54 && num == 2) return &gHoennMapHeader_RustboroCity_DevonCorp_3F;
+    if (group == 54 && num == 3) return &gHoennMapHeader_RustboroCity_Gym;
+    if (group == 54 && num == 4) return &gHoennMapHeader_RustboroCity_PokemonSchool;
+    if (group == 54 && num == 8) return &gHoennMapHeader_RustboroCity_Flat1_1F;
+    if (group == 54 && num == 9) return &gHoennMapHeader_RustboroCity_Flat1_2F;
+    if (group == 54 && num == 10) return &gHoennMapHeader_RustboroCity_House1;
+    if (group == 54 && num == 11) return &gHoennMapHeader_RustboroCity_CuttersHouse;
+    if (group == 54 && num == 13) return &gHoennMapHeader_RustboroCity_Flat2_1F;
+    if (group == 54 && num == 14) return &gHoennMapHeader_RustboroCity_Flat2_2F;
+    if (group == 54 && num == 15) return &gHoennMapHeader_RustboroCity_Flat2_3F;
+    if (group == 55 && num == 0) return &gHoennMapHeader_FortreeCity_House1;
+    if (group == 55 && num == 1) return &gHoennMapHeader_FortreeCity_Gym;
+    if (group == 55 && num == 5) return &gHoennMapHeader_FortreeCity_House2;
+    if (group == 55 && num == 9) return &gHoennMapHeader_FortreeCity_DecorationShop;
+    if (group == 56 && num == 0) return &gHoennMapHeader_LilycoveCity_CoveLilyMotel_1F;
+    if (group == 56 && num == 1) return &gHoennMapHeader_LilycoveCity_CoveLilyMotel_2F;
+    if (group == 56 && num == 2) return &gHoennMapHeader_LilycoveCity_LilycoveMuseum_1F;
+    if (group == 56 && num == 3) return &gHoennMapHeader_LilycoveCity_LilycoveMuseum_2F;
+    if (group == 56 && num == 4) return &gHoennMapHeader_LilycoveCity_ContestLobby;
+    if (group == 56 && num == 5) return &gHoennMapHeader_LilycoveCity_ContestHall;
+    if (group == 56 && num == 9) return &gHoennMapHeader_LilycoveCity_PokemonTrainerFanClub;
+    if (group == 56 && num == 11) return &gHoennMapHeader_LilycoveCity_EmptyMap;
+    if (group == 56 && num == 14) return &gHoennMapHeader_LilycoveCity_House2;
+    if (group == 56 && num == 17) return &gHoennMapHeader_LilycoveCity_DepartmentStore_1F;
+    if (group == 56 && num == 18) return &gHoennMapHeader_LilycoveCity_DepartmentStore_2F;
+    if (group == 56 && num == 19) return &gHoennMapHeader_LilycoveCity_DepartmentStore_3F;
+    if (group == 56 && num == 20) return &gHoennMapHeader_LilycoveCity_DepartmentStore_4F;
+    if (group == 56 && num == 21) return &gHoennMapHeader_LilycoveCity_DepartmentStore_5F;
+    if (group == 56 && num == 22) return &gHoennMapHeader_LilycoveCity_DepartmentStoreRooftop;
+    if (group == 56 && num == 23) return &gHoennMapHeader_LilycoveCity_DepartmentStoreElevator;
+    if (group == 57 && num == 0) return &gHoennMapHeader_MossdeepCity_Gym;
+    if (group == 57 && num == 7) return &gHoennMapHeader_MossdeepCity_StevensHouse;
+    if (group == 57 && num == 9) return &gHoennMapHeader_MossdeepCity_SpaceCenter_1F;
+    if (group == 57 && num == 10) return &gHoennMapHeader_MossdeepCity_SpaceCenter_2F;
+    if (group == 57 && num == 11) return &gHoennMapHeader_MossdeepCity_GameCorner_1F;
+    if (group == 57 && num == 12) return &gHoennMapHeader_MossdeepCity_GameCorner_B1F;
+    if (group == 58 && num == 0) return &gHoennMapHeader_SootopolisCity_Gym_1F;
+    if (group == 58 && num == 1) return &gHoennMapHeader_SootopolisCity_Gym_B1F;
+    if (group == 58 && num == 5) return &gHoennMapHeader_SootopolisCity_House1;
+    if (group == 58 && num == 6) return &gHoennMapHeader_SootopolisCity_House2;
+    if (group == 58 && num == 7) return &gHoennMapHeader_SootopolisCity_House3;
+    if (group == 58 && num == 12) return &gHoennMapHeader_SootopolisCity_House8;
+    if (group == 59 && num == 0) return &gHoennMapHeader_EverGrandeCity_SidneysRoom;
+    if (group == 59 && num == 1) return &gHoennMapHeader_EverGrandeCity_PhoebesRoom;
+    if (group == 59 && num == 2) return &gHoennMapHeader_EverGrandeCity_GlaciasRoom;
+    if (group == 59 && num == 3) return &gHoennMapHeader_EverGrandeCity_DrakesRoom;
+    if (group == 59 && num == 4) return &gHoennMapHeader_EverGrandeCity_ChampionsRoom;
+    if (group == 59 && num == 8) return &gHoennMapHeader_EverGrandeCity_Corridor4;
+    if (group == 59 && num == 10) return &gHoennMapHeader_EverGrandeCity_PokemonLeague;
+    if (group == 59 && num == 11) return &gHoennMapHeader_EverGrandeCity_HallOfFame;
+    if (group == 60 && num == 0) return &gHoennMapHeader_Route104_MrBrineysHouse;
+    if (group == 60 && num == 1) return &gHoennMapHeader_Route104_PrettyPetalFlowerShop;
+    if (group == 63 && num == 0) return &gHoennMapHeader_Route114_FossilManiacsHouse;
+    if (group == 63 && num == 1) return &gHoennMapHeader_Route114_FossilManiacsTunnel;
+    if (group == 63 && num == 2) return &gHoennMapHeader_Route114_LanettesHouse;
+    if (group == 64 && num == 0) return &gHoennMapHeader_Route116_TunnelersRestHouse;
+    if (group == 65 && num == 0) return &gHoennMapHeader_Route117_PokemonDayCare;
+    if (group == 66 && num == 0) return &gHoennMapHeader_Route121_SafariZoneEntrance;
+    if (group == 67 && num == 0) return &gHoennMapHeader_MeteorFalls_1F_1R;
+    if (group == 67 && num == 1) return &gHoennMapHeader_MeteorFalls_1F_2R;
+    if (group == 67 && num == 2) return &gHoennMapHeader_MeteorFalls_B1F_1R;
+    if (group == 67 && num == 3) return &gHoennMapHeader_MeteorFalls_B1F_2R;
+    if (group == 67 && num == 4) return &gHoennMapHeader_RusturfTunnel;
+    if (group == 67 && num == 5) return &gHoennMapHeader_Underwater_SootopolisCity;
+    if (group == 67 && num == 6) return &gHoennMapHeader_DesertRuins;
+    if (group == 67 && num == 7) return &gHoennMapHeader_GraniteCave_1F;
+    if (group == 67 && num == 8) return &gHoennMapHeader_GraniteCave_B1F;
+    if (group == 67 && num == 9) return &gHoennMapHeader_GraniteCave_B2F;
+    if (group == 67 && num == 10) return &gHoennMapHeader_GraniteCave_StevensRoom;
+    if (group == 67 && num == 11) return &gHoennMapHeader_PetalburgWoods;
+    if (group == 67 && num == 12) return &gHoennMapHeader_MtChimney;
+    if (group == 67 && num == 13) return &gHoennMapHeader_JaggedPass;
+    if (group == 67 && num == 14) return &gHoennMapHeader_FieryPath;
+    if (group == 67 && num == 15) return &gHoennMapHeader_MtPyre_1F;
+    if (group == 67 && num == 16) return &gHoennMapHeader_MtPyre_2F;
+    if (group == 67 && num == 17) return &gHoennMapHeader_MtPyre_3F;
+    if (group == 67 && num == 18) return &gHoennMapHeader_MtPyre_4F;
+    if (group == 67 && num == 19) return &gHoennMapHeader_MtPyre_5F;
+    if (group == 67 && num == 20) return &gHoennMapHeader_MtPyre_6F;
+    if (group == 67 && num == 21) return &gHoennMapHeader_MtPyre_Exterior;
+    if (group == 67 && num == 22) return &gHoennMapHeader_MtPyre_Summit;
+    if (group == 67 && num == 23) return &gHoennMapHeader_AquaHideout_1F;
+    if (group == 67 && num == 24) return &gHoennMapHeader_AquaHideout_B1F;
+    if (group == 67 && num == 25) return &gHoennMapHeader_AquaHideout_B2F;
+    if (group == 67 && num == 26) return &gHoennMapHeader_Underwater_SeafloorCavern;
+    if (group == 67 && num == 27) return &gHoennMapHeader_SeafloorCavern_Entrance;
+    if (group == 67 && num == 28) return &gHoennMapHeader_SeafloorCavern_Room1;
+    if (group == 67 && num == 29) return &gHoennMapHeader_SeafloorCavern_Room2;
+    if (group == 67 && num == 30) return &gHoennMapHeader_SeafloorCavern_Room3;
+    if (group == 67 && num == 31) return &gHoennMapHeader_SeafloorCavern_Room4;
+    if (group == 67 && num == 32) return &gHoennMapHeader_SeafloorCavern_Room5;
+    if (group == 67 && num == 33) return &gHoennMapHeader_SeafloorCavern_Room6;
+    if (group == 67 && num == 34) return &gHoennMapHeader_SeafloorCavern_Room7;
+    if (group == 67 && num == 35) return &gHoennMapHeader_SeafloorCavern_Room8;
+    if (group == 67 && num == 36) return &gHoennMapHeader_SeafloorCavern_Room9;
+    if (group == 67 && num == 37) return &gHoennMapHeader_CaveOfOrigin_Entrance;
+    if (group == 67 && num == 38) return &gHoennMapHeader_CaveOfOrigin_1F;
+    if (group == 67 && num == 39) return &gHoennMapHeader_CaveOfOrigin_B1F;
+    if (group == 67 && num == 40) return &gHoennMapHeader_CaveOfOrigin_B2F;
+    if (group == 67 && num == 41) return &gHoennMapHeader_CaveOfOrigin_B3F;
+    if (group == 67 && num == 42) return &gHoennMapHeader_CaveOfOrigin_B4F;
+    if (group == 67 && num == 43) return &gHoennMapHeader_VictoryRoad_1F;
+    if (group == 67 && num == 44) return &gHoennMapHeader_VictoryRoad_B1F;
+    if (group == 67 && num == 45) return &gHoennMapHeader_VictoryRoad_B2F;
+    if (group == 67 && num == 46) return &gHoennMapHeader_ShoalCave_LowTideEntranceRoom;
+    if (group == 67 && num == 47) return &gHoennMapHeader_ShoalCave_LowTideInnerRoom;
+    if (group == 67 && num == 48) return &gHoennMapHeader_ShoalCave_LowTideStairsRoom;
+    if (group == 67 && num == 49) return &gHoennMapHeader_ShoalCave_LowTideLowerRoom;
+    if (group == 67 && num == 50) return &gHoennMapHeader_ShoalCave_HighTideEntranceRoom;
+    if (group == 67 && num == 51) return &gHoennMapHeader_ShoalCave_HighTideInnerRoom;
+    if (group == 67 && num == 52) return &gHoennMapHeader_NewMauville_Entrance;
+    if (group == 67 && num == 53) return &gHoennMapHeader_NewMauville_Inside;
+    if (group == 67 && num == 54) return &gHoennMapHeader_AbandonedShip_Deck;
+    if (group == 67 && num == 55) return &gHoennMapHeader_AbandonedShip_Corridors_1F;
+    if (group == 67 && num == 56) return &gHoennMapHeader_AbandonedShip_Rooms_1F;
+    if (group == 67 && num == 57) return &gHoennMapHeader_AbandonedShip_Corridors_B1F;
+    if (group == 67 && num == 58) return &gHoennMapHeader_AbandonedShip_Rooms_B1F;
+    if (group == 67 && num == 59) return &gHoennMapHeader_AbandonedShip_Rooms2_B1F;
+    if (group == 67 && num == 60) return &gHoennMapHeader_AbandonedShip_Underwater1;
+    if (group == 67 && num == 61) return &gHoennMapHeader_AbandonedShip_Room_B1F;
+    if (group == 67 && num == 62) return &gHoennMapHeader_AbandonedShip_Rooms2_1F;
+    if (group == 67 && num == 63) return &gHoennMapHeader_AbandonedShip_CaptainsOffice;
+    if (group == 67 && num == 64) return &gHoennMapHeader_AbandonedShip_Underwater2;
+    if (group == 67 && num == 65) return &gHoennMapHeader_AbandonedShip_HiddenFloorCorridors;
+    if (group == 67 && num == 66) return &gHoennMapHeader_AbandonedShip_HiddenFloorRooms;
+    if (group == 67 && num == 67) return &gHoennMapHeader_IslandCave;
+    if (group == 67 && num == 68) return &gHoennMapHeader_AncientTomb;
+    if (group == 67 && num == 69) return &gHoennMapHeader_Underwater_Route134;
+    if (group == 67 && num == 70) return &gHoennMapHeader_Underwater_SealedChamber;
+    if (group == 67 && num == 71) return &gHoennMapHeader_SealedChamber_OuterRoom;
+    if (group == 67 && num == 72) return &gHoennMapHeader_SealedChamber_InnerRoom;
+    if (group == 67 && num == 73) return &gHoennMapHeader_ScorchedSlab;
+    if (group == 67 && num == 74) return &gHoennMapHeader_MagmaHideout_1F;
+    if (group == 67 && num == 75) return &gHoennMapHeader_MagmaHideout_B1F;
+    if (group == 67 && num == 76) return &gHoennMapHeader_MagmaHideout_B2F;
+    if (group == 67 && num == 77) return &gHoennMapHeader_SkyPillar_Entrance;
+    if (group == 67 && num == 78) return &gHoennMapHeader_SkyPillar_Outside;
+    if (group == 67 && num == 79) return &gHoennMapHeader_SkyPillar_1F;
+    if (group == 67 && num == 80) return &gHoennMapHeader_SkyPillar_2F;
+    if (group == 67 && num == 81) return &gHoennMapHeader_SkyPillar_3F;
+    if (group == 67 && num == 82) return &gHoennMapHeader_SkyPillar_4F;
+    if (group == 67 && num == 83) return &gHoennMapHeader_ShoalCave_LowTideIceRoom;
+    if (group == 67 && num == 84) return &gHoennMapHeader_SkyPillar_5F;
+    if (group == 67 && num == 85) return &gHoennMapHeader_SkyPillar_Top;
+    if (group == 68 && num == 24) return &gHoennMapHeader_SingleBattleColosseum;
+    if (group == 68 && num == 25) return &gHoennMapHeader_TradeCenter;
+    if (group == 68 && num == 26) return &gHoennMapHeader_RecordCorner;
+    if (group == 68 && num == 27) return &gHoennMapHeader_DoubleBattleColosseum;
+    if (group == 68 && num == 28) return &gHoennMapHeader_LinkContestRoom1;
+    if (group == 68 && num == 35) return &gHoennMapHeader_LinkContestRoom2;
+    if (group == 68 && num == 36) return &gHoennMapHeader_LinkContestRoom3;
+    if (group == 68 && num == 37) return &gHoennMapHeader_LinkContestRoom4;
+    if (group == 68 && num == 38) return &gHoennMapHeader_LinkContestRoom5;
+    if (group == 68 && num == 39) return &gHoennMapHeader_LinkContestRoom6;
+    if (group == 68 && num == 40) return &gHoennMapHeader_InsideOfTruck;
+    if (group == 68 && num == 41) return &gHoennMapHeader_SSTidalCorridor;
+    if (group == 68 && num == 42) return &gHoennMapHeader_SSTidalLowerDeck;
+    if (group == 68 && num == 43) return &gHoennMapHeader_SSTidalRooms;
+    if (group == 69 && num == 0) return &gHoennMapHeader_SafariZone_Northwest;
+    if (group == 69 && num == 1) return &gHoennMapHeader_SafariZone_Northeast;
+    if (group == 69 && num == 2) return &gHoennMapHeader_SafariZone_Southwest;
+    if (group == 69 && num == 3) return &gHoennMapHeader_SafariZone_Southeast;
+    if (group == 69 && num == 4) return &gHoennMapHeader_BattleTower_Outside;
+    if (group == 69 && num == 5) return &gHoennMapHeader_BattleTower_Lobby;
+    if (group == 69 && num == 6) return &gHoennMapHeader_BattleTower_Elevator;
+    if (group == 69 && num == 7) return &gHoennMapHeader_BattleTower_Corridor;
+    if (group == 69 && num == 8) return &gHoennMapHeader_BattleTower_BattleRoom;
+    if (group == 69 && num == 9) return &gHoennMapHeader_SouthernIsland_Exterior;
+    if (group == 69 && num == 10) return &gHoennMapHeader_SouthernIsland_Interior;
+    if (group == 69 && num == 11) return &gHoennMapHeader_SafariZone_RestHouse;
+    if (group == 70 && num == 0) return &gHoennMapHeader_Route104_Prototype;
+    if (group == 71 && num == 0) return &gHoennMapHeader_Route109_SeashoreHouse;
+    if (group == 72 && num == 0) return &gHoennMapHeader_Route110_TrickHouseEntrance;
+    if (group == 72 && num == 1) return &gHoennMapHeader_Route110_TrickHouseEnd;
+    if (group == 72 && num == 2) return &gHoennMapHeader_Route110_TrickHouseCorridor;
+    if (group == 72 && num == 3) return &gHoennMapHeader_Route110_TrickHousePuzzle1;
+    if (group == 72 && num == 4) return &gHoennMapHeader_Route110_TrickHousePuzzle2;
+    if (group == 72 && num == 5) return &gHoennMapHeader_Route110_TrickHousePuzzle3;
+    if (group == 72 && num == 6) return &gHoennMapHeader_Route110_TrickHousePuzzle4;
+    if (group == 72 && num == 7) return &gHoennMapHeader_Route110_TrickHousePuzzle5;
+    if (group == 72 && num == 8) return &gHoennMapHeader_Route110_TrickHousePuzzle6;
+    if (group == 72 && num == 9) return &gHoennMapHeader_Route110_TrickHousePuzzle7;
+    if (group == 72 && num == 10) return &gHoennMapHeader_Route110_TrickHousePuzzle8;
+    if (group == 75 && num == 0) return &gHoennMapHeader_Route119_WeatherInstitute_1F;
+    if (group == 75 && num == 1) return &gHoennMapHeader_Route119_WeatherInstitute_2F;
+    if (group == 76 && num == 0) return &gHoennMapHeader_Route124_DivingTreasureHuntersHouse;
+
+// === MISSING MAPS ===
+    // MISSING: g=45 n=0 MAP_OLDALE_TOWN_HOUSE1 (OldaleTown_House1)
+    // Not in existing: searched for 'OldaleTown_House1'
+    // MISSING: g=45 n=1 MAP_OLDALE_TOWN_HOUSE2 (OldaleTown_House2)
+    // Not in existing: searched for 'OldaleTown_House2'
+    // MISSING: g=45 n=2 MAP_OLDALE_TOWN_POKEMON_CENTER_1F (OldaleTown_PokemonCenter_1F)
+    // Not in existing: searched for 'OldaleTown_PokemonCenter_1F'
+    // MISSING: g=45 n=3 MAP_OLDALE_TOWN_POKEMON_CENTER_2F (OldaleTown_PokemonCenter_2F)
+    // Not in existing: searched for 'OldaleTown_PokemonCenter_2F'
+    // MISSING: g=45 n=4 MAP_OLDALE_TOWN_MART (OldaleTown_Mart)
+    // Not in existing: searched for 'OldaleTown_Mart'
+    // MISSING: g=46 n=0 MAP_DEWFORD_TOWN_HOUSE1 (DewfordTown_House1)
+    // Not in existing: searched for 'DewfordTown_House1'
+    // MISSING: g=46 n=1 MAP_DEWFORD_TOWN_POKEMON_CENTER_1F (DewfordTown_PokemonCenter_1F)
+    // Not in existing: searched for 'DewfordTown_PokemonCenter_1F'
+    // MISSING: g=46 n=2 MAP_DEWFORD_TOWN_POKEMON_CENTER_2F (DewfordTown_PokemonCenter_2F)
+    // Not in existing: searched for 'DewfordTown_PokemonCenter_2F'
+    // MISSING: g=46 n=5 MAP_DEWFORD_TOWN_HOUSE2 (DewfordTown_House2)
+    // Not in existing: searched for 'DewfordTown_House2'
+    // MISSING: g=47 n=3 MAP_LAVARIDGE_TOWN_HOUSE (LavaridgeTown_House)
+    // Not in existing: searched for 'LavaridgeTown_House'
+    // MISSING: g=47 n=4 MAP_LAVARIDGE_TOWN_MART (LavaridgeTown_Mart)
+    // Not in existing: searched for 'LavaridgeTown_Mart'
+    // MISSING: g=47 n=6 MAP_LAVARIDGE_TOWN_POKEMON_CENTER_2F (LavaridgeTown_PokemonCenter_2F)
+    // Not in existing: searched for 'LavaridgeTown_PokemonCenter_2F'
+    // MISSING: g=48 n=0 MAP_FALLARBOR_TOWN_MART (FallarborTown_Mart)
+    // Not in existing: searched for 'FallarborTown_Mart'
+    // MISSING: g=48 n=1 MAP_FALLARBOR_TOWN_CONTEST_LOBBY (FallarborTown_ContestLobby)
+    // Not in existing: searched for 'FallarborTown_ContestLobby'
+    // MISSING: g=48 n=2 MAP_FALLARBOR_TOWN_CONTEST_HALL (FallarborTown_ContestHall)
+    // Not in existing: searched for 'FallarborTown_ContestHall'
+    // MISSING: g=48 n=3 MAP_FALLARBOR_TOWN_POKEMON_CENTER_1F (FallarborTown_PokemonCenter_1F)
+    // Not in existing: searched for 'FallarborTown_PokemonCenter_1F'
+    // MISSING: g=48 n=4 MAP_FALLARBOR_TOWN_POKEMON_CENTER_2F (FallarborTown_PokemonCenter_2F)
+    // Not in existing: searched for 'FallarborTown_PokemonCenter_2F'
+    // MISSING: g=48 n=5 MAP_FALLARBOR_TOWN_HOUSE1 (FallarborTown_House1)
+    // Not in existing: searched for 'FallarborTown_House1'
+    // MISSING: g=48 n=6 MAP_FALLARBOR_TOWN_HOUSE2 (FallarborTown_House2)
+    // Not in existing: searched for 'FallarborTown_House2'
+    // MISSING: g=49 n=0 MAP_VERDANTURF_TOWN_CONTEST_LOBBY (VerdanturfTown_ContestLobby)
+    // Not in existing: searched for 'VerdanturfTown_ContestLobby'
+    // MISSING: g=49 n=1 MAP_VERDANTURF_TOWN_CONTEST_HALL (VerdanturfTown_ContestHall)
+    // Not in existing: searched for 'VerdanturfTown_ContestHall'
+    // MISSING: g=49 n=2 MAP_VERDANTURF_TOWN_MART (VerdanturfTown_Mart)
+    // Not in existing: searched for 'VerdanturfTown_Mart'
+    // MISSING: g=49 n=3 MAP_VERDANTURF_TOWN_POKEMON_CENTER_1F (VerdanturfTown_PokemonCenter_1F)
+    // Not in existing: searched for 'VerdanturfTown_PokemonCenter_1F'
+    // MISSING: g=49 n=4 MAP_VERDANTURF_TOWN_POKEMON_CENTER_2F (VerdanturfTown_PokemonCenter_2F)
+    // Not in existing: searched for 'VerdanturfTown_PokemonCenter_2F'
+    // MISSING: g=49 n=6 MAP_VERDANTURF_TOWN_FRIENDSHIP_RATERS_HOUSE (VerdanturfTown_FriendshipRatersHouse)
+    // Not in existing: searched for 'VerdanturfTown_FriendshipRatersHouse'
+    // MISSING: g=49 n=7 MAP_VERDANTURF_TOWN_HOUSE (VerdanturfTown_House)
+    // Not in existing: searched for 'VerdanturfTown_House'
+    // MISSING: g=50 n=0 MAP_PACIFIDLOG_TOWN_POKEMON_CENTER_1F (PacifidlogTown_PokemonCenter_1F)
+    // Not in existing: searched for 'PacifidlogTown_PokemonCenter_1F'
+    // MISSING: g=50 n=1 MAP_PACIFIDLOG_TOWN_POKEMON_CENTER_2F (PacifidlogTown_PokemonCenter_2F)
+    // Not in existing: searched for 'PacifidlogTown_PokemonCenter_2F'
+    // MISSING: g=50 n=4 MAP_PACIFIDLOG_TOWN_HOUSE3 (PacifidlogTown_House3)
+    // Not in existing: searched for 'PacifidlogTown_House3'
+    // MISSING: g=50 n=5 MAP_PACIFIDLOG_TOWN_HOUSE4 (PacifidlogTown_House4)
+    // Not in existing: searched for 'PacifidlogTown_House4'
+    // MISSING: g=50 n=6 MAP_PACIFIDLOG_TOWN_HOUSE5 (PacifidlogTown_House5)
+    // Not in existing: searched for 'PacifidlogTown_House5'
+    // MISSING: g=51 n=0 MAP_PETALBURG_CITY_WALLYS_HOUSE (PetalburgCity_WallysHouse)
+    // Not in existing: searched for 'PetalburgCity_WallysHouse'
+    // MISSING: g=51 n=2 MAP_PETALBURG_CITY_HOUSE1 (PetalburgCity_House1)
+    // Not in existing: searched for 'PetalburgCity_House1'
+    // MISSING: g=51 n=3 MAP_PETALBURG_CITY_HOUSE2 (PetalburgCity_House2)
+    // Not in existing: searched for 'PetalburgCity_House2'
+    // MISSING: g=51 n=4 MAP_PETALBURG_CITY_POKEMON_CENTER_1F (PetalburgCity_PokemonCenter_1F)
+    // Not in existing: searched for 'PetalburgCity_PokemonCenter_1F'
+    // MISSING: g=51 n=5 MAP_PETALBURG_CITY_POKEMON_CENTER_2F (PetalburgCity_PokemonCenter_2F)
+    // Not in existing: searched for 'PetalburgCity_PokemonCenter_2F'
+    // MISSING: g=51 n=6 MAP_PETALBURG_CITY_MART (PetalburgCity_Mart)
+    // Not in existing: searched for 'PetalburgCity_Mart'
+    // MISSING: g=52 n=2 MAP_SLATEPORT_CITY_CONTEST_LOBBY (SlateportCity_ContestLobby)
+    // Not in existing: searched for 'SlateportCity_ContestLobby'
+    // MISSING: g=52 n=3 MAP_SLATEPORT_CITY_CONTEST_HALL (SlateportCity_ContestHall)
+    // Not in existing: searched for 'SlateportCity_ContestHall'
+    // MISSING: g=52 n=4 MAP_SLATEPORT_CITY_HOUSE1 (SlateportCity_House1)
+    // Not in existing: searched for 'SlateportCity_House1'
+    // MISSING: g=52 n=8 MAP_SLATEPORT_CITY_HARBOR (SlateportCity_Harbor)
+    // Not in existing: searched for 'SlateportCity_Harbor'
+    // MISSING: g=52 n=9 MAP_SLATEPORT_CITY_HOUSE2 (SlateportCity_House2)
+    // Not in existing: searched for 'SlateportCity_House2'
+    // MISSING: g=52 n=10 MAP_SLATEPORT_CITY_POKEMON_CENTER_1F (SlateportCity_PokemonCenter_1F)
+    // Not in existing: searched for 'SlateportCity_PokemonCenter_1F'
+    // MISSING: g=52 n=11 MAP_SLATEPORT_CITY_POKEMON_CENTER_2F (SlateportCity_PokemonCenter_2F)
+    // Not in existing: searched for 'SlateportCity_PokemonCenter_2F'
+    // MISSING: g=52 n=12 MAP_SLATEPORT_CITY_MART (SlateportCity_Mart)
+    // Not in existing: searched for 'SlateportCity_Mart'
+    // MISSING: g=53 n=2 MAP_MAUVILLE_CITY_HOUSE1 (MauvilleCity_House1)
+    // Not in existing: searched for 'MauvilleCity_House1'
+    // MISSING: g=53 n=4 MAP_MAUVILLE_CITY_HOUSE2 (MauvilleCity_House2)
+    // Not in existing: searched for 'MauvilleCity_House2'
+    // MISSING: g=53 n=5 MAP_MAUVILLE_CITY_POKEMON_CENTER_1F (MauvilleCity_PokemonCenter_1F)
+    // Not in existing: searched for 'MauvilleCity_PokemonCenter_1F'
+    // MISSING: g=53 n=6 MAP_MAUVILLE_CITY_POKEMON_CENTER_2F (MauvilleCity_PokemonCenter_2F)
+    // Not in existing: searched for 'MauvilleCity_PokemonCenter_2F'
+    // MISSING: g=53 n=7 MAP_MAUVILLE_CITY_MART (MauvilleCity_Mart)
+    // Not in existing: searched for 'MauvilleCity_Mart'
+    // MISSING: g=54 n=5 MAP_RUSTBORO_CITY_POKEMON_CENTER_1F (RustboroCity_PokemonCenter_1F)
+    // Not in existing: searched for 'RustboroCity_PokemonCenter_1F'
+    // MISSING: g=54 n=6 MAP_RUSTBORO_CITY_POKEMON_CENTER_2F (RustboroCity_PokemonCenter_2F)
+    // Not in existing: searched for 'RustboroCity_PokemonCenter_2F'
+    // MISSING: g=54 n=7 MAP_RUSTBORO_CITY_MART (RustboroCity_Mart)
+    // Not in existing: searched for 'RustboroCity_Mart'
+    // MISSING: g=54 n=12 MAP_RUSTBORO_CITY_HOUSE2 (RustboroCity_House2)
+    // Not in existing: searched for 'RustboroCity_House2'
+    // MISSING: g=54 n=16 MAP_RUSTBORO_CITY_HOUSE3 (RustboroCity_House3)
+    // Not in existing: searched for 'RustboroCity_House3'
+    // MISSING: g=55 n=2 MAP_FORTREE_CITY_POKEMON_CENTER_1F (FortreeCity_PokemonCenter_1F)
+    // Not in existing: searched for 'FortreeCity_PokemonCenter_1F'
+    // MISSING: g=55 n=3 MAP_FORTREE_CITY_POKEMON_CENTER_2F (FortreeCity_PokemonCenter_2F)
+    // Not in existing: searched for 'FortreeCity_PokemonCenter_2F'
+    // MISSING: g=55 n=4 MAP_FORTREE_CITY_MART (FortreeCity_Mart)
+    // Not in existing: searched for 'FortreeCity_Mart'
+    // MISSING: g=55 n=6 MAP_FORTREE_CITY_HOUSE3 (FortreeCity_House3)
+    // Not in existing: searched for 'FortreeCity_House3'
+    // MISSING: g=55 n=7 MAP_FORTREE_CITY_HOUSE4 (FortreeCity_House4)
+    // Not in existing: searched for 'FortreeCity_House4'
+    // MISSING: g=55 n=8 MAP_FORTREE_CITY_HOUSE5 (FortreeCity_House5)
+    // Not in existing: searched for 'FortreeCity_House5'
+    // MISSING: g=56 n=6 MAP_LILYCOVE_CITY_POKEMON_CENTER_1F (LilycoveCity_PokemonCenter_1F)
+    // Not in existing: searched for 'LilycoveCity_PokemonCenter_1F'
+    // MISSING: g=56 n=7 MAP_LILYCOVE_CITY_POKEMON_CENTER_2F (LilycoveCity_PokemonCenter_2F)
+    // Not in existing: searched for 'LilycoveCity_PokemonCenter_2F'
+    // MISSING: g=56 n=8 MAP_LILYCOVE_CITY_UNUSED_MART (LilycoveCity_UnusedMart)
+    // Not in existing: searched for 'LilycoveCity_UnusedMart'
+    // MISSING: g=56 n=10 MAP_LILYCOVE_CITY_HARBOR (LilycoveCity_Harbor)
+    // Not in existing: searched for 'LilycoveCity_Harbor'
+    // MISSING: g=56 n=12 MAP_LILYCOVE_CITY_MOVE_DELETERS_HOUSE (LilycoveCity_MoveDeletersHouse)
+    // Not in existing: searched for 'LilycoveCity_MoveDeletersHouse'
+    // MISSING: g=56 n=13 MAP_LILYCOVE_CITY_HOUSE1 (LilycoveCity_House1)
+    // Not in existing: searched for 'LilycoveCity_House1'
+    // MISSING: g=56 n=15 MAP_LILYCOVE_CITY_HOUSE3 (LilycoveCity_House3)
+    // Not in existing: searched for 'LilycoveCity_House3'
+    // MISSING: g=56 n=16 MAP_LILYCOVE_CITY_HOUSE4 (LilycoveCity_House4)
+    // Not in existing: searched for 'LilycoveCity_House4'
+    // MISSING: g=57 n=1 MAP_MOSSDEEP_CITY_HOUSE1 (MossdeepCity_House1)
+    // Not in existing: searched for 'MossdeepCity_House1'
+    // MISSING: g=57 n=2 MAP_MOSSDEEP_CITY_HOUSE2 (MossdeepCity_House2)
+    // Not in existing: searched for 'MossdeepCity_House2'
+    // MISSING: g=57 n=3 MAP_MOSSDEEP_CITY_POKEMON_CENTER_1F (MossdeepCity_PokemonCenter_1F)
+    // Not in existing: searched for 'MossdeepCity_PokemonCenter_1F'
+    // MISSING: g=57 n=4 MAP_MOSSDEEP_CITY_POKEMON_CENTER_2F (MossdeepCity_PokemonCenter_2F)
+    // Not in existing: searched for 'MossdeepCity_PokemonCenter_2F'
+    // MISSING: g=57 n=5 MAP_MOSSDEEP_CITY_MART (MossdeepCity_Mart)
+    // Not in existing: searched for 'MossdeepCity_Mart'
+    // MISSING: g=57 n=6 MAP_MOSSDEEP_CITY_HOUSE3 (MossdeepCity_House3)
+    // Not in existing: searched for 'MossdeepCity_House3'
+    // MISSING: g=57 n=8 MAP_MOSSDEEP_CITY_HOUSE4 (MossdeepCity_House4)
+    // Not in existing: searched for 'MossdeepCity_House4'
+    // MISSING: g=58 n=2 MAP_SOOTOPOLIS_CITY_POKEMON_CENTER_1F (SootopolisCity_PokemonCenter_1F)
+    // Not in existing: searched for 'SootopolisCity_PokemonCenter_1F'
+    // MISSING: g=58 n=3 MAP_SOOTOPOLIS_CITY_POKEMON_CENTER_2F (SootopolisCity_PokemonCenter_2F)
+    // Not in existing: searched for 'SootopolisCity_PokemonCenter_2F'
+    // MISSING: g=58 n=4 MAP_SOOTOPOLIS_CITY_MART (SootopolisCity_Mart)
+    // Not in existing: searched for 'SootopolisCity_Mart'
+    // MISSING: g=58 n=8 MAP_SOOTOPOLIS_CITY_HOUSE4 (SootopolisCity_House4)
+    // Not in existing: searched for 'SootopolisCity_House4'
+    // MISSING: g=58 n=9 MAP_SOOTOPOLIS_CITY_HOUSE5 (SootopolisCity_House5)
+    // Not in existing: searched for 'SootopolisCity_House5'
+    // MISSING: g=58 n=10 MAP_SOOTOPOLIS_CITY_HOUSE6 (SootopolisCity_House6)
+    // Not in existing: searched for 'SootopolisCity_House6'
+    // MISSING: g=58 n=11 MAP_SOOTOPOLIS_CITY_HOUSE7 (SootopolisCity_House7)
+    // Not in existing: searched for 'SootopolisCity_House7'
+    // MISSING: g=59 n=5 MAP_EVER_GRANDE_CITY_CORRIDOR1 (EverGrandeCity_Corridor1)
+    // Not in existing: searched for 'EverGrandeCity_Corridor1'
+    // MISSING: g=59 n=6 MAP_EVER_GRANDE_CITY_CORRIDOR2 (EverGrandeCity_Corridor2)
+    // Not in existing: searched for 'EverGrandeCity_Corridor2'
+    // MISSING: g=59 n=7 MAP_EVER_GRANDE_CITY_CORRIDOR3 (EverGrandeCity_Corridor3)
+    // Not in existing: searched for 'EverGrandeCity_Corridor3'
+    // MISSING: g=59 n=9 MAP_EVER_GRANDE_CITY_CORRIDOR5 (EverGrandeCity_Corridor5)
+    // Not in existing: searched for 'EverGrandeCity_Corridor5'
+    // MISSING: g=59 n=12 MAP_EVER_GRANDE_CITY_POKEMON_CENTER_1F (EverGrandeCity_PokemonCenter_1F)
+    // Not in existing: searched for 'EverGrandeCity_PokemonCenter_1F'
+    // MISSING: g=59 n=13 MAP_EVER_GRANDE_CITY_POKEMON_CENTER_2F (EverGrandeCity_PokemonCenter_2F)
+    // Not in existing: searched for 'EverGrandeCity_PokemonCenter_2F'
+    // MISSING: g=61 n=0 MAP_ROUTE111_WINSTRATE_FAMILYS_HOUSE (Route111_WinstrateFamilysHouse)
+    // Not in existing: searched for 'Route111_WinstrateFamilysHouse'
+    // MISSING: g=61 n=1 MAP_ROUTE111_OLD_LADYS_REST_STOP (Route111_OldLadysRestStop)
+    // Not in existing: searched for 'Route111_OldLadysRestStop'
+    // MISSING: g=62 n=0 MAP_ROUTE112_CABLE_CAR_STATION (Route112_CableCarStation)
+    // Not in existing: searched for 'Route112_CableCarStation'
+    // MISSING: g=62 n=1 MAP_MT_CHIMNEY_CABLE_CAR_STATION (MtChimney_CableCarStation)
+    // Not in existing: searched for 'MtChimney_CableCarStation'
+    // MISSING: g=68 n=0 MAP_SECRET_BASE_RED_CAVE1 (SecretBase_RedCave1)
+    // Not in existing: searched for 'SecretBase_RedCave1'
+    // MISSING: g=68 n=1 MAP_SECRET_BASE_BROWN_CAVE1 (SecretBase_BrownCave1)
+    // Not in existing: searched for 'SecretBase_BrownCave1'
+    // MISSING: g=68 n=2 MAP_SECRET_BASE_BLUE_CAVE1 (SecretBase_BlueCave1)
+    // Not in existing: searched for 'SecretBase_BlueCave1'
+    // MISSING: g=68 n=3 MAP_SECRET_BASE_YELLOW_CAVE1 (SecretBase_YellowCave1)
+    // Not in existing: searched for 'SecretBase_YellowCave1'
+    // MISSING: g=68 n=4 MAP_SECRET_BASE_TREE1 (SecretBase_Tree1)
+    // Not in existing: searched for 'SecretBase_Tree1'
+    // MISSING: g=68 n=5 MAP_SECRET_BASE_SHRUB1 (SecretBase_Shrub1)
+    // Not in existing: searched for 'SecretBase_Shrub1'
+    // MISSING: g=68 n=6 MAP_SECRET_BASE_RED_CAVE2 (SecretBase_RedCave2)
+    // Not in existing: searched for 'SecretBase_RedCave2'
+    // MISSING: g=68 n=7 MAP_SECRET_BASE_BROWN_CAVE2 (SecretBase_BrownCave2)
+    // Not in existing: searched for 'SecretBase_BrownCave2'
+    // MISSING: g=68 n=8 MAP_SECRET_BASE_BLUE_CAVE2 (SecretBase_BlueCave2)
+    // Not in existing: searched for 'SecretBase_BlueCave2'
+    // MISSING: g=68 n=9 MAP_SECRET_BASE_YELLOW_CAVE2 (SecretBase_YellowCave2)
+    // Not in existing: searched for 'SecretBase_YellowCave2'
+    // MISSING: g=68 n=10 MAP_SECRET_BASE_TREE2 (SecretBase_Tree2)
+    // Not in existing: searched for 'SecretBase_Tree2'
+    // MISSING: g=68 n=11 MAP_SECRET_BASE_SHRUB2 (SecretBase_Shrub2)
+    // Not in existing: searched for 'SecretBase_Shrub2'
+    // MISSING: g=68 n=12 MAP_SECRET_BASE_RED_CAVE3 (SecretBase_RedCave3)
+    // Not in existing: searched for 'SecretBase_RedCave3'
+    // MISSING: g=68 n=13 MAP_SECRET_BASE_BROWN_CAVE3 (SecretBase_BrownCave3)
+    // Not in existing: searched for 'SecretBase_BrownCave3'
+    // MISSING: g=68 n=14 MAP_SECRET_BASE_BLUE_CAVE3 (SecretBase_BlueCave3)
+    // Not in existing: searched for 'SecretBase_BlueCave3'
+    // MISSING: g=68 n=15 MAP_SECRET_BASE_YELLOW_CAVE3 (SecretBase_YellowCave3)
+    // Not in existing: searched for 'SecretBase_YellowCave3'
+    // MISSING: g=68 n=16 MAP_SECRET_BASE_TREE3 (SecretBase_Tree3)
+    // Not in existing: searched for 'SecretBase_Tree3'
+    // MISSING: g=68 n=17 MAP_SECRET_BASE_SHRUB3 (SecretBase_Shrub3)
+    // Not in existing: searched for 'SecretBase_Shrub3'
+    // MISSING: g=68 n=18 MAP_SECRET_BASE_RED_CAVE4 (SecretBase_RedCave4)
+    // Not in existing: searched for 'SecretBase_RedCave4'
+    // MISSING: g=68 n=19 MAP_SECRET_BASE_BROWN_CAVE4 (SecretBase_BrownCave4)
+    // Not in existing: searched for 'SecretBase_BrownCave4'
+    // MISSING: g=68 n=20 MAP_SECRET_BASE_BLUE_CAVE4 (SecretBase_BlueCave4)
+    // Not in existing: searched for 'SecretBase_BlueCave4'
+    // MISSING: g=68 n=21 MAP_SECRET_BASE_YELLOW_CAVE4 (SecretBase_YellowCave4)
+    // Not in existing: searched for 'SecretBase_YellowCave4'
+    // MISSING: g=68 n=22 MAP_SECRET_BASE_TREE4 (SecretBase_Tree4)
+    // Not in existing: searched for 'SecretBase_Tree4'
+    // MISSING: g=68 n=23 MAP_SECRET_BASE_SHRUB4 (SecretBase_Shrub4)
+    // Not in existing: searched for 'SecretBase_Shrub4'
+    // MISSING: g=68 n=29 MAP_UNKNOWN_MAP_25_29 (Unknown2529)
+    // Not in existing: searched for 'Unknown2529'
+    // MISSING: g=68 n=30 MAP_UNKNOWN_MAP_25_30 (Unknown2530)
+    // Not in existing: searched for 'Unknown2530'
+    // MISSING: g=68 n=31 MAP_UNKNOWN_MAP_25_31 (Unknown2531)
+    // Not in existing: searched for 'Unknown2531'
+    // MISSING: g=68 n=32 MAP_UNKNOWN_MAP_25_32 (Unknown2532)
+    // Not in existing: searched for 'Unknown2532'
+    // MISSING: g=68 n=33 MAP_UNKNOWN_MAP_25_33 (Unknown2533)
+    // Not in existing: searched for 'Unknown2533'
+    // MISSING: g=68 n=34 MAP_UNKNOWN_MAP_25_34 (Unknown2534)
+    // Not in existing: searched for 'Unknown2534'
+    // MISSING: g=70 n=1 MAP_ROUTE104_PROTOTYPE_PRETTY_PETAL_FLOWER_SHOP (Route104_PrototypePrettyPetalFlowerShop)
+    // Not in existing: searched for 'Route104_PrototypePrettyPetalFlowerShop'
+    // MISSING: g=72 n=11 MAP_ROUTE110_SEASIDE_CYCLING_ROAD_SOUTH_ENTRANCE (Route110_SeasideCyclingRoadSouthEntrance)
+    // Not in existing: searched for 'Route110_SeasideCyclingRoadSouthEntrance'
+    // MISSING: g=72 n=12 MAP_ROUTE110_SEASIDE_CYCLING_ROAD_NORTH_ENTRANCE (Route110_SeasideCyclingRoadNorthEntrance)
+    // Not in existing: searched for 'Route110_SeasideCyclingRoadNorthEntrance'
+    // MISSING: g=73 n=0 MAP_ROUTE113_GLASS_WORKSHOP (Route113_GlassWorkshop)
+    // Not in existing: searched for 'Route113_GlassWorkshop'
+    // MISSING: g=74 n=0 MAP_ROUTE123_BERRY_MASTERS_HOUSE (Route123_BerryMastersHouse)
+    // Not in existing: searched for 'Route123_BerryMastersHouse'
+    // MISSING: g=75 n=2 MAP_ROUTE119_HOUSE (Route119_House)
+    // Not in existing: searched for 'Route119_House'

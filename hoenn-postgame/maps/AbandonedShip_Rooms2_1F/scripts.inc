@@ -1,0 +1,28 @@
+AbandonedShip_Rooms2_1F_MapScripts:: @ 815EA67
+	.byte 0
+
+AbandonedShip_Rooms2_1F_EventScript_Hal:: @ 815EA68
+	trainerbattle_double TRAINER_LOIS_AND_HAL_1, AbandonedShip_Rooms2_1F_Text_HalIntro, AbandonedShip_Rooms2_1F_Text_HalDefeat, AbandonedShip_Rooms2_1F_Text_HalNeedTwoPokemon
+	specialvar VAR_RESULT, ShouldTryRematchBattle
+	compare VAR_RESULT, 1
+	goto_if_eq AbandonedShip_Rooms2_1F_EventScript_HalRematch
+	msgbox AbandonedShip_Rooms2_1F_Text_HalPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+AbandonedShip_Rooms2_1F_EventScript_HalRematch:: @ 815EA93
+	trainerbattle_rematch_double TRAINER_LOIS_AND_HAL_1, AbandonedShip_Rooms2_1F_Text_HalRematchIntro, AbandonedShip_Rooms2_1F_Text_HalRematchDefeat, AbandonedShip_Rooms2_1F_Text_HalRematchNeedTwoPokemon
+	msgbox AbandonedShip_Rooms2_1F_Text_HalRematchPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+AbandonedShip_Rooms2_1F_EventScript_Lois:: @ 815EAAE
+	trainerbattle_double TRAINER_LOIS_AND_HAL_1, AbandonedShip_Rooms2_1F_Text_LoisIntro, AbandonedShip_Rooms2_1F_Text_LoisDefeat, AbandonedShip_Rooms2_1F_Text_LoisNeedTwoPokemon
+	specialvar VAR_RESULT, ShouldTryRematchBattle
+	compare VAR_RESULT, 1
+	goto_if_eq AbandonedShip_Rooms2_1F_EventScript_LoisRematch
+	msgbox AbandonedShip_Rooms2_1F_Text_LoisPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+AbandonedShip_Rooms2_1F_EventScript_LoisRematch:: @ 815EAD9
+	trainerbattle_rematch_double TRAINER_LOIS_AND_HAL_1, AbandonedShip_Rooms2_1F_Text_LoisRematchIntro, AbandonedShip_Rooms2_1F_Text_LoisRematchDefeat, AbandonedShip_Rooms2_1F_Text_LoisRematchNeedTwoPokemon
+	msgbox AbandonedShip_Rooms2_1F_Text_LoisRematchPostBattle, MSGBOX_AUTOCLOSE
+	end

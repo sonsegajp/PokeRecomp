@@ -1,0 +1,402 @@
+PREFIX := i686-w64-mingw32-
+# MSYS2's mingw-w64-i686 toolchain only ships prefixed wrappers for gcc/cc/g++/etc.
+# binutils (as, ld, objcopy, objdump) come unprefixed in /mingw32/bin/, so we use those.
+OBJCOPY := objcopy
+CC := $(PREFIX)gcc
+CXX := $(PREFIX)g++
+AS := as
+
+SDL_DIR := /c/msys64/mingw32
+ASM_PSEUDO_OP_CONV := sed -e 's/\.4byte/\.int/g;s/\.2byte/\.short/g' -e 's/^[[:space:]]*\.word\b/\t.int/' -e 's/^[[:space:]]*\.section[[:space:]].*%progbits.*$$/\t.data/' -e 's/^[[:space:]]*\.size[[:space:]].*$$//' -e 's/\\@/__MACRO_CTR__/g' -e 's/@.*//' -e 's/__MACRO_CTR__/\\@/g'
+# Post-CPP fixup: wrap macro-call args with top-level operators in extra parens
+# so x86 GAS's macro arg parser doesn't split `(a+b)-c` into two args.
+WRAP_MACRO_ARGS := python tools/wrap_macro_args.py
+#FIX_UNDERSCORE is required for 32 bit windows
+FIX_UNDERSCORE := $(OBJCOPY) --prefix-symbol _
+
+export CPP := $(PREFIX)gcc -E
+export LD := ld
+
+ifeq ($(OS),Windows_NT)
+EXE := .exe
+else
+EXE :=
+endif
+
+all: rom
+
+TITLE       := POKEMON FIRE
+GAME_CODE   := BPRE
+MAKER_CODE  := 01
+REVISION    := 0
+MODERN      := 1
+TARGET_PLATFORM := PLATFORM_SDL2
+TILE_RENDERER := RENDERER_EASY_DRAW
+
+# pokefirered build-flavor defines (mirror config.mk / Makefile in the upstream
+# ROM build). Sets FIRERED vs LEAFGREEN, ENGLISH vs other languages, REVISION.
+GAME_VERSION  ?= FIRERED
+GAME_LANGUAGE ?= ENGLISH
+GAME_REVISION ?= 0
+
+SHELL := /bin/bash -o pipefail
+export TMPDIR := $(CURDIR)/build/pc/tmp
+export TMP := $(CURDIR)/build/pc/tmp
+export TEMP := $(CURDIR)/build/pc/tmp
+
+ELF = $(ROM:.exe=.elf)
+MAP = $(ROM:.exe=.map)
+
+C_SUBDIR = src
+GFLIB_SUBDIR = gflib
+ASM_SUBDIR = asm
+DATA_SRC_SUBDIR = src/data
+DATA_ASM_SUBDIR = data
+SONG_SUBDIR = sound/songs
+MID_SUBDIR = sound/songs/midi
+
+C_BUILDDIR = $(OBJ_DIR)/$(C_SUBDIR)
+GFLIB_BUILDDIR = $(OBJ_DIR)/$(GFLIB_SUBDIR)
+ASM_BUILDDIR = $(OBJ_DIR)/$(ASM_SUBDIR)
+DATA_ASM_BUILDDIR = $(OBJ_DIR)/$(DATA_ASM_SUBDIR)
+SONG_BUILDDIR = $(OBJ_DIR)/$(SONG_SUBDIR)
+MID_BUILDDIR = $(OBJ_DIR)/$(MID_SUBDIR)
+
+ASFLAGS := --32 --defsym MODERN=$(MODERN) --defsym PORTABLE=1 --defsym UBFIX=1 --defsym $(GAME_VERSION)=1 --defsym REVISION=$(GAME_REVISION) --defsym $(GAME_LANGUAGE)=1 --defsym CONNECTION_SOUTH=1 --defsym CONNECTION_NORTH=2 --defsym CONNECTION_WEST=3 --defsym CONNECTION_EAST=4 --defsym CONNECTION_DIVE=5 --defsym CONNECTION_EMERGE=6
+
+GCC_VER := $(shell $(CC) -dumpversion)
+
+CC1 	:= $(shell $(PREFIX)gcc --print-prog-name=cc1) -quiet
+override CFLAGS += -Wno-trigraphs -Wimplicit -Wparentheses -Wunused -m32 -msse2 -mfxsr -std=gnu23 -fleading-underscore -fno-dce -fno-builtin -Wno-unused-function -Wno-error=int-conversion -Wno-error=incompatible-pointer-types -Wno-error=discarded-qualifiers -Wno-int-conversion -Wno-discarded-qualifiers -DPORTABLE -DNONMATCHING -D UBFIX -DMODERN=$(MODERN)
+ROM		:= PokeRecomp.exe
+OBJ_DIR	:= build/pc
+
+CPPFLAGS := -iquote include -iquote $(GFLIB_SUBDIR) -Wno-trigraphs -D NONMATCHING -D PORTABLE -D $(TARGET_PLATFORM) -D $(TILE_RENDERER) -D MODERN=$(MODERN) -D UBFIX -D $(GAME_VERSION) -D REVISION=$(GAME_REVISION) -D $(GAME_LANGUAGE) -D NDEBUG -I$(SDL_DIR)/include -L$(SDL_DIR)/lib
+
+LDFLAGS = -Map ../../$(MAP)
+
+PLATFORM_INCLUDES := 
+
+#Windows only
+ifneq ($(NO_STD_LIB),1)
+	PLATFORM_INCLUDES += -lmingw32
+endif
+
+ifeq ($(TARGET_PLATFORM), PLATFORM_SDL2)
+	PLATFORM_INCLUDES += -lSDL2main -lSDL2.dll
+endif
+	
+ifeq ($(TARGET_PLATFORM), PLATFORM_WIN32)
+	ifeq ($(NO_STD_LIB),1) 
+		PLATFORM_INCLUDES += -Wl,-e__main -nostdlib
+		CPPFLAGS += -D NO_STD_LIB_ENABLED
+	endif
+	PLATFORM_INCLUDES += -lkernel32 -luser32 -lgdi32
+endif
+
+LIB := $(LIBPATH) -lgcc -lc
+
+AUTO_GEN_TARGETS :=
+include make_tools.mk
+
+SHA1 := $(shell { command -v sha1sum || command -v shasum; } 2>/dev/null) -c
+GFX := $(TOOLS_DIR)/gbagfx/gbagfx$(EXE)
+AIF := $(TOOLS_DIR)/aif2pcm/aif2pcm$(EXE)
+WAV2AGB := $(TOOLS_DIR)/wav2agb/wav2agb$(EXE)
+MID := $(TOOLS_DIR)/mid2agb/mid2agb$(EXE)
+SCANINC := $(TOOLS_DIR)/scaninc/scaninc$(EXE)
+PREPROC := $(TOOLS_DIR)/preproc/preproc$(EXE)
+RAMSCRGEN := $(TOOLS_DIR)/ramscrgen/ramscrgen$(EXE)
+FIX := $(TOOLS_DIR)/gbafix/gbafix$(EXE)
+MAPJSON := $(TOOLS_DIR)/mapjson/mapjson$(EXE)
+JSONPROC := $(TOOLS_DIR)/jsonproc/jsonproc$(EXE)
+
+MAKEFLAGS += --no-print-directory
+
+# Clear the default suffixes
+.SUFFIXES:
+# Don't delete intermediate files
+.SECONDARY:
+# Delete files that weren't built properly
+.DELETE_ON_ERROR:
+
+# Secondary expansion is required for dependency variables in object rules.
+.SECONDEXPANSION:
+
+.PHONY: all rom clean compare tidy mostlyclean libagbsyscall modern tidymodern tidynonmodern
+
+infoshell = $(foreach line, $(shell $1 | sed "s/ /__SPACE__/g"), $(info $(subst __SPACE__, ,$(line))))
+
+# Build tools when building the rom
+# Disable dependency scanning for clean/tidy/tools
+# Use a separate minimal makefile for speed
+# Since we don't need to reload most of this makefile
+ifeq (,$(filter-out all rom compare modern libagbsyscall syms,$(MAKECMDGOALS)))
+$(call infoshell, $(MAKE) -f make_tools.mk)
+$(call infoshell, $(MAKE) generated)
+else
+NODEP ?= 1
+endif
+
+# Build tools when building the rom
+# Disable dependency scanning for clean/tidy/tools
+ifeq (,$(filter-out all rom compare modern,$(MAKECMDGOALS)))
+$(call infoshell, $(MAKE) tools)
+else
+NODEP := 1
+endif
+
+C_SRCS_IN := $(wildcard $(C_SUBDIR)/*.c $(C_SUBDIR)/*/*.c $(C_SUBDIR)/*/*/*.c)
+C_SRCS := $(foreach src,$(C_SRCS_IN),$(if $(findstring .inc.c,$(src)),,$(src)))
+C_OBJS := $(patsubst $(C_SUBDIR)/%.c,$(C_BUILDDIR)/%.o,$(C_SRCS))
+
+GFLIB_SRCS := $(wildcard $(GFLIB_SUBDIR)/*.c)
+GFLIB_OBJS := $(patsubst $(GFLIB_SUBDIR)/%.c,$(GFLIB_BUILDDIR)/%.o,$(GFLIB_SRCS))
+
+C_ASM_SRCS += $(wildcard $(C_SUBDIR)/*.s $(C_SUBDIR)/*/*.s $(C_SUBDIR)/*/*/*.s)
+C_ASM_OBJS := $(patsubst $(C_SUBDIR)/%.s,$(C_BUILDDIR)/%.o,$(C_ASM_SRCS))
+
+ASM_SRCS := $(wildcard $(ASM_SUBDIR)/*.s)
+ASM_OBJS := $(patsubst $(ASM_SUBDIR)/%.s,$(ASM_BUILDDIR)/%.o,$(ASM_SRCS))
+
+# get all the data/*.s files EXCEPT the ones with specific rules
+REGULAR_DATA_ASM_SRCS := $(filter-out $(DATA_ASM_SUBDIR)/maps.s $(DATA_ASM_SUBDIR)/map_events.s, $(wildcard $(DATA_ASM_SUBDIR)/*.s))
+
+DATA_ASM_SRCS := $(wildcard $(DATA_ASM_SUBDIR)/*.s)
+DATA_ASM_OBJS := $(patsubst $(DATA_ASM_SUBDIR)/%.s,$(DATA_ASM_BUILDDIR)/%.o,$(DATA_ASM_SRCS))
+
+SONG_SRCS := $(wildcard $(SONG_SUBDIR)/*.s)
+SONG_OBJS := $(patsubst $(SONG_SUBDIR)/%.s,$(SONG_BUILDDIR)/%.o,$(SONG_SRCS))
+
+MID_SRCS := $(wildcard $(MID_SUBDIR)/*.mid)
+MID_OBJS := $(patsubst $(MID_SUBDIR)/%.mid,$(MID_BUILDDIR)/%.o,$(MID_SRCS))
+
+IMGUI_DIR := lib/imgui
+IMGUI_SRCS := $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_draw.cpp \
+              $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp \
+              $(IMGUI_DIR)/backends/imgui_impl_sdl2.cpp \
+              $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
+IMGUI_OBJS := $(patsubst $(IMGUI_DIR)/%.cpp,$(OBJ_DIR)/imgui/%.o,$(IMGUI_SRCS))
+BRIDGE_OBJS := $(OBJ_DIR)/src/platform/imgui_bridge.o
+
+OBJS     := $(C_OBJS) $(GFLIB_OBJS) $(ASM_OBJS) $(DATA_ASM_OBJS) $(SONG_OBJS) $(MID_OBJS)
+OBJS_REL := $(patsubst $(OBJ_DIR)/%,%,$(OBJS))
+ALL_OBJS := $(OBJS) $(IMGUI_OBJS) $(BRIDGE_OBJS)
+
+SUBDIRS  := $(sort $(dir $(ALL_OBJS)))
+
+$(shell mkdir -p $(SUBDIRS) $(OBJ_DIR)/tmp)
+
+rom: $(ROM)
+ifeq ($(COMPARE),1)
+	@$(SHA1) rom.sha1
+endif
+
+# For contributors to make sure a change didn't affect the contents of the ROM.
+compare: ; @$(MAKE) COMPARE=1
+
+clean: mostlyclean clean-tools
+
+mostlyclean: tidy
+	rm -f $(SAMPLE_SUBDIR)/*.bin
+	rm -f $(CRY_SUBDIR)/*.bin
+	rm -f $(MID_SUBDIR)/*.s
+	find . \( -iname '*.1bpp' -o -iname '*.4bpp' -o -iname '*.8bpp' -o -iname '*.gbapal' -o -iname '*.lz' -o -iname '*.rl' -o -iname '*.latfont' -o -iname '*.hwjpnfont' -o -iname '*.fwjpnfont' \) -exec rm {} +
+	rm -f $(DATA_ASM_SUBDIR)/layouts/layouts.inc $(DATA_ASM_SUBDIR)/layouts/layouts_table.inc
+	rm -f $(DATA_ASM_SUBDIR)/maps/connections.inc $(DATA_ASM_SUBDIR)/maps/events.inc $(DATA_ASM_SUBDIR)/maps/groups.inc $(DATA_ASM_SUBDIR)/maps/headers.inc
+	find $(DATA_ASM_SUBDIR)/maps \( -iname 'connections.inc' -o -iname 'events.inc' -o -iname 'header.inc' \) -exec rm {} +
+	rm -f $(AUTO_GEN_TARGETS)
+
+tidy:
+	rm -f $(ROM)$(EXE) $(ELF) $(MAP)
+	rm -r $(OBJ_DIR)
+ifeq ($(MODERN),0)
+	@$(MAKE) tidy MODERN=1
+endif
+
+clean-platform:
+	rm -f $(ROM)$(EXE) $(ELF) $(MAP)
+	rm -r $(OBJ_DIR)/src/platform
+
+clean-generated:
+	-rm -f $(AUTO_GEN_TARGETS)
+	@rm -f $(AUTO_GEN_TARGETS)
+	@echo "rm -f <AUTO_GEN_TARGETS>"
+
+include graphics_file_rules.mk
+include map_data_rules.mk
+include spritesheet_rules.mk
+include json_data_rules.mk
+include audio_rules.mk
+
+generated: $(AUTO_GEN_TARGETS)
+
+%.s: ;
+%.png: ;
+%.pal: ;
+%.aif: ;
+
+%.1bpp: %.png  ; $(GFX) $< $@
+%.4bpp: %.png  ; $(GFX) $< $@
+%.8bpp: %.png  ; $(GFX) $< $@
+%.gbapal: %.pal ; $(GFX) $< $@
+%.gbapal: %.png ; $(GFX) $< $@
+%.lz: % ; $(GFX) $< $@
+%.rl: % ; $(GFX) $< $@
+
+ifeq ($(NODEP),1)
+$(C_BUILDDIR)/%.o: c_dep :=
+else
+$(C_BUILDDIR)/%.o: c_dep = $(shell [[ -f $(C_SUBDIR)/$*.c ]] && $(SCANINC) -I include -I $(TOOLS_DIR)/agbcc/include -I gflib $(C_SUBDIR)/$*.c)
+endif
+
+ifeq ($(DINFO),1)
+override CFLAGS += -g -O0
+else
+override CFLAGS += -O0 -fno-omit-frame-pointer
+endif
+
+# Files that must be compiled at -O0 to prevent stale pointer guard optimization
+# (Pokemon Center transitions crash with -O3 due to quest log stale heap pointers)
+O0_FILES := event_object_movement overworld quest_log quest_log_battle \
+            quest_log_events quest_log_objects quest_log_player \
+            field_screen_effect field_fadetransition field_control_avatar
+
+define O0_RULE
+$(C_BUILDDIR)/$(1).o : $(C_SUBDIR)/$(1).c $$(c_dep)
+	@$$(CPP) $$(CPPFLAGS) $$< -o $(C_BUILDDIR)/$(1).i
+	@$$(PREPROC) $(C_BUILDDIR)/$(1).i charmap.txt | $$(CC1) $$(CFLAGS) -O0 -o $(C_BUILDDIR)/$(1).s
+	@echo -e ".text\n\t.align\t2, 0\n" >> $(C_BUILDDIR)/$(1).s
+	$$(AS) $$(ASFLAGS) -o $$@ $(C_BUILDDIR)/$(1).s
+endef
+$(foreach f,$(O0_FILES),$(eval $(call O0_RULE,$(f))))
+
+$(C_BUILDDIR)/music_player_port.o : $(C_SUBDIR)/music_player_port.c $$(c_dep)
+	@$(CPP) $(CPPFLAGS) $< -o $(C_BUILDDIR)/music_player_port.i
+	@$(PREPROC) $(C_BUILDDIR)/music_player_port.i charmap.txt | $(CC1) $(CFLAGS) -O0 -o $(C_BUILDDIR)/music_player_port.s
+	@echo -e ".text\n\t.align\t2, 0\n" >> $(C_BUILDDIR)/music_player_port.s
+	$(AS) $(ASFLAGS) -o $@ $(C_BUILDDIR)/music_player_port.s
+
+$(C_BUILDDIR)/m4a.o : $(C_SUBDIR)/m4a.c $$(c_dep)
+	@$(CPP) $(CPPFLAGS) $< -o $(C_BUILDDIR)/m4a.i
+	@$(PREPROC) $(C_BUILDDIR)/m4a.i charmap.txt | $(CC1) $(CFLAGS) -O0 -o $(C_BUILDDIR)/m4a.s
+	@echo -e ".text\n\t.align\t2, 0\n" >> $(C_BUILDDIR)/m4a.s
+	$(AS) $(ASFLAGS) -o $@ $(C_BUILDDIR)/m4a.s
+
+$(C_BUILDDIR)/%.o : $(C_SUBDIR)/%.c $$(c_dep)
+	@$(CPP) $(CPPFLAGS) $< -o $(C_BUILDDIR)/$*.i
+	@$(PREPROC) $(C_BUILDDIR)/$*.i charmap.txt | $(CC1) $(CFLAGS) -o $(C_BUILDDIR)/$*.s
+	@echo -e ".text\n\t.align\t2, 0\n" >> $(C_BUILDDIR)/$*.s
+	@sed -i 's/\r$$//' $(C_BUILDDIR)/$*.s
+	$(AS) $(ASFLAGS) -o $@ $(C_BUILDDIR)/$*.s
+
+ifeq ($(NODEP),1)
+$(GFLIB_BUILDDIR)/%.o: c_dep :=
+else
+$(GFLIB_BUILDDIR)/%.o: c_dep = $(shell [[ -f $(GFLIB_SUBDIR)/$*.c ]] && $(SCANINC) -I include -I $(TOOLS_DIR)/agbcc/include -I gflib $(GFLIB_SUBDIR)/$*.c)
+endif
+
+$(GFLIB_BUILDDIR)/%.o : $(GFLIB_SUBDIR)/%.c $$(c_dep)
+	@$(CPP) $(CPPFLAGS) $< -o $(GFLIB_BUILDDIR)/$*.i
+	@$(PREPROC) $(GFLIB_BUILDDIR)/$*.i charmap.txt | $(CC1) $(CFLAGS) -o $(GFLIB_BUILDDIR)/$*.s
+	@echo -e ".text\n\t.align\t2, 0\n" >> $(GFLIB_BUILDDIR)/$*.s
+	$(AS) $(ASFLAGS) -o $@ $(GFLIB_BUILDDIR)/$*.s
+
+# The dep rules have to be explicit or else missing files won't be reported.
+# As a side effect, they're evaluated immediately instead of when the rule is invoked.
+# It doesn't look like $(shell) can be deferred so there might not be a better way.
+
+
+ifeq ($(NODEP),1)
+$(ASM_BUILDDIR)/%.o: $(ASM_SUBDIR)/%.s
+	$(AS) $(ASFLAGS) -o $@ $<
+	$(FIX_UNDERSCORE) $@
+else
+define ASM_DEP
+$1: $2 $$(shell $(SCANINC) -I include -I "" $2)
+	$$(AS) $$(ASFLAGS) -o $$@ $$<
+	$(FIX_UNDERSCORE) $$@
+endef
+$(foreach src, $(ASM_SRCS), $(eval $(call ASM_DEP,$(patsubst $(ASM_SUBDIR)/%.s,$(ASM_BUILDDIR)/%.o, $(src)),$(src))))
+endif
+
+ifeq ($(NODEP),1)
+$(DATA_ASM_BUILDDIR)/%.o: $(DATA_ASM_SUBDIR)/%.s
+	$(PREPROC) $< charmap.txt | $(CPP) -xc -I include - | $(PREPROC) -ie $$< charmap.txt | $(ASM_PSEUDO_OP_CONV) | $(WRAP_MACRO_ARGS) | $(AS) $(ASFLAGS) -o $@
+	$(FIX_UNDERSCORE) $@
+else
+define DATA_ASM_DEP
+$1: $2 $$(shell $(SCANINC) -I include -I "" $2)
+	$$(PREPROC) $$< charmap.txt | $$(CPP) -xc -I include - | $$(PREPROC) -ie $$< charmap.txt | $$(ASM_PSEUDO_OP_CONV) | $$(WRAP_MACRO_ARGS) | $$(AS) $$(ASFLAGS) -o $$@
+	$$(FIX_UNDERSCORE) $$@
+endef
+$(foreach src, $(REGULAR_DATA_ASM_SRCS), $(eval $(call DATA_ASM_DEP,$(patsubst $(DATA_ASM_SUBDIR)/%.s,$(DATA_ASM_BUILDDIR)/%.o, $(src)),$(src))))
+$(foreach src, $(C_ASM_SRCS), $(eval $(call DATA_ASM_DEP,$(patsubst $(C_SUBDIR)/%.s,$(C_BUILDDIR)/%.o, $(src)),$(src))))
+endif
+
+$(SONG_BUILDDIR)/%.o: $(SONG_SUBDIR)/%.s
+	$(ASM_PSEUDO_OP_CONV) $< | $(AS) $(ASFLAGS) -I sound -o $@
+	$(FIX_UNDERSCORE) $@
+
+$(MID_BUILDDIR)/%.o: $(MID_ASM_DIR)/%.s
+	$(ASM_PSEUDO_OP_CONV) $< | $(AS) $(ASFLAGS) -I sound -o $@
+	$(FIX_UNDERSCORE) $@
+
+$(OBJ_DIR)/sym_bss.ld: sym_bss.txt
+	$(RAMSCRGEN) .bss $< ENGLISH > $@
+
+$(OBJ_DIR)/sym_common.ld: sym_common.txt $(C_OBJS) $(wildcard common_syms/*.txt)
+	$(RAMSCRGEN) COMMON $< ENGLISH -c $(C_BUILDDIR),common_syms > $@
+
+$(OBJ_DIR)/sym_ewram.ld: sym_ewram.txt
+	$(RAMSCRGEN) ewram_data $< ENGLISH > $@
+
+# No ELF/linker script needed for DLL build
+
+# Dear ImGui compilation (C++ with g++)
+IMGUI_CXXFLAGS := -O2 -m32 -pipe -DNOMINMAX -D_CRT_SECURE_NO_WARNINGS -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(SDL_DIR)/include -I$(SDL_DIR)/include/SDL2
+
+$(OBJ_DIR)/imgui/%.o: $(IMGUI_DIR)/%.cpp
+	$(CXX) $(IMGUI_CXXFLAGS) -c -o $@ $<
+
+$(OBJ_DIR)/src/platform/imgui_bridge.o: src/platform/imgui_bridge.cpp
+	$(CXX) $(IMGUI_CXXFLAGS) -c -o $@ $<
+
+$(OBJ_DIR)/src/platform/hoenn_bindata.o: src/platform/hoenn_bindata.s
+	$(AS) --32 $(ASFLAGS) -o $@ $<
+	$(FIX_UNDERSCORE) $@
+
+# Ruby prefixed objects (built by pokeruby's Makefile_pc prefix-ruby target)
+RUBY_PREFIXED_DIR := ../pokeruby/build/pc_prefixed
+RUBY_OBJS := $(wildcard $(RUBY_PREFIXED_DIR)/src/*.o $(RUBY_PREFIXED_DIR)/src/*/*.o \
+              $(RUBY_PREFIXED_DIR)/src/*/*/*.o \
+              $(RUBY_PREFIXED_DIR)/data/*.o \
+              $(RUBY_PREFIXED_DIR)/sound/songs/midi/*.o \
+              $(RUBY_PREFIXED_DIR)/imgui/*.o $(RUBY_PREFIXED_DIR)/imgui/*/*.o)
+
+# Sapphire prefixed objects (same source, compiled with SAPPHIRE=1, sp_ prefix)
+SAPPHIRE_PREFIXED_DIR := ../pokeruby/build/sp_prefixed
+SAPPHIRE_OBJS := $(wildcard $(SAPPHIRE_PREFIXED_DIR)/src/*.o $(SAPPHIRE_PREFIXED_DIR)/src/*/*.o \
+              $(SAPPHIRE_PREFIXED_DIR)/src/*/*/*.o \
+              $(SAPPHIRE_PREFIXED_DIR)/data/*.o \
+              $(SAPPHIRE_PREFIXED_DIR)/sound/songs/midi/*.o \
+              $(SAPPHIRE_PREFIXED_DIR)/imgui/*.o $(SAPPHIRE_PREFIXED_DIR)/imgui/*/*.o)
+
+# Gold prefixed objects (built by pokegold-native's Makefile_pc)
+GOLD_PREFIXED_DIR := ../pokegold-native/build/pc_prefixed/gold
+GOLD_OBJS := $(wildcard $(GOLD_PREFIXED_DIR)/*.o)
+
+# Silver prefixed objects (built by pokegold-native's Makefile_pc)
+SILVER_PREFIXED_DIR := ../pokegold-native/build/pc_prefixed/silver
+SILVER_OBJS := $(wildcard $(SILVER_PREFIXED_DIR)/*.o)
+
+$(ROM): $(ALL_OBJS) $(RUBY_OBJS) $(SAPPHIRE_OBJS) $(GOLD_OBJS) $(SILVER_OBJS)
+	@echo $(ALL_OBJS) $(RUBY_OBJS) $(SAPPHIRE_OBJS) $(GOLD_OBJS) $(SILVER_OBJS) > link_objs.txt
+	$(CXX) -m32 -pipe -Wl,--demangle -Wl,--noinhibit-exec -Wl,--warn-unresolved-symbols -Wl,-Map,PokeRecomp.map @link_objs.txt -static-libgcc -static-libstdc++ -static -lpthread -L$(SDL_DIR)/lib $(PLATFORM_INCLUDES) -lopengl32 -lwinmm -lxinput -lcomdlg32 -ldbghelp -lws2_32 -lSDL2_mixer.dll -o $@ 2>linker_errors.txt; exit 0
+
+# Dedicated server build
+.PHONY: server
+server: PokeServer.exe
+
+PokeServer.exe: server/server.c server/protocol.h
+	$(CC) -m32 -pipe -O2 -Wall -o $@ server/server.c -lws2_32

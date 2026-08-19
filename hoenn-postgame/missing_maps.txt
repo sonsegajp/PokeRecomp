@@ -1,0 +1,128 @@
+// === MISSING MAP HEADERS (add to hoenn_data.c before #endif) ===
+const struct MapHeader gHoennMapHeader_FortreeCity_House3 = {
+    .mapLayout = &gHoennLayout_FortreeCity_House1, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 347, .mapLayoutId = 393, .regionMapSectionId = 208,
+    .cave = FALSE, .weather = WEATHER_NONE, .mapType = MAP_TYPE_INDOOR,
+    .bikingAllowed = FALSE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 0,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_FortreeCity_House4 = {
+    .mapLayout = &gHoennLayout_FortreeCity_House2, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 347, .mapLayoutId = 394, .regionMapSectionId = 208,
+    .cave = FALSE, .weather = WEATHER_NONE, .mapType = MAP_TYPE_INDOOR,
+    .bikingAllowed = FALSE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 0,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_FortreeCity_House5 = {
+    .mapLayout = &gHoennLayout_FortreeCity_House1, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 347, .mapLayoutId = 393, .regionMapSectionId = 208,
+    .cave = FALSE, .weather = WEATHER_NONE, .mapType = MAP_TYPE_INDOOR,
+    .bikingAllowed = FALSE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 0,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_PacifidlogTown_House3 = {
+    .mapLayout = &gHoennLayout_PacifidlogTown_House1, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 347, .mapLayoutId = 460, .regionMapSectionId = 208,
+    .cave = FALSE, .weather = WEATHER_NONE, .mapType = MAP_TYPE_INDOOR,
+    .bikingAllowed = FALSE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 0,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_PacifidlogTown_House4 = {
+    .mapLayout = &gHoennLayout_PacifidlogTown_House2, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 347, .mapLayoutId = 461, .regionMapSectionId = 208,
+    .cave = FALSE, .weather = WEATHER_NONE, .mapType = MAP_TYPE_INDOOR,
+    .bikingAllowed = FALSE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 0,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_PacifidlogTown_House5 = {
+    .mapLayout = &gHoennLayout_PacifidlogTown_House1, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 347, .mapLayoutId = 460, .regionMapSectionId = 208,
+    .cave = FALSE, .weather = WEATHER_NONE, .mapType = MAP_TYPE_INDOOR,
+    .bikingAllowed = FALSE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 0,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_Route104_PrototypePrettyPetalFlowerShop = {
+    .mapLayout = &gHoennLayout_Route104_PrettyPetalFlowerShop, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 347, .mapLayoutId = 466, .regionMapSectionId = 208,
+    .cave = FALSE, .weather = WEATHER_NONE, .mapType = MAP_TYPE_INDOOR,
+    .bikingAllowed = FALSE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 0,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_SootopolisCity_House4 = {
+    .mapLayout = &gHoennLayout_SootopolisCity_House1, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 347, .mapLayoutId = 546, .regionMapSectionId = 208,
+    .cave = FALSE, .weather = WEATHER_NONE, .mapType = MAP_TYPE_INDOOR,
+    .bikingAllowed = FALSE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 0,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_SootopolisCity_House5 = {
+    .mapLayout = &gHoennLayout_SootopolisCity_House2, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 347, .mapLayoutId = 547, .regionMapSectionId = 208,
+    .cave = FALSE, .weather = WEATHER_NONE, .mapType = MAP_TYPE_INDOOR,
+    .bikingAllowed = FALSE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 0,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_SootopolisCity_House6 = {
+    .mapLayout = &gHoennLayout_SootopolisCity_House3, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 347, .mapLayoutId = 548, .regionMapSectionId = 208,
+    .cave = FALSE, .weather = WEATHER_NONE, .mapType = MAP_TYPE_INDOOR,
+    .bikingAllowed = FALSE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 0,
+    .floorNum = 0, .battleType = 0,
+};
+const struct MapHeader gHoennMapHeader_SootopolisCity_House7 = {
+    .mapLayout = &gHoennLayout_SootopolisCity_House1, .events = &sNoEvents,
+    .mapScripts = sScript, .connections = NULL,
+    .music = 347, .mapLayoutId = 546, .regionMapSectionId = 208,
+    .cave = FALSE, .weather = WEATHER_NONE, .mapType = MAP_TYPE_INDOOR,
+    .bikingAllowed = FALSE, .allowEscaping = 0, .allowRunning = 1, .showMapName = 0,
+    .floorNum = 0, .battleType = 0,
+};
+
+// === LOOKUP ENTRIES (add to Hoenn_GetMapHeader) ===
+    if (group == 50 && num == 4) return &gHoennMapHeader_PacifidlogTown_House3;
+    if (group == 50 && num == 5) return &gHoennMapHeader_PacifidlogTown_House4;
+    if (group == 50 && num == 6) return &gHoennMapHeader_PacifidlogTown_House5;
+    if (group == 55 && num == 6) return &gHoennMapHeader_FortreeCity_House3;
+    if (group == 55 && num == 7) return &gHoennMapHeader_FortreeCity_House4;
+    if (group == 55 && num == 8) return &gHoennMapHeader_FortreeCity_House5;
+    if (group == 58 && num == 8) return &gHoennMapHeader_SootopolisCity_House4;
+    if (group == 58 && num == 9) return &gHoennMapHeader_SootopolisCity_House5;
+    if (group == 58 && num == 10) return &gHoennMapHeader_SootopolisCity_House6;
+    if (group == 58 && num == 11) return &gHoennMapHeader_SootopolisCity_House7;
+    if (group == 70 && num == 1) return &gHoennMapHeader_Route104_PrototypePrettyPetalFlowerShop;
+
+// === EXTERN DECLARATIONS (add to hoenn_maps.c) ===
+extern const struct MapHeader gHoennMapHeader_FortreeCity_House3;
+extern const struct MapHeader gHoennMapHeader_FortreeCity_House4;
+extern const struct MapHeader gHoennMapHeader_FortreeCity_House5;
+extern const struct MapHeader gHoennMapHeader_PacifidlogTown_House3;
+extern const struct MapHeader gHoennMapHeader_PacifidlogTown_House4;
+extern const struct MapHeader gHoennMapHeader_PacifidlogTown_House5;
+extern const struct MapHeader gHoennMapHeader_Route104_PrototypePrettyPetalFlowerShop;
+extern const struct MapHeader gHoennMapHeader_SootopolisCity_House4;
+extern const struct MapHeader gHoennMapHeader_SootopolisCity_House5;
+extern const struct MapHeader gHoennMapHeader_SootopolisCity_House6;
+extern const struct MapHeader gHoennMapHeader_SootopolisCity_House7;
+
+// === WARP EVENTS (check warp_data.h for these) ===
+// FortreeCity_House3: events=sEvents_FortreeCity_House3 (if in warp_data.h)
+// FortreeCity_House4: events=sEvents_FortreeCity_House4 (if in warp_data.h)
+// FortreeCity_House5: events=sEvents_FortreeCity_House5 (if in warp_data.h)
+// PacifidlogTown_House3: events=sEvents_PacifidlogTown_House3 (if in warp_data.h)
+// PacifidlogTown_House4: events=sEvents_PacifidlogTown_House4 (if in warp_data.h)
+// PacifidlogTown_House5: events=sEvents_PacifidlogTown_House5 (if in warp_data.h)
+// Route104_PrototypePrettyPetalFlowerShop: events=sEvents_Route104_PrototypePrettyPetalFlowerShop (if in warp_data.h)
+// SootopolisCity_House4: events=sEvents_SootopolisCity_House4 (if in warp_data.h)
+// SootopolisCity_House5: events=sEvents_SootopolisCity_House5 (if in warp_data.h)
+// SootopolisCity_House6: events=sEvents_SootopolisCity_House6 (if in warp_data.h)
+// SootopolisCity_House7: events=sEvents_SootopolisCity_House7 (if in warp_data.h)

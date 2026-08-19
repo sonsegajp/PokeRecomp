@@ -1,0 +1,47 @@
+MIT License
+
+Copyright (c) 2026 PokeRecomp contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---------------------------------------------------------------------------
+
+SCOPE OF THIS LICENSE
+
+This license covers ONLY the original PC port code written for this project —
+principally the contents of src/platform/, server/, the PC build system
+(Makefile_pc), and the port's own documentation.
+
+It does NOT and CANNOT cover:
+
+  * Pokemon FireRed / LeafGreen / Ruby / Sapphire / Gold / Silver / Crystal
+    game code, data, graphics, music, text, or any other asset. Those are
+    (c) Nintendo, Creatures Inc., and GAME FREAK inc. This project claims no
+    rights to them and ships none of them.
+
+  * The upstream decompilation sources this port builds on (pret/pokefirered,
+    pret/pokeruby, pret/pokecrystal, and related projects), which are published
+    without a license by their authors.
+
+  * Third-party libraries bundled with or linked into the binary, which carry
+    their own licenses. See THIRD_PARTY_LICENSES.txt.
+
+Running this software requires a ROM image that YOU legally own. The launcher
+extracts assets from your own ROM at runtime into a local .pkmn archive. No
+ROM data is included in this repository or in any release built from it.
