@@ -83,13 +83,29 @@ pacman -S --needed mingw-w64-i686-gcc mingw-w64-i686-SDL2 \
     mingw-w64-i686-SDL2_mixer mingw-w64-i686-SDL2_ttf \
     mingw-w64-i686-pkg-config make git python
 
-git clone --depth 1 https://github.com/ocornut/imgui lib/imgui   # if lib/imgui is empty
-
 make -f Makefile_pc -j$(nproc)
 ```
 
-This produces `PokeRecomp.exe`. Copy it next to the DLLs (conventionally
-`deploy/`) and run it.
+This produces `PokeRecomp.exe`. Copy it into `deploy/` alongside the SDL2 DLLs
+and run it.
+
+### What a fresh clone gives you
+
+Everything needed to build and run FireRed and LeafGreen, **except a ROM**:
+
+| Included | Not included |
+|---|---|
+| All game source and data | Any ROM, `.pkmn` archive, or save file |
+| Dear ImGui, vendored in `lib/imgui` | SDL2 and its DLLs (install via `pacman`, above) |
+| Launcher art and audio (`deploy/launcher/`) | Ruby/Gold prefixed objects (see below) |
+| Build tool sources under `tools/` | |
+
+**Ruby, Sapphire, Gold, Silver and Crystal need sibling repositories.** Their
+code is compiled separately with symbol prefixes and linked in from
+`../pokeruby/build/pc_prefixed/` and `../pokegold-native/build/pc_prefixed/`.
+Those paths are outside this repository; if they are absent the wildcards
+resolve to nothing, the build still succeeds, and you get a FireRed/LeafGreen
+binary. See [BUILDING.md](BUILDING.md#multi-game-support-optional).
 
 Full instructions, dependency notes, multi-game object prefixing, and
 troubleshooting: **[BUILDING.md](BUILDING.md)**.

@@ -40,14 +40,14 @@ make -f Makefile_pc SDL_DIR=/your/path/mingw32
 
 ### Vendored dependencies
 
-Dear ImGui must be present at `lib/imgui/` with its backends in
-`lib/imgui/backends/`. If the directory is empty:
+Nothing to fetch. Dear ImGui is vendored in `lib/imgui/` (with its SDL2 and
+OpenGL3 backends in `lib/imgui/backends/`), and the `stb_*.h` headers are in
+`lib/`. Both are MIT licensed; see [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt).
 
-```bash
-git clone --depth 1 https://github.com/ocornut/imgui lib/imgui
-```
-
-The `stb_*.h` headers in `lib/` are already vendored.
+The launcher's art and audio are committed under `deploy/launcher/`, since the
+launcher UI loads them at runtime and they cannot be regenerated from a ROM.
+The redistributable DLLs that normally sit beside them are **not** committed —
+they come from the MSYS2 packages installed above.
 
 ---
 

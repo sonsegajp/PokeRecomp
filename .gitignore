@@ -26,9 +26,21 @@ custom_assets/gen3/
 *.zip
 *.7z
 ship/
-deploy/
 deploy_backup_*/
 build/release/
+
+# deploy/ is a runtime directory: ROMs, .pkmn archives, saves, accounts, logs
+# and extracted assets all live there and must never be committed. Exclude its
+# contents rather than the directory itself, so the launcher's art can be
+# re-included below (git will not descend into an excluded directory, so
+# excluding `deploy/` outright makes any negation underneath it impossible).
+deploy/*
+
+# The launcher UI loads these at runtime and they cannot be regenerated from a
+# ROM, so they have to ship with the source.
+!deploy/launcher/
+deploy/launcher/**/*.dll
+deploy/launcher/**/*.exe
 
 # ---------------------------------------------------------------------------
 # Build output
