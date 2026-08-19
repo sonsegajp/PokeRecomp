@@ -21,6 +21,12 @@ Crystal**, with cross-game Pokémon storage transfers and online multiplayer.
 
 ## Screenshots
 
+Running natively — no emulator:
+
+| FireRed | LeafGreen |
+|---|---|
+| ![FireRed title](docs/screenshots/09-firered-title.png) | ![LeafGreen title](docs/screenshots/10-leafgreen-title.png) |
+
 | Launcher | Brigette |
 |---|---|
 | ![Launcher title](docs/screenshots/01-launcher.png) | ![Launcher dialogue](docs/screenshots/08-launcher-dialogue.png) |
@@ -33,7 +39,7 @@ Crystal**, with cross-game Pokémon storage transfers and online multiplayer.
 |---|---|
 | ![Gen II select](docs/screenshots/03-game-select-gen2.png) | ![Gen III select](docs/screenshots/04-game-select-gen3.png) |
 
-| FireRed | LeafGreen |
+| FireRed overworld | LeafGreen in-game |
 |---|---|
 | ![FireRed overworld](docs/screenshots/06-firered-overworld.png) | ![LeafGreen in-game](docs/screenshots/07-leafgreen-ingame.png) |
 
