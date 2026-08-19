@@ -44,14 +44,69 @@ Nothing to fetch. Dear ImGui is vendored in `lib/imgui/` (with its SDL2 and
 OpenGL3 backends in `lib/imgui/backends/`), and the `stb_*.h` headers are in
 `lib/`. Both are MIT licensed; see [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt).
 
-The launcher's art and audio are committed under `deploy/launcher/`, since the
-launcher UI loads them at runtime and they cannot be regenerated from a ROM.
-The redistributable DLLs that normally sit beside them are **not** committed —
-they come from the MSYS2 packages installed above.
+---
+
+## 2. What is and isn't in this repository
+
+A clone contains everything needed to build and run **FireRed and LeafGreen**,
+except a ROM and the SDL2 runtime DLLs.
+
+### Included
+
+| Item | Where | Note |
+|---|---|---|
+| Game source and data | `src/`, `data/`, `include/` | The decompilation itself |
+| PC platform layer | `src/platform/` | SDL2, software PPU, audio, net, launcher |
+| Dear ImGui | `lib/imgui/` | Vendored source, MIT |
+| stb headers | `lib/` | MIT / public domain |
+| Launcher art and audio | `deploy/launcher/` | 268 files; the launcher loads these at runtime and they cannot be regenerated from a ROM |
+| Build tool sources | `tools/` | Compiled automatically by the Makefile |
+
+### Deliberately excluded
+
+| Item | Why | How to get it |
+|---|---|---|
+| **ROMs, `.pkmn` archives** | Copyrighted. Never distribute. | Supply your own; the launcher extracts on first run |
+| **Save files, `accounts/`** | Player data | Created as you play |
+| **Extracted assets** (`deploy/assets/`, `extracted_assets/`) | Derived from your ROM | Generated at runtime |
+| **SDL2 and support DLLs** | 123 files, ~122 MB of redistributables | `pacman`, then copy — see below |
+| **Build output** (`build/`, `*.exe`, `*.o`, `*.map`) | Regenerated | `make` |
+| **Ruby/Gold prefixed objects** | Built from separate repositories | See §3, *Multi-game support* |
+
+### Getting the runtime DLLs
+
+The build links against SDL2 but does not copy its DLLs. After installing the
+MSYS2 packages, copy them next to the executable:
+
+```bash
+cp /c/msys64/mingw32/bin/SDL2.dll        deploy/
+cp /c/msys64/mingw32/bin/SDL2_mixer.dll  deploy/
+cp /c/msys64/mingw32/bin/SDL2_ttf.dll    deploy/
+```
+
+SDL2_mixer and SDL2_ttf pull in further dependencies (FLAC, Ogg, Vorbis, Opus,
+mpg123, FreeType, libpng, zlib and others). The reliable way to catch them all
+is to launch the executable and copy whatever Windows reports as missing, or to
+copy the closure in one go:
+
+```bash
+for f in $(ldd deploy/PokeRecomp.exe | grep -i mingw32 | awk '{print $3}'); do
+    cp -u "$f" deploy/
+done
+```
+
+Do **not** copy `libreadline8.dll` — nothing links against it, and it is GPLv3.
+
+### What you actually get
+
+With the above done, `deploy/PokeRecomp.exe` runs, the launcher is fully
+skinned, and **FireRed and LeafGreen are playable**. Ruby, Sapphire, Gold,
+Silver and Crystal will not appear as playable entries unless you also build
+the sibling repositories described in §3.
 
 ---
 
-## 2. Building
+## 3. Building
 
 From the repository root, in the **MINGW32** shell:
 
@@ -101,7 +156,7 @@ needed (see [BUILD_FIXES.md](BUILD_FIXES.md)).
 
 ---
 
-## 3. Deploying
+## 4. Deploying
 
 The runtime looks for its DLLs and data in the working directory. The
 conventional layout lives in `deploy/`:
@@ -133,7 +188,7 @@ tools/pack_release.sh PokeRecomp-v1.0
 
 ---
 
-## 4. Running
+## 5. Running
 
 On first launch the launcher will ask for a ROM. Select a GBA ROM you legally
 own; it is verified against the supported game codes (`BPRE`, `BPGE`, `AXVE`,
@@ -146,7 +201,7 @@ and cheats).
 
 ---
 
-## 5. Troubleshooting
+## 6. Troubleshooting
 
 [BUILD_FIXES.md](BUILD_FIXES.md) documents every known build failure in detail:
 temp-file errors, the `REG_BASE` conflict, the assembly conversion pipeline,
