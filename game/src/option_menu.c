@@ -48,7 +48,8 @@ struct OptionMenu
     /*0x11*/ u8 state;
     /*0x12*/ u8 loadPaletteState;
 #ifdef PLATFORM_PC
-    u8 page; // 0 = the game's options, 1.. = PC SETTINGS pages
+    u8 page;   // 0 = the game's options, 1.. = PC SETTINGS pages
+    u8 scroll; // first PC row shown (pages longer than the window scroll)
 #endif
 };
 
@@ -209,8 +210,11 @@ static const u8 sText_PcHint[] = _("{DPAD_UPDOWN}PICK {DPAD_LEFTRIGHT}SWITCH {B_
 static const u8 sText_NextPage[] = _("SOUND & SPEED");
 static const u8 sText_Back[] = _("BACK");
 static const u8 sText_More[] = _("{RIGHT_ARROW}");
+static const u8 sText_ScrollUp[] = _("{UP_ARROW}");
+static const u8 sText_ScrollDown[] = _("{DOWN_ARROW}");
 
-static const u8 sText_Screen[] = _("SCREEN");
+static const u8 sText_Fullscreen[] = _("FULLSCREEN");
+static const u8 sText_WindowSize[] = _("WINDOW SIZE");
 static const u8 sText_Filter[] = _("FILTER");
 static const u8 sText_Scaling[] = _("SCALING");
 static const u8 sText_Colors[] = _("COLORS");
@@ -253,14 +257,14 @@ static const u8 sText_MixerGba[] = _("GBA");
 static const u8 sText_MixerHq[] = _("HI-FI");
 static const u8 *const sMixerLabels[] = {sText_MixerGba, sText_MixerHq};
 
-// SCREEN: x2..x8 window sizes, then FULL (stored as fullscreen=1)
-static int sScreenChoice;
-static const u8 sText_Full[] = _("FULL");
+#define PC_MAX_ROWS     16
+#define PC_VISIBLE_ROWS 7   // what the options window holds; longer pages scroll
 
-static const struct PcOptionRow sPcPages[PC_PAGE_COUNT][7] =
+static const struct PcOptionRow sPcPages[PC_PAGE_COUNT][PC_MAX_ROWS] =
 {
     [1] = {
-        {sText_Screen, PCROW_VALUE, &sScreenChoice, 2, 9, NULL, sText_X, sText_Empty},
+        {sText_Fullscreen, PCROW_VALUE, &gPcSettings.fullscreen, 0, 1, sOffOnLabels},
+        {sText_WindowSize, PCROW_VALUE, &gPcSettings.window_scale, 2, 8, NULL, sText_X, sText_Empty},
         {sText_Filter, PCROW_VALUE, &gPcSettings.filter, 0, PC_FILTER_COUNT - 1, sFilterLabels},
         {sText_Scaling, PCROW_VALUE, &gPcSettings.scaling, 0, PC_SCALE_COUNT - 1, sScalingLabels},
         {sText_Colors, PCROW_VALUE, &gPcSettings.color_correct, 0, 1, sColorLabels},
@@ -279,29 +283,9 @@ static const struct PcOptionRow sPcPages[PC_PAGE_COUNT][7] =
 static u8 PcPageRowCount(u8 page)
 {
     u8 n = 0;
-    while (n < 7 && sPcPages[page][n].name != NULL)
+    while (n < PC_MAX_ROWS && sPcPages[page][n].name != NULL)
         n++;
     return n;
-}
-
-static void PcScreenChoiceLoad(void)
-{
-    sScreenChoice = gPcSettings.fullscreen ? 9 : gPcSettings.window_scale;
-    if (sScreenChoice < 2)
-        sScreenChoice = 2;
-}
-
-static void PcScreenChoiceStore(void)
-{
-    if (sScreenChoice == 9)
-    {
-        gPcSettings.fullscreen = TRUE;
-    }
-    else
-    {
-        gPcSettings.fullscreen = FALSE;
-        gPcSettings.window_scale = sScreenChoice;
-    }
 }
 
 // Left/right on a PC row. Returns TRUE if the value changed.
@@ -317,8 +301,6 @@ static bool8 PcRowStep(const struct PcOptionRow *row, int dir)
     if (v < row->min)
         v = row->max;
     *row->value = v;
-    if (row->value == &sScreenChoice)
-        PcScreenChoiceStore();
     PcSettingsApplyVideo();
     return TRUE;
 }
@@ -332,11 +314,7 @@ static void PcRowValueString(const struct PcOptionRow *row, u8 *dst)
         StringCopy(dst, sText_More);
     if (row->kind != PCROW_VALUE)
         return;
-    if (row->value == &sScreenChoice && sScreenChoice == 9)
-    {
-        StringCopy(dst, sText_Full);
-    }
-    else if (row->labels)
+    if (row->labels)
     {
         StringCopy(dst, row->labels[*row->value - row->min]);
     }
@@ -394,7 +372,7 @@ void CB2_OptionsMenuFromStartMenu(void)
     }
 #ifdef PLATFORM_PC
     sOptionMenuPtr->page = 0;
-    PcScreenChoiceLoad();
+    sOptionMenuPtr->scroll = 0;
 #endif
     SetHelpContext(HELPCONTEXT_OPTIONS);
     SetMainCallback2(CB2_OptionMenu);
@@ -588,7 +566,7 @@ static void Task_OptionMenu(u8 taskId)
             PrintOptionMenuHeader();
             LoadOptionMenuItemNames();
             for (i = 0; i < MENUITEM_COUNT; i++)
-                BufferOptionMenuString(i);
+                BufferOptionMenuString(i + (sOptionMenuPtr->page != 0 ? sOptionMenuPtr->scroll : 0));
             UpdateSettingSelectionDisplay(sOptionMenuPtr->cursorPos);
             OptionMenu_PickSwitchCancel();
             break;
@@ -615,8 +593,21 @@ static u8 PcSwitchPage(u8 page)
 {
     sOptionMenuPtr->page = page;
     sOptionMenuPtr->cursorPos = 0;
+    sOptionMenuPtr->scroll = 0;
     PlaySE(SE_SELECT);
     return 5;
+}
+
+// Scroll so the cursor row is on screen: 5 = redraw the page, 3 = just move the cursor.
+static u8 PcScrollToCursor(void)
+{
+    u8 old = sOptionMenuPtr->scroll;
+
+    if (sOptionMenuPtr->cursorPos < sOptionMenuPtr->scroll)
+        sOptionMenuPtr->scroll = sOptionMenuPtr->cursorPos;
+    else if (sOptionMenuPtr->cursorPos >= sOptionMenuPtr->scroll + PC_VISIBLE_ROWS)
+        sOptionMenuPtr->scroll = sOptionMenuPtr->cursorPos - (PC_VISIBLE_ROWS - 1);
+    return sOptionMenuPtr->scroll != old ? 5 : 3;
 }
 
 // Input on the PC pages. Same conventions as the game's page.
@@ -633,12 +624,12 @@ static u8 PcOptionMenu_ProcessInput(void)
     if (JOY_REPT(DPAD_UP))
     {
         sOptionMenuPtr->cursorPos = sOptionMenuPtr->cursorPos == 0 ? count - 1 : sOptionMenuPtr->cursorPos - 1;
-        return 3;
+        return PcScrollToCursor();
     }
     if (JOY_REPT(DPAD_DOWN))
     {
         sOptionMenuPtr->cursorPos = sOptionMenuPtr->cursorPos == count - 1 ? 0 : sOptionMenuPtr->cursorPos + 1;
-        return 3;
+        return PcScrollToCursor();
     }
     if (JOY_NEW(B_BUTTON) || (JOY_NEW(A_BUTTON) && row->kind == PCROW_BACK))
     {
@@ -720,6 +711,16 @@ static void BufferOptionMenuString(u8 selection)
     
     memcpy(dst, sOptionMenuTextColor, 3);
     x = 0x82;
+#ifdef PLATFORM_PC
+    if (sOptionMenuPtr->page != 0)
+    {
+        u8 line = selection - sOptionMenuPtr->scroll;
+        if (selection < sOptionMenuPtr->scroll || line >= PC_VISIBLE_ROWS)
+            return;
+        y = ((GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT) - 1) * line) + 2;
+    }
+    else
+#endif
     y = ((GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT) - 1) * selection) + 2;
     FillWindowPixelRect(1, 1, x, y, 0x46, GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT));
 #ifdef PLATFORM_PC
@@ -837,9 +838,15 @@ static void LoadOptionMenuItemNames(void)
     if (sOptionMenuPtr->page != 0)
     {
         u8 count = PcPageRowCount(sOptionMenuPtr->page);
-        for (i = 0; i < count; i++)
-            AddTextPrinterParameterized(WIN_OPTIONS, FONT_NORMAL, sPcPages[sOptionMenuPtr->page][i].name, 8,
+        for (i = 0; i < PC_VISIBLE_ROWS && sOptionMenuPtr->scroll + i < count; i++)
+            AddTextPrinterParameterized(WIN_OPTIONS, FONT_NORMAL, sPcPages[sOptionMenuPtr->page][sOptionMenuPtr->scroll + i].name, 8,
                                         (u8)((i * (GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT))) + 2) - i, TEXT_SKIP_DRAW, NULL);
+        // more rows above / below
+        if (sOptionMenuPtr->scroll > 0)
+            AddTextPrinterParameterized(WIN_OPTIONS, FONT_NORMAL, sText_ScrollUp, 0xC8, 2, TEXT_SKIP_DRAW, NULL);
+        if (sOptionMenuPtr->scroll + PC_VISIBLE_ROWS < count)
+            AddTextPrinterParameterized(WIN_OPTIONS, FONT_NORMAL, sText_ScrollDown, 0xC8,
+                                        (u8)(((PC_VISIBLE_ROWS - 1) * (GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT) - 1)) + 2), TEXT_SKIP_DRAW, NULL);
         return;
     }
     for (i = 0; i < MENUITEM_COUNT; i++)
@@ -860,6 +867,10 @@ static void UpdateSettingSelectionDisplay(u16 selection)
     u16 maxLetterHeight, y;
     
     maxLetterHeight = GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT);
+#ifdef PLATFORM_PC
+    if (sOptionMenuPtr->page != 0)
+        selection -= sOptionMenuPtr->scroll;
+#endif
     y = selection * (maxLetterHeight - 1) + 0x3A;
     SetGpuReg(REG_OFFSET_WIN0V, WIN_RANGE(y, y + maxLetterHeight));
     SetGpuReg(REG_OFFSET_WIN0H, WIN_RANGE(0x10, 0xE0));
