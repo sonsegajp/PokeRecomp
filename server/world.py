@@ -19,6 +19,7 @@ import time
 from protocol import *  # noqa: F401,F403
 
 TYPE_MYSTERY = 9          # "???" -- never boosted
+NO_BOOST = 0xFF           # boost_type off
 SPECIES_UNOWN = 201
 LAND_RATES = (20, 20, 10, 10, 10, 10, 5, 5, 4, 4, 1, 1)   # % per land slot (wild_encounters.json)
 RARE_SHARE = 10            # a species is "rare" at a place if it is <= 10% of encounters there
@@ -76,6 +77,14 @@ class World:
     # ---- the day's boost ----------------------------------------------------
 
     def boost_type(self):
+        """Today's boosted type, or NO_BOOST (settings: boost_type daily / off / a type)."""
+        setting = str(getattr(self.args, "boost_type", "daily")).strip().upper()
+        if setting == "OFF":
+            return NO_BOOST
+        if setting != "DAILY":
+            names = [n.upper() for n in self.type_names]
+            if setting in names:
+                return names.index(setting)
         types = [t for t in range(len(self.type_names)) if t != TYPE_MYSTERY]
         day = int(time.time() // 86400)
         return random.Random(day).choice(types)
@@ -85,13 +94,15 @@ class World:
     def state_frame(self):
         e = self.event
         left = max(0, int(e[6] - time.time())) if e else 0
-        return frame(S_WORLD, struct.pack("<BHBBBHBBBI", self.boost_type(), self.args.shiny_odds,
+        return frame(S_WORLD, struct.pack("<BHBBBHBBBIH", self.boost_type(), self.args.shiny_odds,
                                           EVENT_OUTBREAK if e else EVENT_NONE,
                                           e[0] if e else 0, e[1] if e else 0, e[3] if e else 0,
-                                          e[4] if e else 0, e[5] if e else 0, self.args.outbreak_percent, left))
+                                          e[4] if e else 0, e[5] if e else 0, self.args.outbreak_percent, left,
+                                          max(1, min(getattr(self.args, "base_shiny_odds", 8192), 65535))))
 
     def boost_text(self):
-        return "Today, %s-type POKéMON shine more often!" % self.type_names[self.boost_type()]
+        t = self.boost_type()
+        return None if t == NO_BOOST else "Today, %s-type POKéMON shine more often!" % self.type_names[t]
 
     def event_text(self):
         e = self.event
@@ -100,7 +111,7 @@ class World:
 
     def announcements(self):
         """Chat lines for a player who just arrived."""
-        lines = [self.boost_text()]
+        lines = [self.boost_text()] if self.boost_text() else []
         if self.event:
             lines.append(self.event_text())
         return [system_chat(t) for t in lines]
@@ -112,7 +123,7 @@ class World:
         out = []
         now = time.time()
         day = int(now // 86400)
-        if self.day is not None and day != self.day:
+        if self.day is not None and day != self.day and self.boost_text():
             out += [system_chat(self.boost_text())]
         changed = self.day != day
         self.day = day
@@ -120,7 +131,7 @@ class World:
             out.append(system_chat("The outbreak of %s on %s is over." % (self.names[self.event[3]], self.event[2])))
             self.event = None
             changed = True
-        if not self.event and now >= self.next_event and self.places:
+        if not self.event and now >= self.next_event and self.places and getattr(self.args, "outbreaks", True):
             (group, num), name, mons = random.choice(self.places)
             species, (lo, hi) = random.choice(mons)
             if self.args.outbreak:            # an admin's pick: "GROUP.NUM:SPECIES"

@@ -2842,15 +2842,21 @@ bool8 Online_OutbreakMon(u16 *species, u8 *level)
 
 // The day's boosted type: extra rolls for a shiny wild Pokemon (each roll is
 // the normal 1/8192), so the odds become about 1 in shinyOdds.
+// Extra shiny rolls for a wild Pokemon on this world: its settings' odds for
+// every wild Pokemon, and the better odds for the day's boosted type.
 u8 Online_ShinyRerolls(u16 species)
 {
     const struct PcNetWorld *w = PcNetWorldState();
+    u8 rolls = 0;
 
-    if (w == NULL || w->boostType >= NUMBER_OF_MON_TYPES || w->shinyOdds == 0 || species >= NUM_SPECIES)
+    if (w == NULL || species >= NUM_SPECIES)
         return 0;
-    if (gSpeciesInfo[species].types[0] != w->boostType && gSpeciesInfo[species].types[1] != w->boostType)
-        return 0;
-    return min(8192 / w->shinyOdds, 64) - 1;
+    if (w->baseShinyOdds != 0 && w->baseShinyOdds < 8192)
+        rolls = min(8192 / w->baseShinyOdds, 256) - 1;   // up to 255 extra rolls: 1 in ~32 at best
+    if (w->boostType < NUMBER_OF_MON_TYPES && w->shinyOdds != 0
+     && (gSpeciesInfo[species].types[0] == w->boostType || gSpeciesInfo[species].types[1] == w->boostType))
+        rolls = max(rolls, min(8192 / w->shinyOdds, 256) - 1);
+    return rolls;
 }
 
 // ---- specials for the 2F and for other trainers -----------------------------------------------

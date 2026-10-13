@@ -758,6 +758,7 @@ static void handle_game(uint8_t type, const uint8_t *p, int len)
         world.minLevel = p[8];
         world.maxLevel = p[9];
         world.percent = p[10];
+        world.baseShinyOdds = len >= 17 ? get16(p + 15) : 8192;
         have_world = 1;
         break;
     case S_LINK_STATE:

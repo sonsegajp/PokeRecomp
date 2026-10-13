@@ -107,7 +107,8 @@ S_SESSION_END    = 0xC8  # u8 reason
 S_LINK_STATE     = 0xC9  # u8 all_open (every member has its end open = "connected")
 S_GUILD_CHAT_FROM = 0xCB  # name[8], u16 tag, text
 S_WORLD          = 0xCA  # u8 boost_type, u16 shiny_odds, u8 event_kind, u8 group, u8 num, u16 species,
-                         #   u8 min, u8 max, u8 percent, u32 seconds_left (S_CHAT_FROM id 0 = the server)
+                         #   u8 min, u8 max, u8 percent, u32 seconds_left, u16 base_shiny_odds
+                         #   (every wild Pokemon; boost_type 0xFF = no boost) (S_CHAT_FROM id 0 = the server)
 S_ERROR          = 0xCF  # u8 code
 
 KIND_SINGLE, KIND_DOUBLE, KIND_TRADE = 1, 2, 3

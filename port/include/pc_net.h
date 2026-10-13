@@ -53,6 +53,7 @@ struct PcNetWorld {
     uint16_t species;
     uint8_t minLevel, maxLevel;
     uint8_t percent;            /* share of wild encounters there */
+    uint16_t baseShinyOdds;     /* 1 in N for every wild Pokemon on this world (8192 = the games' own) */
 };
 
 void PcNetPump(void);

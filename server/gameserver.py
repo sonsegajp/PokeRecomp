@@ -27,7 +27,8 @@ import time
 
 from protocol import *  # noqa: F401,F403
 import legality
-from world import World
+import world_config
+from world import World, system_chat
 
 # The PokeRecomp master every world registers with (and players log in to).
 # Not printed anywhere: hosts and players only ever see world names.
@@ -231,6 +232,8 @@ class GameServer:
             player.send(self.world.state_frame())
             for line in self.world.announcements():
                 player.send(line)
+            if self.args.welcome:
+                player.send(system_chat(self.args.welcome))
             print(f"game: player {player.id} joined ({len(self.players)} online)")
             while True:
                 msg = await read_frame(reader)
@@ -267,6 +270,11 @@ class GameServer:
                 player.send(frame(S_DECLINED, struct.pack("<HB", target_id, DECLINE_GONE)))
             elif target.session or player.session or target.pending_to:
                 player.send(frame(S_DECLINED, struct.pack("<HB", target_id, DECLINE_BUSY)))
+            elif (kind == KIND_TRADE and not self.args.trades) or (kind != KIND_TRADE and not self.args.battles):
+                # this world's settings: no battles / no trades
+                player.send(system_chat("Trades are off on this world." if kind == KIND_TRADE
+                                        else "Battles are off on this world."))
+                player.send(frame(S_DECLINED, struct.pack("<HB", target_id, DECLINE_NO)))
             else:
                 player.pending_to = (target_id, kind)
                 target.send(frame(S_REQUESTED, struct.pack("<HB", player.id, kind)))
@@ -284,7 +292,7 @@ class GameServer:
         elif t == S_LINK_CMD and player.session and len(p) >= CMD_LENGTH * 2:
             if not player.session.all_open():
                 pass                                  # cable not connected: dropped, as on hardware
-            elif self.inspect(player, bytes(p[:CMD_LENGTH * 2])):
+            elif self.args.legality and self.inspect(player, bytes(p[:CMD_LENGTH * 2])):
                 return                                # session ended: illegal Pokémon
             elif len(player.link_queue) >= MAX_QUEUE:
                 self.end_session(player, 3)
@@ -389,6 +397,15 @@ class GameServer:
 
 async def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--config", help="a world settings file (world_config.py); the command line wins over it")
+    ap.add_argument("--write-config", metavar="FILE", help="write a settings file with every setting, then exit")
+    ap.add_argument("--welcome", default="", help="chat line everyone sees on arrival")
+    ap.add_argument("--base-shiny-odds", type=int, default=8192, help="1 in N for every wild Pokemon")
+    ap.add_argument("--boost-type", default="daily", help="daily, off, or a type name (FIRE)")
+    ap.add_argument("--outbreaks", type=world_config.parse_bool, default=True, help="on/off")
+    ap.add_argument("--legality", type=world_config.parse_bool, default=True, help="on/off: check Pokemon")
+    ap.add_argument("--battles", type=world_config.parse_bool, default=True, help="on/off")
+    ap.add_argument("--trades", type=world_config.parse_bool, default=True, help="on/off")
     ap.add_argument("--name", default="Kanto")
     ap.add_argument("--region", default="kanto", choices=sorted(REGION_NAMES),
                     help="kanto: FireRed/LeafGreen world; hoenn: Ruby/Sapphire/Emerald world")
@@ -404,7 +421,15 @@ async def main():
     ap.add_argument("--first-event", type=float, default=1, help="minutes until the first outbreak")
     ap.add_argument("--outbreak-percent", type=int, default=50, help="share of wild encounters there")
     ap.add_argument("--outbreak", help='start with this outbreak: "GROUP.NUM:SPECIES" (e.g. 3.19:25)')
+    first, _ = ap.parse_known_args()
+    if first.config and os.path.exists(first.config):
+        ap.set_defaults(**world_config.read(first.config))   # the file, then the command line over it
     args = ap.parse_args()
+    args.max = max(1, min(args.max, 200))
+    if args.write_config:
+        world_config.write_template(args.write_config, args)
+        print("game: wrote", args.write_config)
+        return
     args.positions = args.positions or os.path.join(os.path.dirname(os.path.abspath(__file__)), f"positions_{args.port}.json")
     gs = GameServer(args)
     srv = await asyncio.start_server(gs.handle, "0.0.0.0", args.port)
