@@ -20,7 +20,10 @@
 
 #include "pc_rompack.h"
 
-#ifdef LEAFGREEN
+#if defined(EMERALD)
+#define GAME_NAME L"Pokémon Emerald"
+#define PACK_NAME L"emerald.pak"
+#elif defined(LEAFGREEN)
 #define GAME_NAME L"Pokémon LeafGreen"
 #define PACK_NAME L"leafgreen.pak"
 #else

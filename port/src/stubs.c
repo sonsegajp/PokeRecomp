@@ -13,15 +13,27 @@ typedef uint32_t u32;
 typedef int8_t s8;
 
 /* ROM header fields the game reads. */
+#if defined(EMERALD)
+const char RomHeaderGameCode[4] = {'B', 'P', 'E', 'E'};
+#elif defined(LEAFGREEN)
+const char RomHeaderGameCode[4] = {'B', 'P', 'G', 'E'};
+#else
 const char RomHeaderGameCode[4] = {'B', 'P', 'R', 'E'};
+#endif
 const u8 RomHeaderSoftwareVersion = 0;
 
+#ifndef EMERALD   /* Emerald defines its heap in malloc.c */
 /* The heap the linker script placed at the end of EWRAM. */
 u8 gHeap[0x20000] __attribute__((aligned(4)));
+#endif
 
 /* IntrMain is ARM code copied to IWRAM on the console; interrupts are
  * dispatched by the host here, so it only needs to exist. */
+#ifdef EMERALD
+u32 IntrMain[1];
+#else
 u32 intr_main[1];
+#endif
 
 /* Multiboot: always fails ("no partner"). */
 struct MultiBootParam;

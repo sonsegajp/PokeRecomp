@@ -1,0 +1,81 @@
+TrainerHill_Elevator_MapScripts::
+	map_script MAP_SCRIPT_ON_FRAME_TABLE, TrainerHill_Elevator_OnFrame
+	.byte 0
+
+TrainerHill_Elevator_OnFrame:
+	map_script_2 VAR_TEMP_4, 0, TrainerHill_Elevator_EventScript_EnterElevator
+	.2byte 0
+
+TrainerHill_Elevator_EventScript_Attendant::
+	end
+
+TrainerHill_Elevator_EventScript_ExitToRoof::
+	applywaitmovement LOCALID_PLAYER, TrainerHill_Elevator_Movement_PlayerExitElevatorToRoof
+	releaseall
+	warp MAP_TRAINER_HILL_ROOF, 15, 5
+	waitstate
+	end
+
+TrainerHill_Elevator_EventScript_EnterElevator::
+	applywaitmovement LOCALID_PLAYER, TrainerHill_Elevator_Movement_PlayerApproachAttendant
+	applywaitmovement LOCALID_TRAINER_HILL_ELEVATOR_ATTENDANT, TrainerHill_Elevator_Movement_AttendantFacePlayer
+	lockall
+	msgbox TrainerHill_Elevator_Text_ReturnToReception, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, TrainerHill_Elevator_EventScript_ExitToRoof
+	releaseall
+	applywaitmovement LOCALID_TRAINER_HILL_ELEVATOR_ATTENDANT, TrainerHill_Elevator_Movement_AttendantFaceDown
+	applywaitmovement LOCALID_PLAYER, TrainerHill_Elevator_Movement_PlayerMoveToCenterOfElevator
+	call TrainerHill_Elevator_EventScript_MoveElevator
+	delay 25
+	applywaitmovement LOCALID_PLAYER, TrainerHill_Elevator_Movement_PlayerExitElevator
+	warp MAP_TRAINER_HILL_ENTRANCE, 17, 8
+	waitstate
+	end
+
+@ Unused
+TrainerHill_Elevator_EventScript_ExitFloorSelect::
+	goto TrainerHill_Elevator_EventScript_CloseFloorSelect
+	end
+
+@ Functionally unused
+TrainerHill_Elevator_EventScript_CloseFloorSelect::
+	special CloseDeptStoreElevatorWindow
+	releaseall
+	end
+
+TrainerHill_Elevator_EventScript_MoveElevator::
+	waitse
+	special MoveElevator
+	return
+
+TrainerHill_Elevator_Movement_PlayerMoveToCenterOfElevator:
+	walk_up
+	walk_up
+	walk_right
+	face_down
+	step_end
+
+TrainerHill_Elevator_Movement_PlayerApproachAttendant:
+	delay_16
+	walk_left
+	step_end
+
+TrainerHill_Elevator_Movement_PlayerExitElevator:
+	delay_16
+	walk_down
+	walk_down
+	step_end
+
+TrainerHill_Elevator_Movement_PlayerExitElevatorToRoof:
+	face_down
+	delay_16
+	step_end
+
+TrainerHill_Elevator_Movement_AttendantFacePlayer:
+	face_right
+	step_end
+
+TrainerHill_Elevator_Movement_AttendantFaceDown:
+	face_down
+	step_end
+

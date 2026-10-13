@@ -12,3 +12,4 @@ game/tools/*/*.exe
 dist/
 *.gba
 *.pak
+EmeraldPC.exe

@@ -1,1 +1,2 @@
-037335f4c725d7c9aecdac87066f2002b4bd7e14 Sat Sep 26 15:54:25 2026 -0500
+pokefirered: https://github.com/pret/pokefirered 037335f4c725d7c9aecdac87066f2002b4bd7e14 Sat Sep 26 15:54:25 2026 -0500
+pokeemerald: https://github.com/pret/pokeemerald 731ad5bfd6e6f265508d0efcca0ba42f9dcf5881 (2026-10-01)

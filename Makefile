@@ -2,6 +2,7 @@
 #
 #   make            build FireRedPC.exe
 #   make VERSION=LEAFGREEN   build LeafGreenPC.exe (needs `make leafgreen_modern` in game/ first)
+#   make VERSION=EMERALD     build EmeraldPC.exe from emerald/ (pret pokeemerald; `make modern` there first)
 #   make assets     (re)build pret's assets + reference ROM (needs devkitARM)
 #
 # Game C:   cpp -> pret preproc (INCBIN, charmap strings) -> i686 gcc
@@ -9,7 +10,16 @@
 
 VERSION ?= FIRERED
 GAME   := game
-ifeq ($(VERSION),LEAFGREEN)
+PREPROC_ARGS :=
+ifeq ($(VERSION),EMERALD)
+GAME   := emerald
+BUILD  := build/pc_em
+ARMOBJ := $(GAME)/build/modern
+EXE    := EmeraldPC.exe
+VERSION_DEF := -D EMERALD=1
+SHA1S  := emerald/rom.sha1
+PREPROC_ARGS := -g build/assets
+else ifeq ($(VERSION),LEAFGREEN)
 BUILD  := build/pc_lg
 ARMOBJ := $(GAME)/build/leafgreen_modern
 EXE    := LeafGreenPC.exe
@@ -41,11 +51,15 @@ LDFLAGS := -m32 -g
 LIBS := $(shell sdl2-config --libs) -lopengl32 -lwinmm -lws2_32 -lcomdlg32 -Wl,--defsym,_gNumMusicPlayers=4,--defsym,_gMaxLines=0
 
 # Game sources that are replaced or have no PC equivalent.
-GAME_SKIP := isagbprn.c mini_printf.c librfu_intr.c multiboot.c agb_flash.c agb_flash_1m.c agb_flash_le.c agb_flash_mx.c
+# (Emerald: libisagbprn.c is debug print; its clock chip, siirtc.c, is port/src/rtc.c)
+GAME_SKIP := isagbprn.c mini_printf.c librfu_intr.c multiboot.c agb_flash.c agb_flash_1m.c agb_flash_le.c agb_flash_mx.c \
+             libisagbprn.c siirtc.c
 GAME_SRCS := $(filter-out $(addprefix $(GAME)/src/,$(GAME_SKIP)),$(wildcard $(GAME)/src/*.c))
 GAME_OBJS := $(patsubst $(GAME)/src/%.c,$(BUILD)/game/%.o,$(GAME_SRCS))
+# Our game-side code shared by every game, built with that game's headers.
+SHARED_OBJS := $(patsubst shared/%.c,$(BUILD)/shared/%.o,$(wildcard shared/*.c))
 
-DATA_ARM  := $(filter-out $(ARMOBJ)/data/mystery_event_msg.o,$(wildcard $(ARMOBJ)/data/*.o)) $(wildcard $(ARMOBJ)/sound/songs/midi/*.o)
+DATA_ARM  := $(filter-out $(ARMOBJ)/data/mystery_event_msg.o $(ARMOBJ)/data/mystery_gift.o,$(wildcard $(ARMOBJ)/data/*.o)) $(wildcard $(ARMOBJ)/sound/songs/midi/*.o)
 DATA_OBJS := $(patsubst $(ARMOBJ)/%.o,$(BUILD)/data/%.o,$(DATA_ARM))
 
 PORT_SRCS := $(wildcard port/src/*.c)
@@ -64,13 +78,13 @@ ROM_DIRS ?= .
 ROMPACK := build/rompack.exe
 
 $(EXE): $(BUILD)/game.exe $(ROMPACK) tools/game_ranges.py
-	$(PY) tools/game_ranges.py $(BUILD)/FireRedPC.map $(BUILD)/game_ranges.txt $(BUILD)/game/ $(BUILD)/data/
+	$(PY) tools/game_ranges.py $(BUILD)/FireRedPC.map $(BUILD)/game_ranges.txt $(BUILD)/game/ $(BUILD)/shared/ $(BUILD)/data/
 	$(ROMPACK) $(BUILD)/game.exe $@ --allow $(BUILD)/game_ranges.txt $(foreach f,$(SHA1S),--sha1 $(firstword $(shell cat $(f)))) $(foreach d,$(ROM_DIRS),--dir $(d))
 
 $(ROMPACK): tools/rompack.c
 	/c/msys64/mingw64/bin/gcc -O2 -o $@ $<
 
-$(BUILD)/game.exe: $(GAME_OBJS) $(DATA_OBJS) $(PORT_OBJS)
+$(BUILD)/game.exe: $(GAME_OBJS) $(SHARED_OBJS) $(DATA_OBJS) $(PORT_OBJS)
 	@echo "LD $@"
 	@printf '%s\n' $^ > $(BUILD)/objs.rsp
 	@$(CC) $(LDFLAGS) -o $@ @$(BUILD)/objs.rsp $(LIBS) -Wl,-Map=$(BUILD)/FireRedPC.map
@@ -79,7 +93,13 @@ $(BUILD)/game.exe: $(GAME_OBJS) $(DATA_OBJS) $(PORT_OBJS)
 $(BUILD)/game/%.o: $(GAME)/src/%.c
 	@mkdir -p $(dir $@)
 	cd $(GAME) && $(CC) -E -m32 $(GAME_CPPFLAGS) -MMD -MF ../$@.d -MT ../$@ src/$*.c \
-	  | tools/preproc/preproc.exe -i src/$*.c charmap.txt \
+	  | tools/preproc/preproc.exe -i $(PREPROC_ARGS) src/$*.c charmap.txt \
+	  | $(CC) $(GAME_CFLAGS) -x c -c - -o ../$@
+
+$(BUILD)/shared/%.o: shared/%.c
+	@mkdir -p $(dir $@)
+	cd $(GAME) && $(CC) -E -m32 $(GAME_CPPFLAGS) -MMD -MF ../$@.d -MT ../$@ ../shared/$*.c \
+	  | tools/preproc/preproc.exe -i $(PREPROC_ARGS) ../shared/$*.c charmap.txt \
 	  | $(CC) $(GAME_CFLAGS) -x c -c - -o ../$@
 
 $(BUILD)/data/%.s: $(ARMOBJ)/%.o tools/elf2x86.py
@@ -99,6 +119,6 @@ assets:
 clean:
 	rm -rf $(BUILD) $(EXE)
 
--include $(GAME_OBJS:.o=.o.d) $(PORT_OBJS:.o=.d)
+-include $(GAME_OBJS:.o=.o.d) $(SHARED_OBJS:.o=.o.d) $(PORT_OBJS:.o=.d)
 .PHONY: all assets clean
 .PRECIOUS: $(BUILD)/data/%.s

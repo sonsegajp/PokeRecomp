@@ -1,0 +1,18 @@
+// PC port: names that differ between the games our shared code (shared/*.c)
+// is built into. Include after the game's own headers.
+#ifndef GUARD_PC_GAME_H
+#define GUARD_PC_GAME_H
+
+#ifdef EMERALD
+// pokeemerald renamed the item getters
+#define ItemId_GetPocket     GetItemPocket
+#define ItemId_GetImportance GetItemImportance
+#define ItemId_GetPrice      GetItemPrice
+#define ItemId_GetName       GetItemName
+#endif
+
+#ifndef LAND_WILD_COUNT
+#define LAND_WILD_COUNT 12   // every Gen 3 game: 12 grass slots
+#endif
+
+#endif // GUARD_PC_GAME_H
