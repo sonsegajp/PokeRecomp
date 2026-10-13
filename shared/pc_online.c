@@ -2496,8 +2496,14 @@ static void Task_OnlineScreen(u8 taskId)
                 // Everyone on a server starts out in their region's first
                 // town (Pallet / Littleroot), between the houses; the welcome
                 // message plays on arrival.
+                u8 group, num, facing;
+                s16 x, y;
+
                 sJoinedWarp = FALSE;
                 sShowJoinedMessage = TRUE;
+                if (PcNetLastPosition(&group, &num, &x, &y, &facing))   // back where they left off
+                    SetWarpDestination(group, num, -1, x, y);
+                else
 #ifdef EMERALD
                 SetWarpDestination(MAP_GROUP(MAP_LITTLEROOT_TOWN), MAP_NUM(MAP_LITTLEROOT_TOWN), -1, 10, 10);
 #else
@@ -2951,11 +2957,13 @@ static void UpdateNameTags(void)
 static void SendPresence(void)
 {
     struct ObjectEvent *player = &gObjectEvents[gPlayerAvatar.objectEventId];
-    u8 flags = (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_DASH) ? 1 : 0;
+    u8 flags = (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_DASH) ? PC_NET_POS_DASH : 0;
     s16 x = player->currentCoords.x - MAP_OFFSET, y = player->currentCoords.y - MAP_OFFSET;
 
     if (ArePlayerFieldControlsLocked())
-        flags |= 2;   // busy (talking, in a menu)
+        flags |= PC_NET_POS_BUSY;   // busy (talking, in a menu)
+    else if ((gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_ON_FOOT) && !InCableClubRoom())
+        flags |= PC_NET_POS_SAFE;   // somewhere to come back to after leaving
     if (++sPosTimer < 60
      && sLastPos.group == gSaveBlock1Ptr->location.mapGroup && sLastPos.num == gSaveBlock1Ptr->location.mapNum
      && sLastPos.x == x && sLastPos.y == y && sLastPos.facing == player->facingDirection && sLastPos.flags == flags)

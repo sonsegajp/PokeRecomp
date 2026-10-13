@@ -82,6 +82,12 @@ int PcNetOwnsRegion(int region);        /* this player can play there (owns that
 void PcNetBeginJoin(int index, uint8_t gender);
 void PcNetDisconnect(void);
 int PcNetConnected(void);
+/* Where this account was the last time it left the joined server (the server
+ * logs it on disconnect); 0 if never / nowhere safe. */
+int PcNetLastPosition(uint8_t *group, uint8_t *num, int16_t *x, int16_t *y, uint8_t *facing);
+#define PC_NET_POS_DASH 1
+#define PC_NET_POS_BUSY 2
+#define PC_NET_POS_SAFE 4   /* on foot on an ordinary map: a spot to come back to */
 const char *PcNetConnectedServerName(void);
 
 /* presence */

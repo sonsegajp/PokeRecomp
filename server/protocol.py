@@ -79,7 +79,7 @@ G_VERIFIED       = 0xA0  # u32 req, u8 ok, u32 account_id, name[8], u16 tag, u32
 
 # client <-> game server
 S_JOIN           = 0x40  # token[16], u8 gender, u16 version, u8 game (GAME_*)
-S_POS            = 0x41  # u8 group, u8 num, s16 x, s16 y, u8 facing, u8 flags
+S_POS            = 0x41  # u8 group, u8 num, s16 x, s16 y, u8 facing, u8 flags (POS_*)
 S_CHAT           = 0x42  # text (game charset, 0xFF-terminated, <= 64)
 S_REQUEST        = 0x43  # u16 target, u8 kind
 S_RESPOND        = 0x44  # u16 from, u8 accept
@@ -87,7 +87,8 @@ S_LINK_CMD       = 0x45  # u16[8]
 S_LINK_END       = 0x46
 S_LINK_OPEN      = 0x47  # u8 open (this player's end of the cable)
 S_GUILD_CHAT     = 0x48  # text (game charset) -> the sender's guild, on every server
-S_WELCOME        = 0xC0  # u16 my_id, name[24] server_name
+S_WELCOME        = 0xC0  # u16 my_id, name[24] server_name, then u8 has_pos + u8 group, u8 num,
+                         #   s16 x, s16 y, u8 facing: where this account last was on this server
 S_PLAYER         = 0xC1  # u16 id, name[8], u16 tag, u8 gender, u8 group, u8 num, s16 x, s16 y, u8 facing, u8 flags, u8 game
 S_PLAYER_GONE    = 0xC2  # u16 id
 S_CHAT_FROM      = 0xC3  # u16 id, text
@@ -142,3 +143,6 @@ GAME_FIRERED, GAME_LEAFGREEN, GAME_EMERALD, GAME_RUBY, GAME_SAPPHIRE = 0, 1, 2, 
 REGION_KANTO, REGION_HOENN = 0, 1
 REGION_NAMES = {"kanto": REGION_KANTO, "hoenn": REGION_HOENN}
 GAME_REGION = {GAME_FIRERED: "kanto", GAME_LEAFGREEN: "kanto", GAME_EMERALD: "hoenn", GAME_RUBY: "hoenn", GAME_SAPPHIRE: "hoenn"}
+
+# S_POS flags
+POS_DASH, POS_BUSY, POS_SAFE = 1, 2, 4   # POS_SAFE: on foot on an ordinary map (a spot to come back to)

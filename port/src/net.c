@@ -65,6 +65,8 @@ static int reply_len, master_error;
 static uint8_t join_gender;
 
 /* servers */
+/* S_WELCOME: where this account was when it last left this server */
+static struct { int valid; uint8_t group, num, facing; int16_t x, y; } last_pos;
 static struct { char name[25], host[65]; uint16_t port, players, max; uint8_t region; } servers[PC_NET_MAX_SERVERS];
 static int server_count;
 static int connected;
@@ -375,6 +377,17 @@ int PcNetOwnsRegion(int region)
 }
 
 int PcNetConnected(void) { return connected; }
+
+int PcNetLastPosition(uint8_t *group, uint8_t *num, int16_t *x, int16_t *y, uint8_t *facing)
+{
+    if (!last_pos.valid) return 0;
+    *group = last_pos.group;
+    *num = last_pos.num;
+    *x = last_pos.x;
+    *y = last_pos.y;
+    *facing = last_pos.facing;
+    return 1;
+}
 const char *PcNetConnectedServerName(void) { return connected_name; }
 
 void PcNetBeginJoin(int index, uint8_t gender)
@@ -626,6 +639,14 @@ static void handle_game(uint8_t type, const uint8_t *p, int len)
         connected = 1;
         have_world = 0;
         if (len >= 2) my_player_id = get16(p);
+        last_pos.valid = len >= 2 + 24 + 8 && p[26];   /* where we were when we last left */
+        if (last_pos.valid) {
+            last_pos.group = p[27];
+            last_pos.num = p[28];
+            last_pos.x = (int16_t)get16(p + 29);
+            last_pos.y = (int16_t)get16(p + 31);
+            last_pos.facing = p[33];
+        }
         if (op == OP_JOIN) finish_op(PC_NET_OP_OK);
         conn_close(&master);           /* the master is only needed until we're in */
         master_logged_in = 0;

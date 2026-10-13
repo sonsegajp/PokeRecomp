@@ -20,8 +20,10 @@ them — so both games see identical data in identical order, as on a cable.
 import argparse
 import asyncio
 import collections
+import json
 import os
 import struct
+import time
 
 from protocol import *  # noqa: F401,F403
 import legality
@@ -43,6 +45,7 @@ class Player:
         self.gender = 0
         self.game = GAME_FIRERED
         self.pos = (0, 0, 0, 0, 0, 0)       # group, num, x, y, facing, flags
+        self.safe_pos = None                # the last spot on foot: where they come back to
         self.session = None
         self.pending_to = None              # (target id, kind) we asked
         self.link_queue = collections.deque()
@@ -79,6 +82,36 @@ class GameServer:
         self.verify_waits = {}
         self.next_req = 1
         self.world = World(args)
+        self.positions_file = args.positions
+        try:
+            with open(self.positions_file) as f:
+                self.positions = json.load(f)  # account id -> [group, num, x, y, facing, time]
+        except (OSError, ValueError):
+            self.positions = {}
+
+    def log_position(self, player):
+        """A player left: remember where, so they come back to the same spot."""
+        if not player.account or not player.safe_pos:
+            return
+        g, n, x, y, facing = player.safe_pos
+        self.positions[str(player.account)] = [g, n, x, y, facing, int(time.time())]
+        print(f"game: player {player.id} (account {player.account}) left at map {g}.{n} ({x},{y})")
+        try:
+            tmp = self.positions_file + ".tmp"
+            with open(tmp, "w") as f:
+                json.dump(self.positions, f)
+            os.replace(tmp, self.positions_file)
+        except OSError as e:
+            print("game: could not write", self.positions_file, e)
+
+    def welcome(self, player):
+        last = self.positions.get(str(player.account))
+        body = struct.pack("<H", player.id) + text(self.args.name, 24)
+        if last:
+            body += struct.pack("<BBBhhB", 1, *last[:5])
+        else:
+            body += bytes(8)
+        return frame(S_WELCOME, body)
 
     # ---- master link ---------------------------------------------------------
 
@@ -180,7 +213,7 @@ class GameServer:
                 player.game = msg[1][TOKEN_LEN + 3]
             self.players[player.id] = player
             self.presence(player, 1)
-            player.send(frame(S_WELCOME, struct.pack("<H", player.id) + text(self.args.name, 24)))
+            player.send(self.welcome(player))
             for other in self.players.values():
                 if other is not player:
                     player.send(other.info())
@@ -199,6 +232,7 @@ class GameServer:
         finally:
             if player and self.players.get(player.id) is player:
                 del self.players[player.id]
+                self.log_position(player)
                 self.end_session(player, 2)
                 self.presence(player, 0)
                 self.broadcast(frame(S_PLAYER_GONE, struct.pack("<H", player.id)))
@@ -208,6 +242,8 @@ class GameServer:
     def dispatch(self, player, t, p):
         if t == S_POS and len(p) >= 8:
             player.pos = struct.unpack_from("<BBhhBB", p)
+            if player.pos[5] & POS_SAFE:
+                player.safe_pos = player.pos[:5]
             self.broadcast(player.info(), skip=player)
         elif t == S_CHAT:
             self.broadcast(frame(S_CHAT_FROM, struct.pack("<H", player.id) + bytes(p[:64])))
@@ -351,6 +387,7 @@ async def main():
     ap.add_argument("--master", default="127.0.0.1:27100")
     ap.add_argument("--key-file", default="server_key.txt")
     ap.add_argument("--max", type=int, default=100)
+    ap.add_argument("--positions", help="file keeping each player's last position (default: positions_PORT.json)")
     ap.add_argument("--shiny-odds", type=int, default=512, help="1 in N for the day's boosted type (normally 8192)")
     ap.add_argument("--event-every", type=float, default=60, help="minutes between outbreaks")
     ap.add_argument("--event-length", type=float, default=20, help="minutes an outbreak lasts")
@@ -358,6 +395,7 @@ async def main():
     ap.add_argument("--outbreak-percent", type=int, default=50, help="share of wild encounters there")
     ap.add_argument("--outbreak", help='start with this outbreak: "GROUP.NUM:SPECIES" (e.g. 3.19:25)')
     args = ap.parse_args()
+    args.positions = args.positions or os.path.join(os.path.dirname(os.path.abspath(__file__)), f"positions_{args.port}.json")
     gs = GameServer(args)
     srv = await asyncio.start_server(gs.handle, "0.0.0.0", args.port)
     print("game: listening on", args.port)

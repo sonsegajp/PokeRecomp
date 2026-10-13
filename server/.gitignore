@@ -2,3 +2,4 @@ master.db*
 server_key.txt
 __pycache__/
 sample_party_block.bin
+positions_*.json
