@@ -1242,7 +1242,7 @@ Common_EventScript_WirelessClubAttendant::
 	end
 
 Common_EventScript_DirectCornerAttendant::
-	goto Online_EventScript_LocalClosed
+	goto Online_EventScript_Market
 	end
 
 VermilionCity_PokemonCenter_1F_EventScript_VSSeekerWoman::

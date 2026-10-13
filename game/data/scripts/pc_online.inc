@@ -595,6 +595,27 @@ Online_Text_MailboxNoRoom::
 	.string "There's no room for more POKéMON.\n"
 	.string "Make space in your PC, then come back.$"
 
+@ ---- POKéMON MARKET (the right 2F desk): trainers sell items to each other ----
+
+Online_EventScript_Market::
+	goto_if_questlog EventScript_ReleaseEnd
+	special QuestLog_CutRecording
+	lock
+	faceplayer
+	special Online_HasAccount
+	goto_if_eq VAR_RESULT, FALSE, Online_EventScript_GlobalNeedAccount
+	msgbox Online_Text_MarketWelcome
+	fadescreen FADE_TO_BLACK
+	special Online_OpenMarket
+	waitstate
+	msgbox Online_Text_ComeAgain
+	release
+	end
+
+Online_Text_MarketWelcome::
+	.string "Welcome to the POKéMON MARKET!\n"
+	.string "Trainers everywhere buy and sell here.$"
+
 Online_Text_FriendAdded::
 	.string "{STR_VAR_1} is now on your\n"
 	.string "FRIENDS list!$"

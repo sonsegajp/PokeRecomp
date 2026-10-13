@@ -472,5 +472,6 @@ gSpecials::
 	def_special Online_GtsOffer
 	def_special Online_GtsWithdraw
 	def_special Online_AddFriend
+	def_special Online_OpenMarket
 gSpecialsEnd::
 

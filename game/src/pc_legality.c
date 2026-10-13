@@ -12,6 +12,8 @@
 #include "wild_encounter.h"
 #include "battle_main.h"
 #include "data.h"
+#include "item.h"
+#include "mail_data.h"
 #include "characters.h"
 #include "constants/maps.h"
 #include "constants/items.h"
@@ -87,6 +89,14 @@ static void WorldData(FILE *f)
         if (s)
             fputc(',', f);
         Name(f, gTypeNames[s]);
+    }
+    fprintf(f, "],\n\"items\":[");   // [pocket, importance, price, mail, name] by item id
+    for (s = 0; s < ITEMS_COUNT; s++)
+    {
+        fprintf(f, "%s[%u,%u,%u,%u,", s ? "," : "", ItemId_GetPocket(s), ItemId_GetImportance(s),
+                ItemId_GetPrice(s), ItemIsMail(s));
+        Name(f, ItemId_GetName(s));
+        fputc(']', f);
     }
     fprintf(f, "],\n\"types\":{");
     for (s = 1; s < NUM_SPECIES; s++)

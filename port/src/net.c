@@ -561,6 +561,7 @@ static void handle_master(uint8_t type, const uint8_t *p, int len)
     case 0x84:                                                /* M_FRIENDS */
     case 0x86: case 0x87: case 0x88: case 0x89: case 0x8A:   /* M_WONDER_RESULT .. M_GTS_RESULT */
     case 0x8B:                                                /* M_GUILD */
+    case 0x8C: case 0x8D: case 0x8E:                          /* M_MARKET_OK / _LIST / _MINE_LIST */
         if (op == OP_REQUEST) {
             reply_type = type;
             reply_len = len > (int)sizeof reply_data ? (int)sizeof reply_data : len;

@@ -23,6 +23,7 @@ import time
 from protocol import *  # noqa: F401,F403
 from trades import Trades
 from social import Guilds
+from market import Market
 
 TOKEN_TTL = 24 * 3600
 SERVER_TIMEOUT = 30
@@ -50,6 +51,7 @@ class Master:
         self.online = {}       # account_id -> server name
         self.trades = Trades(self.db)
         self.guilds = Guilds(self.db)
+        self.market = Market(self.db)
 
     # ---- accounts ----------------------------------------------------------
 
@@ -195,6 +197,10 @@ class Master:
         if t == M_FRIEND_REMOVE and account_id and len(p) >= 4:
             self.remove_friend(account_id, struct.unpack_from("<I", p)[0])
             return frame(M_FRIENDS, self.friends_frame(account_id))
+        if account_id and M_MARKET_SELL <= t <= M_MARKET_COLLECT:
+            reply = self.market.dispatch(account_id, t, p, lambda a: (self.account(a) or (b"", 0))[0])
+            if reply:
+                return reply
         if account_id and M_GUILD_INFO <= t <= M_GUILD_LEAVE:
             result = self.guilds.dispatch(account_id, t, p, lambda a: self.account(a) or (b"", 0), self.online)
             if result:

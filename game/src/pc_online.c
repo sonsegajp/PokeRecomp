@@ -46,6 +46,10 @@
 #include "pc_net.h"
 #include "pc_chat.h"
 #include "pc_online.h"
+#include "item.h"
+#include "money.h"
+#include "mail_data.h"
+#include "constants/items.h"
 #include "random.h"
 
 bool32 PcFieldIsOnScreen(void); // overworld.c
@@ -86,6 +90,7 @@ static const u8 sText_Registered[] = _("Registered! Your online name is");
 static const u8 sText_Here[] = _("{RIGHT_ARROW}");
 static const u8 sText_Friends[] = _("FRIENDS");
 static const u8 sText_Guild[] = _("GUILD");
+static const u8 sText_Market[] = _("POKéMON MARKET");
 static const u8 sText_GtsSearching[] = _("Searching the GTS…");
 
 static const u8 sTextColor[] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_LIGHT_GRAY};
@@ -134,8 +139,10 @@ static u8 *CopyNameWithTag(u8 *dst, const u8 *name, u16 tag)
 // ---- the ONLINE CLUB screen ---------------------------------------------------------------
 
 enum { MODE_BUSY, MODE_REGISTER, MODE_SERVERS, MODE_MESSAGE, MODE_GTS_PICK, MODE_GTS_WANT, MODE_GTS_LIST,
-       MODE_FRIENDS, MODE_FRIEND_MENU, MODE_GUILD, MODE_CONFIRM };
-enum { BUSY_LOGIN, BUSY_REGISTER, BUSY_JOIN, BUSY_RENAME, BUSY_GTS_SEARCH, BUSY_GTS_MINE, BUSY_FRIENDS, BUSY_GUILD };
+       MODE_FRIENDS, MODE_FRIEND_MENU, MODE_GUILD, MODE_CONFIRM,
+       MODE_MKT_MENU, MODE_MKT_ITEMS, MODE_MKT_PRICE, MODE_MKT_BROWSE, MODE_MKT_BUY, MODE_MKT_MINE };
+enum { BUSY_LOGIN, BUSY_REGISTER, BUSY_JOIN, BUSY_RENAME, BUSY_GTS_SEARCH, BUSY_GTS_MINE, BUSY_FRIENDS, BUSY_GUILD,
+       BUSY_MKT_SELL, BUSY_MKT_BROWSE, BUSY_MKT_BUY, BUSY_MKT_MINE, BUSY_MKT_CANCEL, BUSY_MKT_COLLECT };
 enum { GTS_NONE, GTS_DEPOSIT, GTS_SEARCH, GTS_MINE };   // the GTS screen: VAR_0x8006 + 1
 enum { ROW_SERVER, ROW_REFRESH, ROW_RENAME, ROW_DISCONNECT, ROW_BACK, ROW_FRIENDS, ROW_GUILD };
 enum { NAMING_NONE, NAMING_REGISTER, NAMING_RENAME, NAMING_GUILD_CREATE, NAMING_GUILD_JOIN };
@@ -181,6 +188,7 @@ struct OnlineScreen
     u16 timer;
     u8 naming;           // coming back from the naming screen: what for
     u8 gtsMode;          // GTS_* when this is the GTS screen
+    bool8 market;        // this is the POKéMON MARKET screen
     u8 friendCount, friendSel;
     struct OnlineFriend friends[MAX_FRIENDS];
     u8 inGuild, memberCount, guildOp, confirmAction;
@@ -212,6 +220,8 @@ static const struct BgTemplate sOnlineBgs[] =
 
 static void Task_OnlineScreen(u8 taskId);
 static void CB2_OnlineInit(void);
+static void MarketReturn(u8 mode);
+static void MarketTakeBack(void);
 
 static void VBlankCB_Online(void)
 {
@@ -267,7 +277,15 @@ static void PrintHeader(const u8 *title)
 {
     FillWindowPixelBuffer(WIN_HEADER, PIXEL_FILL(1));
     AddTextPrinterParameterized(WIN_HEADER, FONT_NORMAL, title, 8, 1, TEXT_SKIP_DRAW, NULL);
-    if (PcNetHasAccount() && sOnline->mode == MODE_SERVERS)
+    if (sOnline->market)
+    {
+        u8 *end = gStringVar1;
+        *end++ = CHAR_CURRENCY;
+        ConvertIntToDecimalStringN(end, GetMoney(&gSaveBlock1Ptr->money), STR_CONV_MODE_LEFT_ALIGN, 7);
+        AddTextPrinterParameterized3(WIN_HEADER, FONT_SMALL, 0xCC - GetStringWidth(FONT_SMALL, gStringVar1, 0), 3,
+                                     sValueColor, TEXT_SKIP_DRAW, gStringVar1);
+    }
+    else if (PcNetHasAccount() && sOnline->mode == MODE_SERVERS)
     {
         CopyNameWithTag(gStringVar1, PcNetMyName(), PcNetMyTag());
         AddTextPrinterParameterized3(WIN_HEADER, FONT_SMALL, 0xCC - GetStringWidth(FONT_SMALL, gStringVar1, 0), 3,
@@ -472,8 +490,8 @@ static void LeaveScreen(u8 taskId)
 
 enum { MSG_FRIEND_ADD = 0x05, MSG_FRIEND_LIST = 0x06, MSG_FRIEND_REMOVE = 0x0F,
        MSG_GUILD_INFO = 0x10, MSG_GUILD_CREATE = 0x11, MSG_GUILD_JOIN = 0x12, MSG_GUILD_LEAVE = 0x13 };
-enum { NET_ERR_NOT_FOUND = 4, NET_ERR_FULL = 5 };
-enum { CONFIRM_REMOVE_FRIEND, CONFIRM_LEAVE_GUILD };
+enum { NET_ERR_NOT_FOUND = 4, NET_ERR_FULL = 5, NET_ERR_NO_MATCH = 7 };
+enum { CONFIRM_REMOVE_FRIEND, CONFIRM_LEAVE_GUILD, CONFIRM_TAKE_BACK };
 enum { FMENU_JOIN, FMENU_REMOVE, FMENU_BACK };
 
 static const u8 sText_Offline[] = _("OFFLINE");
@@ -754,11 +772,15 @@ static void ShowGuild(void)
 
 // -- YES / NO
 
+static const u8 sText_TakeBackAsk[] = _("Take these items back?");
+
 static void DrawConfirm(void)
 {
-    PrintHeader(sOnline->confirmAction == CONFIRM_LEAVE_GUILD ? sText_Guild : sText_Friends);
+    PrintHeader(sOnline->confirmAction == CONFIRM_LEAVE_GUILD ? sText_Guild
+              : sOnline->confirmAction == CONFIRM_TAKE_BACK ? ScreenTitle() : sText_Friends);
     FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
-    PrintLine(1, sOnline->confirmAction == CONFIRM_LEAVE_GUILD ? sText_LeaveAsk : sText_RemoveAsk, sTextColor);
+    PrintLine(1, sOnline->confirmAction == CONFIRM_LEAVE_GUILD ? sText_LeaveAsk
+               : sOnline->confirmAction == CONFIRM_TAKE_BACK ? sText_TakeBackAsk : sText_RemoveAsk, sTextColor);
     PrintLine(3, sText_Yes, sTextColor);
     PrintLine(4, sText_No, sTextColor);
     FinishList();
@@ -944,6 +966,8 @@ static void ConfirmInput(u8 taskId)
         sOnline->cursor = 0;
         if (sOnline->confirmAction == CONFIRM_LEAVE_GUILD)
             ShowGuild();
+        else if (sOnline->confirmAction == CONFIRM_TAKE_BACK)
+            MarketReturn(MODE_MKT_MINE);
         else
             ShowFriendMenu();
     }
@@ -956,6 +980,10 @@ static void ConfirmInput(u8 taskId)
         {
             GuildRequest(MSG_GUILD_LEAVE, NULL);
         }
+        else if (sOnline->confirmAction == CONFIRM_TAKE_BACK)
+        {
+            MarketTakeBack();
+        }
         else
         {
             u32 id = sOnline->friends[sOnline->friendSel].id;
@@ -966,6 +994,7 @@ static void ConfirmInput(u8 taskId)
 }
 
 static void GtsHandleBusy(void);
+static void MarketHandleBusy(void);
 
 static void HandleBusy(void)
 {
@@ -978,6 +1007,11 @@ static void HandleBusy(void)
     if (sOnline->busyOp == BUSY_FRIENDS || sOnline->busyOp == BUSY_GUILD)
     {
         SocialHandleBusy();
+        return;
+    }
+    if (sOnline->busyOp >= BUSY_MKT_SELL)
+    {
+        MarketHandleBusy();
         return;
     }
     if (status == PC_NET_OP_PENDING)
@@ -1171,6 +1205,8 @@ static const u8 *ScreenTitle(void)
     case GTS_SEARCH:  return sText_GtsSearch;
     case GTS_MINE:    return sText_GtsMine;
     }
+    if (sOnline->market)
+        return sText_Market;
     return sText_OnlineClub;
 }
 
@@ -1595,6 +1631,765 @@ static void GtsStart(void)
     }
 }
 
+// ---- the POKé MARKET screen (same look; opened by Online_OpenMarket) -----------------------
+//
+// Trainers sell items to each other through the master server (server/market.py).
+// The bag and money change only after the server has done its part, and items
+// being listed leave the bag (and the game is saved) before the server sees
+// them, so a crash can lose a sale but never duplicate items.
+
+enum { MSG_MARKET_SELL = 0x14, MSG_MARKET_BROWSE = 0x15, MSG_MARKET_BUY = 0x16, MSG_MARKET_MINE = 0x17,
+       MSG_MARKET_CANCEL = 0x18, MSG_MARKET_COLLECT = 0x19 };
+enum { MKT_SELL, MKT_BUY, MKT_MINE, MKT_EXIT, MKT_MENU_ROWS };
+enum { PRICE_QTY, PRICE_EACH, PRICE_LIST, PRICE_CANCEL, PRICE_ROWS };
+enum { BUY_QTY, BUY_OK, BUY_CANCEL, BUY_ROWS };
+
+#define MKT_MAX_BAG 160
+#define MKT_MAX_LIST 48
+#define MKT_LIST_ROWS 6
+#define MKT_MAX_MONEY 999999
+#define MKT_MAX_PRICE 999999
+#define MKT_FEE_PERCENT 5
+
+static const u8 sText_MktSell[] = _("SELL");
+static const u8 sText_MktBuy[] = _("BUY");
+static const u8 sText_MktMine[] = _("MY SHOP");
+static const u8 sText_MktExit[] = _("EXIT");
+static const u8 sText_MktWhatSell[] = _("WHAT WILL YOU SELL?");
+static const u8 sText_MktQuantity[] = _("QUANTITY");
+static const u8 sText_MktPriceEach[] = _("PRICE EACH");
+static const u8 sText_MktYouGet[] = _("YOU GET (-5% FEE)");
+static const u8 sText_MktListIt[] = _("PUT ON SALE");
+static const u8 sText_MktTotal[] = _("TOTAL");
+static const u8 sText_MktYouHave[] = _("YOU HAVE");
+static const u8 sText_MktBuyIt[] = _("BUY");
+static const u8 sText_MktCollect[] = _("COLLECT");
+static const u8 sText_MktFrom[] = _("FROM ");
+static const u8 sText_MktNothingToSell1[] = _("You have no items that");
+static const u8 sText_MktNothingToSell2[] = _("can be sold here.");
+static const u8 sText_MktNothingForSale1[] = _("Nothing is for sale");
+static const u8 sText_MktNothingForSale2[] = _("right now.");
+static const u8 sText_MktListed[] = _("Your items are on sale!");
+static const u8 sText_MktListed2[] = _("Collect the money at MY SHOP.");
+static const u8 sText_MktTooMany1[] = _("You already have 10 things");
+static const u8 sText_MktTooMany2[] = _("on sale.");
+static const u8 sText_MktBought[] = _("Thank you! You bought them.");
+static const u8 sText_MktSoldOut[] = _("Sorry, that sold out.");
+static const u8 sText_MktChanged[] = _("That offer just changed.");
+static const u8 sText_MktNoMoney[] = _("You don't have enough money.");
+static const u8 sText_MktNoRoom[] = _("There's no room in the BAG.");
+static const u8 sText_MktCollected[] = _("You collected your money!");
+static const u8 sText_MktTookBack[] = _("You took your items back.");
+static const u8 sText_MktNoSales[] = _("Nothing on sale yet.");
+
+struct MarketListing
+{
+    u32 id;
+    u16 item, quantity;
+    u32 price;
+    u8 name[PLAYER_NAME_LENGTH + 1];
+};
+
+struct MarketScreen
+{
+    u16 bagItem[MKT_MAX_BAG];
+    u16 bagQty[MKT_MAX_BAG];
+    u8 bagCount;
+    u16 item, quantity, maxQuantity;
+    u32 price;
+    u8 count;
+    u8 sel;
+    u8 rowsBeforeListings;   // MY SHOP: the COLLECT row
+    u32 wallet;
+    u16 accel;
+    struct MarketListing list[MKT_MAX_LIST];
+};
+static EWRAM_DATA struct MarketScreen *sMkt = NULL;
+
+static u32 MyMoney(void)
+{
+    return GetMoney(&gSaveBlock1Ptr->money);
+}
+
+// "₽12345"
+static u8 *MoneyText(u8 *dst, u32 amount)
+{
+    *dst++ = CHAR_CURRENCY;
+    return ConvertIntToDecimalStringN(dst, amount, STR_CONV_MODE_LEFT_ALIGN, 7);
+}
+
+// "x12"
+static u8 *QtyText(u8 *dst, u16 qty)
+{
+    *dst++ = CHAR_x;
+    return ConvertIntToDecimalStringN(dst, qty, STR_CONV_MODE_LEFT_ALIGN, 3);
+}
+
+static bool8 MarketTradable(u16 item)
+{
+    u8 pocket = ItemId_GetPocket(item);
+    return item != ITEM_NONE && item < ITEMS_COUNT && pocket != POCKET_KEY_ITEMS
+        && ItemId_GetImportance(item) == 0 && !ItemIsMail(item);
+}
+
+static void BuildBagList(void)
+{
+    static const u8 sPockets[] = {POCKET_ITEMS, POCKET_POKE_BALLS, POCKET_TM_CASE, POCKET_BERRY_POUCH};
+    int p, i;
+    sMkt->bagCount = 0;
+    for (p = 0; p < NELEMS(sPockets); p++)
+    {
+        const struct BagPocket *pocket = &gBagPockets[sPockets[p] - 1];
+        for (i = 0; i < pocket->capacity && sMkt->bagCount < MKT_MAX_BAG; i++)
+        {
+            u16 item = pocket->itemSlots[i].itemId;
+            u16 qty = BagGetQuantityByPocketPosition(sPockets[p], i);
+            if (qty && MarketTradable(item))
+            {
+                sMkt->bagItem[sMkt->bagCount] = item;
+                sMkt->bagQty[sMkt->bagCount] = qty;
+                sMkt->bagCount++;
+            }
+        }
+    }
+}
+
+// Hold LEFT/RIGHT to change faster.
+static s32 Accelerated(s32 slow)
+{
+    if (!JOY_HELD(DPAD_LEFT) && !JOY_HELD(DPAD_RIGHT))
+        sMkt->accel = 0;
+    else if (sMkt->accel < 0xFFFF)
+        sMkt->accel++;
+    if (sMkt->accel > 40 && slow < 1000) return slow * 1000;
+    if (sMkt->accel > 25) return slow * 100;
+    if (sMkt->accel > 12) return slow * 10;
+    return slow;
+}
+
+static void MarketPrintRight(int line, const u8 *text, const u8 *color)
+{
+    AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0xC0 - GetStringWidth(FONT_NORMAL, text, 0),
+                                 line * RowHeight() + 2, color, TEXT_SKIP_DRAW, text);
+}
+
+// -- top menu
+
+static void DrawMarketMenu(void)
+{
+    PrintHeader(sText_Market);
+    FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
+    PrintLine(MKT_SELL, sText_MktSell, sTextColor);
+    PrintLine(MKT_BUY, sText_MktBuy, sTextColor);
+    PrintLine(MKT_MINE, sText_MktMine, sTextColor);
+    PrintLine(MKT_EXIT, sText_MktExit, sTextColor);
+    FinishList();
+    SetHighlight(sOnline->cursor);
+    PrintHint(sText_HintBrowse);
+}
+
+static void MarketShowMenu(void)
+{
+    sOnline->mode = MODE_MKT_MENU;
+    if (sOnline->cursor >= MKT_MENU_ROWS)
+        sOnline->cursor = 0;
+    DrawMarketMenu();
+}
+
+// -- SELL: pick an item from the bag, then quantity and price
+
+static void DrawSellItems(void)
+{
+    int i;
+    u8 buf[16];
+    PrintHeader(sText_MktWhatSell);
+    FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
+    for (i = 0; i < VISIBLE_ROWS && sOnline->scroll + i < sMkt->bagCount; i++)
+    {
+        int row = sOnline->scroll + i;
+        PrintLine(i, ItemId_GetName(sMkt->bagItem[row]), sTextColor);
+        *QtyText(buf, sMkt->bagQty[row]) = EOS;
+        MarketPrintRight(i, buf, sValueColor);
+    }
+    FinishList();
+    SetHighlight(sOnline->cursor - sOnline->scroll);
+    PrintHint(sText_HintBrowse);
+}
+
+static void MarketShowSellItems(void)
+{
+    BuildBagList();
+    if (sMkt->bagCount == 0)
+    {
+        ShowMessage(sText_MktNothingToSell1, sText_MktNothingToSell2, NULL, FALSE, MODE_MKT_MENU);
+        return;
+    }
+    sOnline->mode = MODE_MKT_ITEMS;
+    sOnline->cursor = sOnline->scroll = 0;
+    DrawSellItems();
+}
+
+static const u8 sPriceLines[PRICE_ROWS] = {1, 2, 5, 6};
+
+static void DrawPrice(void)
+{
+    u8 buf[24];
+    PrintHeader(sText_Market);
+    FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
+    PrintLine(0, ItemId_GetName(sMkt->item), sValueColor);
+    PrintLine(1, sText_MktQuantity, sTextColor);
+    *QtyText(buf, sMkt->quantity) = EOS;
+    MarketPrintRight(1, buf, sValueColor);
+    PrintLine(2, sText_MktPriceEach, sTextColor);
+    *MoneyText(buf, sMkt->price) = EOS;
+    MarketPrintRight(2, buf, sValueColor);
+    PrintLine(3, sText_MktYouGet, sTextColor);
+    *MoneyText(buf, (u32)((u64)sMkt->price * sMkt->quantity * (100 - MKT_FEE_PERCENT) / 100)) = EOS;
+    MarketPrintRight(3, buf, sTextColor);
+    PrintLine(5, sText_MktListIt, sTextColor);
+    PrintLine(6, sText_GtsCancel, sTextColor);
+    FinishList();
+    SetHighlight(sPriceLines[sOnline->cursor]);
+    PrintHint(sText_HintChange);
+}
+
+static void MarketShowPrice(void)
+{
+    u16 base;
+    sOnline->mode = MODE_MKT_PRICE;
+    sMkt->item = sMkt->bagItem[sMkt->sel];
+    sMkt->maxQuantity = min(sMkt->bagQty[sMkt->sel], 999);
+    sMkt->quantity = 1;
+    base = ItemId_GetPrice(sMkt->item);
+    sMkt->price = base ? base : 100;   // start at the POKé MART price
+    sMkt->accel = 0;
+    sOnline->cursor = PRICE_QTY;
+    DrawPrice();
+}
+
+// -- BUY: everyone's offers, cheapest of each item first
+
+static void DrawBrowse(void)
+{
+    int i;
+    u8 buf[24];
+    u8 *end;
+    PrintHeader(sText_Market);
+    FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
+    for (i = 0; i < MKT_LIST_ROWS && sOnline->scroll + i < sMkt->count; i++)
+    {
+        const struct MarketListing *l = &sMkt->list[sOnline->scroll + i];
+        PrintLine(i, ItemId_GetName(l->item), sTextColor);
+        *QtyText(buf, l->quantity) = EOS;
+        AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0x70, i * RowHeight() + 2, sTextColor, TEXT_SKIP_DRAW, buf);
+        *MoneyText(buf, l->price) = EOS;
+        MarketPrintRight(i, buf, sValueColor);
+    }
+    end = StringCopy(buf, sText_MktFrom);
+    StringCopy(end, sMkt->list[sOnline->cursor].name);
+    PrintLine(MKT_LIST_ROWS, buf, sValueColor);
+    FinishList();
+    SetHighlight(sOnline->cursor - sOnline->scroll);
+    PrintHint(sText_HintBrowse);
+}
+
+static void MarketFetchBrowse(void)
+{
+    PcNetMasterRequest(MSG_MARKET_BROWSE, NULL, 0);
+    StartBusy(BUSY_MKT_BROWSE);
+}
+
+static u16 MaxBuyable(const struct MarketListing *l)
+{
+    u16 n = l->quantity;
+    u32 money = MyMoney();
+    if (l->price && money / l->price < n)
+        n = money / l->price;
+    while (n > 0 && !CheckBagHasSpace(l->item, n))
+        n--;
+    return n;
+}
+
+static const u8 sBuyLines[BUY_ROWS] = {1, 5, 6};
+
+static void DrawBuy(void)
+{
+    const struct MarketListing *l = &sMkt->list[sMkt->sel];
+    u8 buf[24];
+    PrintHeader(sText_Market);
+    FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
+    PrintLine(0, ItemId_GetName(l->item), sValueColor);
+    *MoneyText(buf, l->price) = EOS;
+    MarketPrintRight(0, buf, sValueColor);
+    PrintLine(1, sText_MktQuantity, sTextColor);
+    *QtyText(buf, sMkt->quantity) = EOS;
+    MarketPrintRight(1, buf, sValueColor);
+    PrintLine(2, sText_MktTotal, sTextColor);
+    *MoneyText(buf, l->price * sMkt->quantity) = EOS;
+    MarketPrintRight(2, buf, sTextColor);
+    PrintLine(3, sText_MktYouHave, sTextColor);
+    *MoneyText(buf, MyMoney()) = EOS;
+    MarketPrintRight(3, buf, sTextColor);
+    PrintLine(5, sText_MktBuyIt, sTextColor);
+    PrintLine(6, sText_GtsCancel, sTextColor);
+    FinishList();
+    SetHighlight(sBuyLines[sOnline->cursor]);
+    PrintHint(sText_HintChange);
+}
+
+static void MarketShowBuy(void)
+{
+    const struct MarketListing *l = &sMkt->list[sMkt->sel];
+    sOnline->mode = MODE_MKT_BUY;
+    sMkt->maxQuantity = MaxBuyable(l);
+    sMkt->quantity = sMkt->maxQuantity ? 1 : 0;
+    sMkt->accel = 0;
+    sOnline->cursor = BUY_QTY;
+    DrawBuy();
+}
+
+// -- MY SHOP: money waiting to be collected, your offers (A takes one back)
+
+static u8 MineRowCount(void)
+{
+    return sMkt->rowsBeforeListings + sMkt->count + 1;   // + BACK
+}
+
+static void DrawMine(void)
+{
+    int i;
+    u8 buf[24];
+    PrintHeader(sText_MktMine);
+    FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
+    if (sMkt->count == 0 && !sMkt->rowsBeforeListings)
+        PrintLine(1, sText_MktNoSales, sTextColor);
+    for (i = 0; i < VISIBLE_ROWS && sOnline->scroll + i < MineRowCount(); i++)
+    {
+        int row = sOnline->scroll + i;
+        int line = i + (sMkt->count == 0 && !sMkt->rowsBeforeListings ? 3 : 0);
+        if (row < sMkt->rowsBeforeListings)
+        {
+            PrintLine(line, sText_MktCollect, sTextColor);
+            *MoneyText(buf, sMkt->wallet) = EOS;
+            MarketPrintRight(line, buf, sValueColor);
+        }
+        else if (row == MineRowCount() - 1)
+        {
+            PrintLine(line, sText_Back, sTextColor);
+        }
+        else
+        {
+            const struct MarketListing *l = &sMkt->list[row - sMkt->rowsBeforeListings];
+            PrintLine(line, ItemId_GetName(l->item), sTextColor);
+            *QtyText(buf, l->quantity) = EOS;
+            AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0x70, line * RowHeight() + 2, sTextColor, TEXT_SKIP_DRAW, buf);
+            *MoneyText(buf, l->price) = EOS;
+            MarketPrintRight(line, buf, sValueColor);
+        }
+    }
+    FinishList();
+    SetHighlight(sOnline->cursor - sOnline->scroll + (sMkt->count == 0 && !sMkt->rowsBeforeListings ? 3 : 0));
+    PrintHint(sText_HintBrowse);
+}
+
+static void MarketFetchMine(void)
+{
+    PcNetMasterRequest(MSG_MARKET_MINE, NULL, 0);
+    StartBusy(BUSY_MKT_MINE);
+}
+
+static void MarketSave(void)
+{
+    TrySavingData(SAVE_NORMAL);
+}
+
+// M_MARKET_LIST: u8 n, n x (u32 id, u16 item, u16 qty, u32 price, name[8]);
+// M_MARKET_MINE_LIST: u32 wallet, u8 n, n x (u32 id, u16 item, u16 qty, u32 price)
+static void MarketParse(const u8 *p, int len, bool8 mine)
+{
+    int i, n, size = mine ? 12 : 12 + PC_NET_NAME_LEN;
+    sMkt->count = 0;
+    if (mine)
+    {
+        if (len < 5)
+            return;
+        sMkt->wallet = p[0] | (p[1] << 8) | (p[2] << 16) | ((u32)p[3] << 24);
+        p += 4;
+        len -= 4;
+    }
+    n = len >= 1 ? p[0] : 0;
+    for (i = 0; i < n && sMkt->count < MKT_MAX_LIST && 1 + (i + 1) * size <= len; i++)
+    {
+        const u8 *e = p + 1 + i * size;
+        struct MarketListing *l = &sMkt->list[sMkt->count];
+        l->id = e[0] | (e[1] << 8) | (e[2] << 16) | ((u32)e[3] << 24);
+        l->item = e[4] | (e[5] << 8);
+        l->quantity = e[6] | (e[7] << 8);
+        l->price = e[8] | (e[9] << 8) | (e[10] << 16) | ((u32)e[11] << 24);
+        l->name[0] = EOS;
+        if (!mine)
+            CopyNetName(l->name, e + 12);
+        if (MarketTradable(l->item) && l->quantity && l->price)
+            sMkt->count++;
+    }
+}
+
+static void MarketHandleBusy(void)
+{
+    int status = PcNetOpStatus();
+    u8 type;
+    const u8 *reply;
+    int len;
+
+    if (status == PC_NET_OP_PENDING)
+        return;
+    len = status == PC_NET_OP_OK ? PcNetMasterReply(&type, &reply) : 0;
+    switch (sOnline->busyOp)
+    {
+    case BUSY_MKT_SELL:
+        if (status == PC_NET_OP_OK)
+        {
+            PlaySE(SE_SHOP);
+            ShowMessage(sText_MktListed, sText_MktListed2, NULL, FALSE, MODE_MKT_MENU);
+        }
+        else
+        {
+            AddBagItem(sMkt->item, sMkt->quantity);   // the server didn't take them: give them back
+            MarketSave();
+            if (PcNetMasterError() == NET_ERR_FULL)
+                ShowMessage(sText_MktTooMany1, sText_MktTooMany2, NULL, FALSE, MODE_MKT_MENU);
+            else
+                ShowMessage(sText_CantReach1, sText_CantReach2, NULL, FALSE, MODE_MKT_MENU);
+        }
+        break;
+    case BUSY_MKT_BROWSE:
+        if (status != PC_NET_OP_OK)
+            ShowMessage(sText_CantReach1, sText_CantReach2, NULL, FALSE, MODE_MKT_MENU);
+        else
+        {
+            MarketParse(reply, len, FALSE);
+            if (sMkt->count == 0)
+                ShowMessage(sText_MktNothingForSale1, sText_MktNothingForSale2, NULL, FALSE, MODE_MKT_MENU);
+            else
+            {
+                sOnline->mode = MODE_MKT_BROWSE;
+                if (sOnline->cursor >= sMkt->count)
+                    sOnline->cursor = sMkt->count - 1;
+                if (sOnline->scroll > sOnline->cursor)
+                    sOnline->scroll = sOnline->cursor;
+                DrawBrowse();
+            }
+        }
+        break;
+    case BUSY_MKT_BUY:
+        if (status == PC_NET_OP_OK && len >= 8)
+        {
+            u16 item = reply[0] | (reply[1] << 8), qty = reply[2] | (reply[3] << 8);
+            u32 cost = reply[4] | (reply[5] << 8) | (reply[6] << 16) | ((u32)reply[7] << 24);
+            RemoveMoney(&gSaveBlock1Ptr->money, cost);
+            AddBagItem(item, qty);
+            MarketSave();
+            PlaySE(SE_SHOP);
+            ShowMessage(sText_MktBought, NULL, NULL, FALSE, MODE_MKT_BROWSE);
+        }
+        else if (PcNetMasterError() == NET_ERR_NOT_FOUND)
+            ShowMessage(sText_MktSoldOut, NULL, NULL, FALSE, MODE_MKT_BROWSE);
+        else if (PcNetMasterError() == NET_ERR_NO_MATCH)
+            ShowMessage(sText_MktChanged, NULL, NULL, FALSE, MODE_MKT_BROWSE);
+        else
+            ShowMessage(sText_CantReach1, sText_CantReach2, NULL, FALSE, MODE_MKT_MENU);
+        break;
+    case BUSY_MKT_MINE:
+        if (status != PC_NET_OP_OK)
+            ShowMessage(sText_CantReach1, sText_CantReach2, NULL, FALSE, MODE_MKT_MENU);
+        else
+        {
+            MarketParse(reply, len, TRUE);
+            sMkt->rowsBeforeListings = sMkt->wallet ? 1 : 0;
+            sOnline->mode = MODE_MKT_MINE;
+            if (sOnline->cursor >= MineRowCount())
+                sOnline->cursor = MineRowCount() - 1;
+            if (sOnline->scroll > sOnline->cursor)
+                sOnline->scroll = sOnline->cursor;
+            DrawMine();
+        }
+        break;
+    case BUSY_MKT_CANCEL:
+        if (status == PC_NET_OP_OK && len >= 4)
+        {
+            AddBagItem(reply[0] | (reply[1] << 8), reply[2] | (reply[3] << 8));
+            MarketSave();
+            ShowMessage(sText_MktTookBack, NULL, NULL, FALSE, MODE_MKT_MINE);
+        }
+        else if (PcNetMasterError() == NET_ERR_NOT_FOUND)
+            ShowMessage(sText_MktSoldOut, NULL, NULL, FALSE, MODE_MKT_MINE);
+        else
+            ShowMessage(sText_CantReach1, sText_CantReach2, NULL, FALSE, MODE_MKT_MENU);
+        break;
+    case BUSY_MKT_COLLECT:
+        if (status == PC_NET_OP_OK && len >= 4)
+        {
+            AddMoney(&gSaveBlock1Ptr->money, reply[0] | (reply[1] << 8) | (reply[2] << 16) | ((u32)reply[3] << 24));
+            MarketSave();
+            PlaySE(SE_SHOP);
+            ShowMessage(sText_MktCollected, NULL, NULL, FALSE, MODE_MKT_MINE);
+        }
+        else
+            ShowMessage(sText_CantReach1, sText_CantReach2, NULL, FALSE, MODE_MKT_MENU);
+        break;
+    }
+}
+
+// After a message: back to where it came from (fresh lists from the server).
+static void MarketReturn(u8 mode)
+{
+    if (mode == MODE_MKT_BROWSE)
+        MarketFetchBrowse();
+    else if (mode == MODE_MKT_MINE)
+        MarketFetchMine();
+    else
+        MarketShowMenu();
+}
+
+static void MarketMenuInput(u8 taskId)
+{
+    if (JOY_NEW(DPAD_UP) || JOY_NEW(DPAD_DOWN))
+    {
+        sOnline->cursor = (sOnline->cursor + (JOY_NEW(DPAD_UP) ? MKT_MENU_ROWS - 1 : 1)) % MKT_MENU_ROWS;
+        PlaySE(SE_SELECT);
+        DrawMarketMenu();
+    }
+    else if (JOY_NEW(B_BUTTON) || (JOY_NEW(A_BUTTON) && sOnline->cursor == MKT_EXIT))
+    {
+        PlaySE(SE_SELECT);
+        LeaveScreen(taskId);
+    }
+    else if (JOY_NEW(A_BUTTON))
+    {
+        u8 pick = sOnline->cursor;
+        PlaySE(SE_SELECT);
+        sOnline->cursor = sOnline->scroll = 0;
+        if (pick == MKT_SELL)
+            MarketShowSellItems();
+        else if (pick == MKT_BUY)
+            MarketFetchBrowse();
+        else
+            MarketFetchMine();
+    }
+}
+
+static void SellItemsInput(u8 taskId)
+{
+    if (ListMove(sMkt->bagCount))
+        DrawSellItems();
+    else if (JOY_NEW(B_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        sOnline->cursor = MKT_SELL;
+        MarketShowMenu();
+    }
+    else if (JOY_NEW(A_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        sMkt->sel = sOnline->cursor;
+        MarketShowPrice();
+    }
+}
+
+static void PriceInput(u8 taskId)
+{
+    if (JOY_NEW(DPAD_UP) || JOY_NEW(DPAD_DOWN))
+    {
+        sOnline->cursor = (sOnline->cursor + (JOY_NEW(DPAD_UP) ? PRICE_ROWS - 1 : 1)) % PRICE_ROWS;
+        PlaySE(SE_SELECT);
+        DrawPrice();
+    }
+    else if ((JOY_REPT(DPAD_LEFT) || JOY_REPT(DPAD_RIGHT)) && sOnline->cursor <= PRICE_EACH)
+    {
+        s32 dir = JOY_REPT(DPAD_LEFT) ? -1 : 1;
+        if (sOnline->cursor == PRICE_QTY)
+        {
+            s32 q = sMkt->quantity + dir * (sMkt->accel > 12 ? 10 : 1);
+            sMkt->accel++;
+            sMkt->quantity = q < 1 ? 1 : q > sMkt->maxQuantity ? sMkt->maxQuantity : q;
+        }
+        else
+        {
+            s32 p = (s32)sMkt->price + dir * Accelerated(1);
+            sMkt->price = p < 1 ? 1 : p > MKT_MAX_PRICE ? MKT_MAX_PRICE : p;
+        }
+        PlaySE(SE_SELECT);
+        DrawPrice();
+    }
+    else if (!JOY_HELD(DPAD_LEFT) && !JOY_HELD(DPAD_RIGHT))
+    {
+        sMkt->accel = 0;
+        if (JOY_NEW(B_BUTTON) || (JOY_NEW(A_BUTTON) && sOnline->cursor == PRICE_CANCEL))
+        {
+            PlaySE(SE_SELECT);
+            sOnline->cursor = sMkt->sel;
+            sOnline->mode = MODE_MKT_ITEMS;
+            DrawSellItems();
+        }
+        else if (JOY_NEW(A_BUTTON) && sOnline->cursor == PRICE_LIST)
+        {
+            u8 payload[8];
+            PlaySE(SE_SELECT);
+            // off the bag (and saved) before the server has them: never duplicated
+            if (!RemoveBagItem(sMkt->item, sMkt->quantity))
+                return;
+            MarketSave();
+            payload[0] = sMkt->item;
+            payload[1] = sMkt->item >> 8;
+            payload[2] = sMkt->quantity;
+            payload[3] = sMkt->quantity >> 8;
+            payload[4] = sMkt->price;
+            payload[5] = sMkt->price >> 8;
+            payload[6] = sMkt->price >> 16;
+            payload[7] = sMkt->price >> 24;
+            sOnline->cursor = MKT_SELL;
+            PcNetMasterRequest(MSG_MARKET_SELL, payload, sizeof(payload));
+            StartBusy(BUSY_MKT_SELL);
+        }
+    }
+}
+
+static void BrowseInput(u8 taskId)
+{
+    if (JOY_REPT(DPAD_UP) || JOY_REPT(DPAD_DOWN))
+    {
+        if (JOY_REPT(DPAD_UP))
+            sOnline->cursor = sOnline->cursor == 0 ? sMkt->count - 1 : sOnline->cursor - 1;
+        else
+            sOnline->cursor = sOnline->cursor + 1 >= sMkt->count ? 0 : sOnline->cursor + 1;
+        if (sOnline->cursor < sOnline->scroll)
+            sOnline->scroll = sOnline->cursor;
+        else if (sOnline->cursor >= sOnline->scroll + MKT_LIST_ROWS)
+            sOnline->scroll = sOnline->cursor - MKT_LIST_ROWS + 1;
+        PlaySE(SE_SELECT);
+        DrawBrowse();
+    }
+    else if (JOY_NEW(B_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        sOnline->cursor = MKT_BUY;
+        MarketShowMenu();
+    }
+    else if (JOY_NEW(A_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        sMkt->sel = sOnline->cursor;
+        MarketShowBuy();
+    }
+}
+
+static void BuyInput(u8 taskId)
+{
+    const struct MarketListing *l = &sMkt->list[sMkt->sel];
+    if (JOY_NEW(DPAD_UP) || JOY_NEW(DPAD_DOWN))
+    {
+        sOnline->cursor = (sOnline->cursor + (JOY_NEW(DPAD_UP) ? BUY_ROWS - 1 : 1)) % BUY_ROWS;
+        PlaySE(SE_SELECT);
+        DrawBuy();
+    }
+    else if ((JOY_REPT(DPAD_LEFT) || JOY_REPT(DPAD_RIGHT)) && sOnline->cursor == BUY_QTY && sMkt->maxQuantity)
+    {
+        s32 q = sMkt->quantity + (JOY_REPT(DPAD_LEFT) ? -1 : 1) * (sMkt->accel > 12 ? 10 : 1);
+        sMkt->accel++;
+        sMkt->quantity = q < 1 ? 1 : q > sMkt->maxQuantity ? sMkt->maxQuantity : q;
+        PlaySE(SE_SELECT);
+        DrawBuy();
+    }
+    else if (!JOY_HELD(DPAD_LEFT) && !JOY_HELD(DPAD_RIGHT))
+    {
+        sMkt->accel = 0;
+        if (JOY_NEW(B_BUTTON) || (JOY_NEW(A_BUTTON) && sOnline->cursor == BUY_CANCEL))
+        {
+            PlaySE(SE_SELECT);
+            sOnline->cursor = sMkt->sel;
+            sOnline->mode = MODE_MKT_BROWSE;
+            DrawBrowse();
+        }
+        else if (JOY_NEW(A_BUTTON) && sOnline->cursor == BUY_OK)
+        {
+            u8 payload[10];
+            PlaySE(SE_SELECT);
+            if (sMkt->quantity == 0 || !IsEnoughMoney(&gSaveBlock1Ptr->money, l->price * sMkt->quantity))
+            {
+                ShowMessage(sText_MktNoMoney, NULL, NULL, FALSE, MODE_MKT_BROWSE);
+                return;
+            }
+            if (!CheckBagHasSpace(l->item, sMkt->quantity))
+            {
+                ShowMessage(sText_MktNoRoom, NULL, NULL, FALSE, MODE_MKT_BROWSE);
+                return;
+            }
+            payload[0] = l->id;
+            payload[1] = l->id >> 8;
+            payload[2] = l->id >> 16;
+            payload[3] = l->id >> 24;
+            payload[4] = sMkt->quantity;
+            payload[5] = sMkt->quantity >> 8;
+            payload[6] = l->price;
+            payload[7] = l->price >> 8;
+            payload[8] = l->price >> 16;
+            payload[9] = l->price >> 24;
+            sOnline->cursor = sMkt->sel;
+            PcNetMasterRequest(MSG_MARKET_BUY, payload, sizeof(payload));
+            StartBusy(BUSY_MKT_BUY);
+        }
+    }
+}
+
+static void MineInput(u8 taskId)
+{
+    u8 count = MineRowCount();
+    if (ListMove(count))
+        DrawMine();
+    else if (JOY_NEW(B_BUTTON) || (JOY_NEW(A_BUTTON) && sOnline->cursor == count - 1))
+    {
+        PlaySE(SE_SELECT);
+        sOnline->cursor = MKT_MINE;
+        MarketShowMenu();
+    }
+    else if (JOY_NEW(A_BUTTON) && sOnline->cursor < sMkt->rowsBeforeListings)
+    {
+        u32 room = MKT_MAX_MONEY - min(MyMoney(), MKT_MAX_MONEY);
+        u8 payload[4] = {room, room >> 8, room >> 16, room >> 24};
+        PlaySE(SE_SELECT);
+        if (room == 0)
+            return;
+        PcNetMasterRequest(MSG_MARKET_COLLECT, payload, sizeof(payload));
+        StartBusy(BUSY_MKT_COLLECT);
+    }
+    else if (JOY_NEW(A_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        sMkt->sel = sOnline->cursor - sMkt->rowsBeforeListings;
+        ShowConfirm(CONFIRM_TAKE_BACK);
+    }
+}
+
+static void MarketTakeBack(void)
+{
+    const struct MarketListing *l = &sMkt->list[sMkt->sel];
+    u8 payload[4] = {l->id, l->id >> 8, l->id >> 16, l->id >> 24};
+    if (!CheckBagHasSpace(l->item, l->quantity))
+    {
+        ShowMessage(sText_MktNoRoom, NULL, NULL, FALSE, MODE_MKT_MINE);
+        return;
+    }
+    PcNetMasterRequest(MSG_MARKET_CANCEL, payload, sizeof(payload));
+    StartBusy(BUSY_MKT_CANCEL);
+}
+
+static void MarketStart(void)
+{
+    sMkt = AllocZeroed(sizeof(*sMkt));
+    sOnline->cursor = 0;
+    MarketShowMenu();
+}
+
 static void Task_OnlineScreen(u8 taskId)
 {
     if (gTasks[taskId].data[0] == 2)   // off to the naming screen
@@ -1617,6 +2412,7 @@ static void Task_OnlineScreen(u8 taskId)
             FreeAllWindowBuffers();
             FREE_AND_SET_NULL(sOnline);
             FREE_AND_SET_NULL(sGtsScreen);
+            FREE_AND_SET_NULL(sMkt);
             DestroyTask(taskId);
             if (sJoinedWarp)
             {
@@ -1680,6 +2476,8 @@ static void Task_OnlineScreen(u8 taskId)
                 GtsShowPick();
             else if (sOnline->messageMode == MODE_GUILD)
                 ShowGuild();
+            else if (sOnline->messageMode >= MODE_MKT_MENU)
+                MarketReturn(sOnline->messageMode);
             else
                 ShowServers();
         }
@@ -1695,6 +2493,24 @@ static void Task_OnlineScreen(u8 taskId)
         break;
     case MODE_CONFIRM:
         ConfirmInput(taskId);
+        break;
+    case MODE_MKT_MENU:
+        MarketMenuInput(taskId);
+        break;
+    case MODE_MKT_ITEMS:
+        SellItemsInput(taskId);
+        break;
+    case MODE_MKT_PRICE:
+        PriceInput(taskId);
+        break;
+    case MODE_MKT_BROWSE:
+        BrowseInput(taskId);
+        break;
+    case MODE_MKT_BUY:
+        BuyInput(taskId);
+        break;
+    case MODE_MKT_MINE:
+        MineInput(taskId);
         break;
     case MODE_GTS_PICK:
         GtsPickInput(taskId);
@@ -1758,6 +2574,10 @@ static void CB2_OnlineInit(void)
         if (sOnline->gtsMode)
         {
             GtsStart();
+        }
+        else if (sOnline->market)
+        {
+            MarketStart();
         }
         else if (sOnline->naming == NAMING_GUILD_CREATE || sOnline->naming == NAMING_GUILD_JOIN)
         {
@@ -2475,6 +3295,15 @@ void Online_OpenGts(void)
     SetMainCallback2(CB2_OnlineInit);
 }
 
+// special Online_OpenMarket (after fadescreen; then waitstate): the POKéMON MARKET.
+void Online_OpenMarket(void)
+{
+    sOnline = AllocZeroed(sizeof(*sOnline));
+    sOnline->market = TRUE;
+    gMain.savedCallback = CB2_ReturnToFieldContinueScriptPlayMapMusic;
+    SetMainCallback2(CB2_OnlineInit);
+}
+
 // special Online_GtsCheckOffer (VAR_0x8004 = party slot): does it fit the chosen
 // listing? VAR_RESULT 0 yes, 1 wrong species, 2 wrong level, 3 wrong gender.
 // (The server checks again; this just gives a clear message.)
@@ -2627,4 +3456,5 @@ void Online_GtsDeposit(void) {}
 void Online_GtsOffer(void) {}
 void Online_GtsWithdraw(void) {}
 void Online_AddFriend(void) {}
+void Online_OpenMarket(void) {}
 #endif
