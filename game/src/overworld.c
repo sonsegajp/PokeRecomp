@@ -439,10 +439,17 @@ static void LoadSaveblockObjEventScripts(void)
     const struct ObjectEventTemplate * src = gMapHeader.events->objectEvents;
     struct ObjectEventTemplate * savObjTemplates = gSaveBlock1Ptr->objectEventTemplates;
 
+#ifdef PLATFORM_PC
+    // The original copies all 64 slots from a map that has fewer (or no,
+    // src == NULL) templates; only the map's own templates are real.
+    for (i = 0; i < OBJECT_EVENT_TEMPLATES_COUNT; i++)
+        savObjTemplates[i].script = i < gMapHeader.events->objectEventCount ? src[i].script : NULL;
+#else
     for (i = 0; i < OBJECT_EVENT_TEMPLATES_COUNT; i++)
     {
         savObjTemplates[i].script = src[i].script;
     }
+#endif
 }
 
 void SetObjEventTemplateCoords(u8 localId, s16 x, s16 y)
@@ -1471,7 +1478,12 @@ static void DoCB1_Overworld_QuestLogPlayback(void)
 void CB1_Overworld(void)
 {
 #ifdef PLATFORM_PC
-    // Test hook (--warp): warp once the player can move.
+    // Test hooks (--give-mon, --warp): run once the player can move.
+    if (gPcDebugGiveMon.species && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
+    {
+        ScriptGiveMon(gPcDebugGiveMon.species, gPcDebugGiveMon.level, 0, 0, 0, 0); // no held item
+        gPcDebugGiveMon.species = 0;
+    }
     if (gPcDebugWarp.pending && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
     {
         gPcDebugWarp.pending = 0;

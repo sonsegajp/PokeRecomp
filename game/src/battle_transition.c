@@ -630,6 +630,11 @@ bool8 IsBattleTransitionDone(void)
     u8 taskId = FindTaskIdByFunc(Task_BattleTransition);
     if (gTasks[taskId].tTransitionDone)
     {
+#ifdef PLATFORM_PC
+        // The transition's VBlank callback would run once more on the freed
+        // data (harmless BIOS reads on hardware). The battle installs its own.
+        SetVBlankCallback(NULL);
+#endif
         InitTransitionData();
         FREE_AND_SET_NULL(sTransitionData);
         DestroyTask(taskId);

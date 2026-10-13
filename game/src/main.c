@@ -233,6 +233,12 @@ static void InitMainCallbacks(void)
     SetMainCallback2(CB2_InitCopyrightScreenAfterBootup);
     gSaveBlock2Ptr = &gSaveBlock2;
     gSaveBlock1Ptr = &gSaveBlock1;
+#ifdef PLATFORM_PC
+    // FRLG leaves this NULL until the first MoveSaveBlocks_ResetHeap, so the
+    // boot-time LoadGameSave wrote the PC boxes through a NULL pointer (into
+    // the BIOS on hardware). Point it at the real storage like the other two.
+    gPokemonStoragePtr = &gPokemonStorage;
+#endif
     gSaveBlock2.encryptionKey = 0;
     gQuestLogPlaybackState = QL_PLAYBACK_STATE_STOPPED;
 #if REVISION >= 0xA
