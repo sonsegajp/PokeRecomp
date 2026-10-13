@@ -266,10 +266,55 @@ enum
 #define WILD_CHECK_REPEL    0x1
 #define WILD_CHECK_KEEN_EYE 0x2
 
+#ifdef PLATFORM_PC
+// Online (FireRed and LeafGreen players together), both versions' exclusives
+// turn up: each roll uses this version's table or the other version's for the
+// same place and area, half the time each (pc_wild_other.c).
+extern const struct WildPokemonHeader gWildMonHeadersOtherVersion[];
+int PcNetConnected(void);
+
+static const struct WildPokemonInfo *CrossVersionInfo(const struct WildPokemonInfo *info)
+{
+    const struct WildPokemonHeader *h, *o;
+    const struct WildPokemonInfo *other;
+    int i, j, k = 0;
+
+    if (!PcNetConnected() || !(Random() & 1))
+        return info;
+    for (i = 0; gWildMonHeaders[i].mapGroup != MAP_GROUP(MAP_UNDEFINED); i++)
+    {
+        h = &gWildMonHeaders[i];
+        if (h->landMonsInfo != info && h->waterMonsInfo != info && h->rockSmashMonsInfo != info && h->fishingMonsInfo != info)
+            continue;
+        // a map can have several tables in a row (Altering Cave): keep the same one
+        while (i > 0 && gWildMonHeaders[i - 1].mapGroup == h->mapGroup && gWildMonHeaders[i - 1].mapNum == h->mapNum)
+            i--, k++;
+        for (j = 0; gWildMonHeadersOtherVersion[j].mapGroup != MAP_GROUP(MAP_UNDEFINED); j++)
+        {
+            o = &gWildMonHeadersOtherVersion[j];
+            if (o->mapGroup != h->mapGroup || o->mapNum != h->mapNum)
+                continue;
+            while (k-- > 0 && o[1].mapGroup == h->mapGroup && o[1].mapNum == h->mapNum)
+                o++;
+            other = h->landMonsInfo == info ? o->landMonsInfo
+                  : h->waterMonsInfo == info ? o->waterMonsInfo
+                  : h->rockSmashMonsInfo == info ? o->rockSmashMonsInfo
+                  : o->fishingMonsInfo;
+            return other ? other : info;
+        }
+        break;
+    }
+    return info;
+}
+#endif
+
 static bool8 TryGenerateWildMon(const struct WildPokemonInfo * info, u8 area, u8 flags)
 {
     u8 slot = 0;
     u8 level;
+#ifdef PLATFORM_PC
+    info = CrossVersionInfo(info);
+#endif
     switch (area)
     {
     case WILD_AREA_LAND:
@@ -293,7 +338,11 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo * info, u8 area, u8
 
 static u16 GenerateFishingEncounter(const struct WildPokemonInfo * info, u8 rod)
 {
-    u8 slot = ChooseWildMonIndex_Fishing(rod);
+    u8 slot;
+#ifdef PLATFORM_PC
+    info = CrossVersionInfo(info);
+#endif
+    slot = ChooseWildMonIndex_Fishing(rod);
     u8 level = ChooseWildMonLevel(&info->wildPokemon[slot]);
     GenerateWildMon(info->wildPokemon[slot].species, level, slot);
     return info->wildPokemon[slot].species;

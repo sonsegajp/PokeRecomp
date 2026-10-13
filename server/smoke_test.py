@@ -57,6 +57,9 @@ async def main():
     print("bob session (link id, players, kind, partner):", struct.unpack("<BBBH", p))
     _, p = await call(ra, wa, S_LINK_CMD, struct.pack("<8H", 0x2222, 1, 2, 3, 4, 5, 6, 7), {S_SESSION})
     print("alice session:", struct.unpack("<BBBH", p))
+    # frames only flow while both ends of the cable are open
+    wa.write(frame(S_LINK_OPEN, b"\x01"))
+    wb.write(frame(S_LINK_OPEN, b"\x01"))
     wb.write(frame(S_LINK_CMD, struct.pack("<8H", 0x3333, 9, 9, 9, 9, 9, 9, 9)))
     for who, (r, w) in (("alice", (ra, wa)), ("bob", (rb, wb))):
         while True:

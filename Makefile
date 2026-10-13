@@ -1,15 +1,25 @@
 # FireRed PC — build (run from an MSYS2 MINGW32 shell, or via build.sh).
 #
 #   make            build FireRedPC.exe
+#   make VERSION=LEAFGREEN   build LeafGreenPC.exe (needs `make leafgreen_modern` in game/ first)
 #   make assets     (re)build pret's assets + reference ROM (needs devkitARM)
 #
 # Game C:   cpp -> pret preproc (INCBIN, charmap strings) -> i686 gcc
 # Game data: pret's ARM objects -> tools/elf2x86.py -> i686 as
 
+VERSION ?= FIRERED
 GAME   := game
+ifeq ($(VERSION),LEAFGREEN)
+BUILD  := build/pc_lg
+ARMOBJ := $(GAME)/build/leafgreen_modern
+EXE    := LeafGreenPC.exe
+VERSION_DEF := -D LEAFGREEN=1
+else
 BUILD  := build/pc
 ARMOBJ := $(GAME)/build/firered_modern
 EXE    := FireRedPC.exe
+VERSION_DEF := -D FIRERED=1
+endif
 
 CC     := gcc
 CXX    := g++
@@ -17,7 +27,7 @@ AS     := as
 PY     := /c/Users/hyper/AppData/Local/Programs/Python/Python310/python
 PREPROC := $(GAME)/tools/preproc/preproc.exe
 
-GAME_DEFS := -D PLATFORM_PC -D MODERN=1 -D FIRERED=1 -D REVISION=0 -D ENGLISH=1 -D NDEBUG
+GAME_DEFS := -D PLATFORM_PC -D MODERN=1 $(VERSION_DEF) -D REVISION=0 -D ENGLISH=1 -D NDEBUG
 # (paths relative to $(GAME): preproc resolves INCBIN paths from there)
 GAME_CPPFLAGS := -iquote include -I ../port/include -Wno-trigraphs $(GAME_DEFS)
 # Struct layouts must match the ARM build the data was assembled for.
