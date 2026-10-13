@@ -110,6 +110,7 @@ uint16_t PcInputPoll(int *quit, int *fast_forward)
     SDL_Event e;
     uint16_t held = 0;
 
+    PcVideoKeepFocus();
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) *quit = 1;
         else if (e.type == SDL_CONTROLLERDEVICEADDED) pad_add(e.cdevice.which);

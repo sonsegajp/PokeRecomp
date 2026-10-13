@@ -24,6 +24,18 @@ static int parent_width, parent_height;
 
 void PcVideoSetParent(uintptr_t parent) { launcher_parent = (HWND)parent; }
 int PcVideoIsEmbedded(void) { return launcher_parent != NULL; }
+
+/* Inside the launcher: whenever the launcher is the active window and the game
+ * is showing, the keyboard belongs to the game. (Coming back with Alt+Tab, the
+ * launcher's own focus restore can land on its panel after it hands focus to
+ * us, and the game would get no keys.) Launcher prompts are their own windows,
+ * and its menus hide the game, so neither is interrupted. */
+void PcVideoKeepFocus(void)
+{
+    if (!launcher_parent || !native_window || !IsWindowVisible(native_window)) return;
+    if (GetForegroundWindow() == GetAncestor(launcher_parent, GA_ROOT) && GetFocus() != native_window)
+        SetFocus(native_window);
+}
 void PcVideoRequestLauncherExit(void)
 {
     if (launcher_parent && IsWindow(launcher_parent))

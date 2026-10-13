@@ -156,7 +156,9 @@ internal sealed class LauncherWindow : Form
         Controls.Add(loading);
         gamePanel.Resize += delegate { SizeGameWindow(); };
         gamePanel.Click += delegate { FocusGameWindow(); };
-        Activated += delegate { if (gamePid != 0 && !exitPrompt) FocusGameWindow(); };
+        // After Alt+Tab, WinForms restores focus to its own last control once Activated has run;
+        // handing the keyboard to the game afterwards (BeginInvoke) keeps it with the game.
+        Activated += delegate { if (gamePid != 0 && !exitPrompt) BeginInvoke(new Action(FocusGameWindow)); };
         pollTimer.Interval = 400;
         pollTimer.Tick += async delegate { await PollState(); };
         keyTimer.Interval = 40;

@@ -33,6 +33,7 @@ int PcFieldIsOnScreen(void);
 int PcVideoInit(const char *title);
 void PcVideoSetParent(uintptr_t parent);
 int PcVideoIsEmbedded(void);
+void PcVideoKeepFocus(void);   /* in the launcher: the keyboard comes back to the game */
 void PcVideoRequestLauncherExit(void);
 int PcVideoMaintainParent(void);
 void PcVideoPresent(const uint32_t *frame, int width, int height);
