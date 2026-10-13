@@ -2800,16 +2800,22 @@ static bool8 InCableClubRoom(void)
 // ---- other trainers in the field --------------------------------------------------------------
 
 #define AVATAR_LOCALID_BASE 0xE0
-#define GUIDE_LOCALID 0xDF   // NURSE JOY, the online guide on every Pokemon Center 2F (pc_online.inc)
+#define GUIDE_LOCALID 0xDF   // the online guide on every Pokemon Center 2F (pc_online.inc)
+// a professor's lab aide (they have walking sprites): Oak's in Kanto, Birch's in Hoenn
+#ifdef EMERALD
+#define GUIDE_GFX OBJ_EVENT_GFX_SCIENTIST_1
+#else
+#define GUIDE_GFX OBJ_EVENT_GFX_SCIENTIST
+#endif
 // The 2F floor plan (same in every Pokemon Center of both regions): the desks
 // are at x = 2 / 6 / 10 behind the counter; y = 4 is the row in front of it,
 // rows 5 and 6 are open floor and the stairs down are at (1, 6).
 #define GUIDE_DESK_ROW 4
-#define GUIDE_WALK_ROW 5     // she walks here...
-#define GUIDE_FOLLOW_ROW 6   // ...and the player alongside, a row lower
+#define GUIDE_WALK_ROW 5     // he walks along here between desks
+#define GUIDE_LEAVE_ROW 6    // and leaves along here
 #define GUIDE_STAIRS_X 1
 #define GUIDE_STAIRS_Y 6
-#define GUIDE_REST_X 4       // where she waits if she can't take the stairs
+#define GUIDE_REST_X 4       // where he waits if he can't take the stairs
 static const u8 sGuideDeskX[] = {2, 6, 10};   // ONLINE CLUB, GLOBAL TRADE, POKEMON MARKET
 #define GUIDE_WALK_LEAVE 3
 #define GUIDE_WALK_APPROACH 4
@@ -3084,10 +3090,10 @@ static bool8 OnPokemonCenter2F(void)
 #endif
 }
 
-// The first time a trainer comes up to a Pokemon Center 2F, NURSE JOY is
-// standing there. She spots them (!), comes over, walks them through each
-// online desk with the player following her, then leaves downstairs. Once
-// per save (PC_FLAG_ONLINE_GUIDE).
+// The first time a trainer comes up to a Pokemon Center 2F, the professor's
+// AIDE is standing there. He spots them (!), comes over, walks them through
+// each online desk with the player following him, then leaves downstairs.
+// Once per save (PC_FLAG_ONLINE_GUIDE).
 static void UpdateGuide(void)
 {
     static u8 sSettled;   // frames the field has been free: the arrival (fade, map name, ...) is over
@@ -3100,7 +3106,7 @@ static void UpdateGuide(void)
     }
     if (TryGetObjectEventIdByLocalIdAndMap(GUIDE_LOCALID, gSaveBlock1Ptr->location.mapNum,
                                            gSaveBlock1Ptr->location.mapGroup, &objId) != 0)
-        SpawnSpecialObjectEventParameterized(OBJ_EVENT_GFX_NURSE, MOVEMENT_TYPE_FACE_DOWN, GUIDE_LOCALID,
+        SpawnSpecialObjectEventParameterized(GUIDE_GFX, MOVEMENT_TYPE_FACE_DOWN, GUIDE_LOCALID,
                                              GUIDE_REST_X + MAP_OFFSET, GUIDE_WALK_ROW + MAP_OFFSET,
                                              gObjectEvents[gPlayerAvatar.objectEventId].currentElevation);
     if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || gPaletteFade.active
@@ -3149,10 +3155,11 @@ static struct ObjectEvent *GuideObject(void)
 }
 
 // special Online_GuideWalk (then waitmovement on both), VAR_0x8004:
-//   GUIDE_WALK_APPROACH: NURSE JOY comes over to stand beside the player;
-//   0 / 1 / 2: to the ONLINE CLUB / GLOBAL TRADE / MARKET desk. She stops in
-//     front of it, turned to the player, who follows and stops behind her;
-//   GUIDE_WALK_LEAVE: she goes down the stairs (or aside, if the player is
+//   GUIDE_WALK_APPROACH: the AIDE comes over to stand beside the player;
+//   0 / 1 / 2: to the ONLINE CLUB / GLOBAL TRADE / MARKET desk. He stops in
+//     front of it and turns around; the player walks in his footsteps one
+//     step behind him (they start out next to each other);
+//   GUIDE_WALK_LEAVE: he goes down the stairs (or aside, if the player is
 //     standing on them).
 void Online_GuideWalk(void)
 {
@@ -3176,9 +3183,40 @@ void Online_GuideWalk(void)
     }
     else if (gSpecialVar_0x8004 < ARRAY_COUNT(sGuideDeskX))
     {
-        s16 desk = sGuideDeskX[gSpecialVar_0x8004];
-        GuidePath(sGuideMoves[0], gx, gy, GUIDE_WALK_ROW, desk, GUIDE_DESK_ROW, MOVEMENT_ACTION_FACE_DOWN);
-        GuidePath(sGuideMoves[1], px, py, GUIDE_FOLLOW_ROW, desk, GUIDE_WALK_ROW, MOVEMENT_ACTION_FACE_UP);
+        s16 desk = sGuideDeskX[gSpecialVar_0x8004], x = gx, y = gy;
+        u8 *m = sGuideMoves[0], *f = sGuideMoves[1];
+        int steps;
+
+        // him: off the desk row sideways (the player is right behind him),
+        // along the open floor, up to the next desk; then he turns around
+        if (y == GUIDE_DESK_ROW)
+        {
+            s16 side = desk > x ? 1 : -1;
+            if (x + side == px && y == py)   // the player is on that side: step down instead
+            {
+                m = GuideSteps(m, 1, MOVEMENT_ACTION_WALK_NORMAL_DOWN);
+                y++;
+            }
+            else
+            {
+                m = GuideSteps(m, 1, side > 0 ? MOVEMENT_ACTION_WALK_NORMAL_RIGHT : MOVEMENT_ACTION_WALK_NORMAL_LEFT);
+                x += side;
+            }
+        }
+        GuidePath(m, x, y, GUIDE_WALK_ROW, desk, GUIDE_DESK_ROW, MOVEMENT_ACTION_FACE_DOWN);
+        for (steps = 0; sGuideMoves[0][steps] != MOVEMENT_ACTION_FACE_DOWN; steps++)
+            ;
+        // the player follows in his footsteps, one step behind: into the
+        // tile he just left, then every step but his last
+        if (steps > 0)
+        {
+            *f++ = gx > px ? MOVEMENT_ACTION_WALK_NORMAL_RIGHT : gx < px ? MOVEMENT_ACTION_WALK_NORMAL_LEFT
+                 : gy > py ? MOVEMENT_ACTION_WALK_NORMAL_DOWN : MOVEMENT_ACTION_WALK_NORMAL_UP;
+            memcpy(f, sGuideMoves[0], steps - 1);
+            f += steps - 1;
+        }
+        *f++ = MOVEMENT_ACTION_FACE_UP;
+        *f = MOVEMENT_ACTION_STEP_END;
         ScriptMovement_StartObjectMovementScript(LOCALID_PLAYER, mapNum, mapGroup, sGuideMoves[1]);
     }
     else if (px == GUIDE_STAIRS_X && py == GUIDE_STAIRS_Y)
@@ -3187,14 +3225,14 @@ void Online_GuideWalk(void)
     }
     else
     {
-        // step aside from the player behind her, then along the open floor to the stairs
+        // step aside from the player behind him, then along the open floor to the stairs
         u8 *m = GuideSteps(sGuideMoves[0], 1, gx < 12 ? MOVEMENT_ACTION_WALK_NORMAL_RIGHT : MOVEMENT_ACTION_WALK_NORMAL_LEFT);
-        GuidePath(m, gx < 12 ? gx + 1 : gx - 1, gy, GUIDE_FOLLOW_ROW, GUIDE_STAIRS_X, GUIDE_STAIRS_Y, MOVEMENT_ACTION_FACE_LEFT);
+        GuidePath(m, gx < 12 ? gx + 1 : gx - 1, gy, GUIDE_LEAVE_ROW, GUIDE_STAIRS_X, GUIDE_STAIRS_Y, MOVEMENT_ACTION_FACE_LEFT);
     }
     ScriptMovement_StartObjectMovementScript(GUIDE_LOCALID, mapNum, mapGroup, sGuideMoves[0]);
 }
 
-// special Online_GuideRemove: she went down the stairs.
+// special Online_GuideRemove: he went down the stairs.
 void Online_GuideRemove(void)
 {
     struct ObjectEvent *guide = GuideObject();

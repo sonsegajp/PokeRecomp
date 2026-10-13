@@ -613,8 +613,8 @@ Online_Text_FriendAdded::
 	.string "{STR_VAR_1} is now on your\n"
 	.string "FRIENDS list!$"
 
-@ NURSE JOY, the online guide: the first time a trainer comes up to a
-@ Pokemon Center 2F she is standing there (pc_online.c, local id 0xDF). She
+@ The online guide, PROF. BIRCH's AIDE: the first time a trainer comes up to
+@ a Pokemon Center 2F he is standing there (pc_online.c, local id 0xDF). He
 @ spots them, comes over, walks to each desk with the player following and
 @ explains it, then goes back downstairs.
 Online_EventScript_Guide::
@@ -651,7 +651,7 @@ Online_Movement_GuideNotice:
 	delay_16
 	step_end
 
-@ both walk to the desk in VAR_0x8004: NURSE JOY in front, the player behind
+@ both walk to the desk in VAR_0x8004: the AIDE in front, the player behind
 Online_EventScript_GuideWalk::
 	special Online_GuideWalk
 	waitmovement 0xDF
@@ -661,7 +661,8 @@ Online_EventScript_GuideWalk::
 Online_Text_GuideHello::
 	.string "Oh! Is this your first time up\n"
 	.string "on the second floor?\p"
-	.string "I'm NURSE JOY, the ONLINE guide.\p"
+	.string "I'm one of PROF. BIRCH's AIDES.\n"
+	.string "I'm helping out with ONLINE play.\p"
 	.string "Up here, you can play with real\n"
 	.string "trainers from all over.\p"
 	.string "Let me show you around!\n"
