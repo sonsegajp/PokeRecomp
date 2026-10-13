@@ -21,6 +21,9 @@
 #include "constants/moves.h"
 #include "constants/songs.h"
 #include "constants/rgb.h"
+#ifdef PLATFORM_PC
+#include "pc_online.h"
+#endif
 
 // iwram
 COMMON_DATA u32 gMonShrinkDuration = 0;
@@ -2245,6 +2248,9 @@ void TryShinyAnimation(u8 battler, struct Pokemon *mon)
 
         if (isShiny)
         {
+#ifdef PLATFORM_PC
+            Online_ShinyEvent(battler, mon, FALSE);
+#endif
             if (GetSpriteTileStartByTag(ANIM_TAG_GOLD_STARS) == 0xFFFF)
             {
                 LoadCompressedSpriteSheetUsingHeap(&gBattleAnimPicTable[ANIM_TAG_GOLD_STARS - ANIM_SPRITES_START]);

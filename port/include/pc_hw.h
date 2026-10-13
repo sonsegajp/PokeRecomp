@@ -53,6 +53,10 @@ extern struct PcDebugWarp gPcDebugWarp;
  * party the same way. */
 struct PcDebugGiveMon { int species, level; };
 extern struct PcDebugGiveMon gPcDebugGiveMon[6];
+/* Test hook (--wild-battle SPECIES LEVEL SHINY): a wild battle starts as
+ * soon as the player can move. */
+struct PcDebugWild { int species, level, shiny; };
+extern struct PcDebugWild gPcDebugWild;
 /* Test hook (--give-item ITEM COUNT): added to the bag the same way. */
 struct PcDebugGiveItem { int item, count; };
 extern struct PcDebugGiveItem gPcDebugGiveItem;

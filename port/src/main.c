@@ -17,6 +17,7 @@
 #include "pc_settings.h"
 #include "pc_net.h"
 #include "pc_chat.h"
+#include "pc_controls.h"
 #include "pc_rompack.h"
 #include "pc_travel.h"
 #include "pc_launcher.h"
@@ -162,6 +163,7 @@ void PcWaitForInterrupt(unsigned short mask)
 static int spin_count;
 struct PcDebugWarp gPcDebugWarp;
 struct PcDebugGiveMon gPcDebugGiveMon[6];
+struct PcDebugWild gPcDebugWild;
 struct PcDebugGiveItem gPcDebugGiveItem;
 struct PcDebugNet gPcDebugNet;
 
@@ -350,6 +352,12 @@ int main(int argc, char *argv[])
                 gPcDebugGiveMon[n].level = level;
                 n++;
             }
+        }
+        else if (!strcmp(argv[i], "--controls")) PcControlsToggle();   /* test: the controls panel open */
+        else if (!strcmp(argv[i], "--wild-battle") && i + 3 < argc) {
+            gPcDebugWild.species = atoi(argv[++i]);
+            gPcDebugWild.level = atoi(argv[++i]);
+            gPcDebugWild.shiny = atoi(argv[++i]);
         }
         else if (!strcmp(argv[i], "--field-width") && i + 1 < argc) test_width = atoi(argv[++i]); /* test: widescreen field width */
         else if (!strcmp(argv[i], "--shots") && i + 2 < argc) {

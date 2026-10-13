@@ -18,7 +18,14 @@ struct PcSettings gPcSettings = {
     .volume = 8,
     .hq_audio = 1,
     .fast_forward = 4,
+    /* X Z Backspace Enter, arrows, A S, Tab */
+    .key_bind = {27, 29, 42, 40, 82, 81, 80, 79, 4, 22, 43},
+    /* A B Back Start, d-pad, LB RB, RT */
+    .pad_bind = {0, 1, 4, 6, 11, 12, 13, 14, 9, 10, PC_PAD_RT},
 };
+
+const int gPcDefaultKeyBind[PC_BIND_COUNT] = {27, 29, 42, 40, 82, 81, 80, 79, 4, 22, 43};
+const int gPcDefaultPadBind[PC_BIND_COUNT] = {0, 1, 4, 6, 11, 12, 13, 14, 9, 10, PC_PAD_RT};
 
 static const struct { const char *key; int *value; int lo, hi; } fields[] = {
     {"window_scale", &gPcSettings.window_scale, 1, 8},
@@ -31,6 +38,12 @@ static const struct { const char *key; int *value; int lo, hi; } fields[] = {
     {"volume", &gPcSettings.volume, 0, 10},
     {"hq_audio", &gPcSettings.hq_audio, 0, 1},
     {"fast_forward", &gPcSettings.fast_forward, 2, 8},
+#define BIND(name, i) {"key_" name, &gPcSettings.key_bind[i], 0, PC_KEY_MAX}, \
+                      {"pad_" name, &gPcSettings.pad_bind[i], 0, PC_PAD_MAX}
+    BIND("a", PC_BIND_A), BIND("b", PC_BIND_B), BIND("select", PC_BIND_SELECT), BIND("start", PC_BIND_START),
+    BIND("up", PC_BIND_UP), BIND("down", PC_BIND_DOWN), BIND("left", PC_BIND_LEFT), BIND("right", PC_BIND_RIGHT),
+    BIND("l", PC_BIND_L), BIND("r", PC_BIND_R), BIND("turbo", PC_BIND_TURBO),
+#undef BIND
 };
 
 void PcSettingsLoad(void)
@@ -58,7 +71,7 @@ void PcSettingsSave(void)
     FILE *f = fopen(SETTINGS_PATH, "w");
 
     if (!f) return;
-    fprintf(f, "# FireRed PC settings (also editable in-game: OPTIONS > PC SETTINGS)\n");
+    fprintf(f, "# PokeRecomp settings (also in the launcher's Options, and in game: OPTIONS > PC SETTINGS, F1 for controls)\n");
     for (size_t i = 0; i < sizeof fields / sizeof fields[0]; i++)
         fprintf(f, "%s = %d\n", fields[i].key, *fields[i].value);
     fclose(f);

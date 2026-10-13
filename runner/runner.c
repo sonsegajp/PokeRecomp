@@ -210,6 +210,7 @@ static int travel_leg(int argc, wchar_t **wargv)
         if (!wcscmp(wargv[i], L"--save-file") || !wcscmp(wargv[i], L"--pkmn") || !wcscmp(wargv[i], L"--input")) { i++; continue; }
         if (!wcscmp(wargv[i], L"--warp")) { i += 4; continue; }
         if (!wcscmp(wargv[i], L"--give-mon") || !wcscmp(wargv[i], L"--give-item")) { i += 2; continue; }
+        if (!wcscmp(wargv[i], L"--wild-battle")) { i += 3; continue; }
         if (!wcscmp(wargv[i], L"--travel") || !wcscmp(wargv[i], L"--chained") || !wcscmp(wargv[i], L"--net-travel")
          || !wcscmp(wargv[i], L"--net-autojoin")) continue;
         append_arg(cmd, 32768, wargv[i]);

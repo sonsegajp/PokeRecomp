@@ -23,6 +23,14 @@
 #define PC_FLAG_ONLINE_GUIDE FLAG_UNUSED_0x4A7
 #endif
 
+// save flag: this trainer has joined a server before (the "other trainers are
+// real players" explanation is only for the first time)
+#if defined(EMERALD)
+#define PC_FLAG_ONLINE_JOINED FLAG_UNUSED_0x021
+#else
+#define PC_FLAG_ONLINE_JOINED FLAG_UNUSED_0x4A8
+#endif
+
 #ifndef LAND_WILD_COUNT
 #define LAND_WILD_COUNT 12   // every Gen 3 game: 12 grass slots
 #endif

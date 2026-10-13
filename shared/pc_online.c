@@ -64,6 +64,8 @@
 #include "data.h"
 #include "pokemon_storage_system.h"
 #include "save.h"
+#include "load_save.h"
+#include "battle_anim.h"
 #include "pc_net.h"
 #include "pc_chat.h"
 #include "pc_online.h"
@@ -230,6 +232,99 @@ static EWRAM_DATA struct OnlineScreen *sOnline = NULL;
 static EWRAM_DATA u8 sOnlineName[PLAYER_NAME_LENGTH + 1] = {0};   // edited on the naming screen
 static EWRAM_DATA bool8 sJoinedWarp = FALSE;     // joined: leave the screen into Pallet Town
 static EWRAM_DATA bool8 sShowJoinedMessage = FALSE;
+static EWRAM_DATA bool8 sFirstJoin = FALSE;         // the first server this save has joined
+
+// Where the trainer was playing offline when they joined a server. Online and
+// offline are separate places: the server keeps the online spot, and this is
+// where leaving the server (or losing it) puts them back. Any save made while
+// online continues from here when the game is loaded offline.
+static EWRAM_DATA struct {
+    bool8 valid;
+    bool8 continueWarpSet;   // we set the save's continue-game warp to it
+    s8 group, num;
+    s16 x, y;
+} sOffline = {0};
+
+static void NoteJoined(void)
+{
+    sFirstJoin = !FlagGet(PC_FLAG_ONLINE_JOINED);
+    FlagSet(PC_FLAG_ONLINE_JOINED);
+}
+
+static void RememberOfflinePosition(void)
+{
+    s16 x, y;
+    if (sOffline.valid)   // switching servers: still the same offline spot
+        return;
+    PlayerGetDestCoords(&x, &y);
+    sOffline.group = gSaveBlock1Ptr->location.mapGroup;
+    sOffline.num = gSaveBlock1Ptr->location.mapNum;
+    sOffline.x = x - MAP_OFFSET;
+    sOffline.y = y - MAP_OFFSET;
+    sOffline.valid = TRUE;
+}
+
+// load_save.c SavePlayerParty (every save): while the trainer is away online,
+// the save continues at their offline spot.
+void PcOnlineOnSave(void)
+{
+    if (sOffline.valid)
+    {
+        struct WarpData *w = &gSaveBlock1Ptr->continueGameWarp;
+        w->mapGroup = sOffline.group;
+        w->mapNum = sOffline.num;
+        w->warpId = -1;
+        w->x = sOffline.x;
+        w->y = sOffline.y;
+        SetContinueGameWarpStatus();
+        sOffline.continueWarpSet = TRUE;
+    }
+    else if (sOffline.continueWarpSet)
+    {
+        ClearContinueGameWarpStatus();
+        sOffline.continueWarpSet = FALSE;
+    }
+}
+
+// Back to the offline spot (left the server, or lost it).
+static void SetOfflineWarp(void)
+{
+    SetWarpDestination(sOffline.group, sOffline.num, -1, sOffline.x, sOffline.y);
+    sOffline.valid = FALSE;
+    if (sOffline.continueWarpSet)
+    {
+        ClearContinueGameWarpStatus();
+        sOffline.continueWarpSet = FALSE;
+    }
+}
+
+// Battle: a shiny wild Pokemon appeared (TryShinyAnimation) or was caught
+// (Cmd_givecaughtmon). Everyone on the server hears about it.
+void Online_ShinyEvent(u8 battler, struct Pokemon *mon, bool8 caught)
+{
+    u8 name[POKEMON_NAME_LENGTH + 1];
+    u16 species;
+
+    if (!PcNetConnected() || !IsMonShiny(mon))
+        return;
+    if (gBattleTypeFlags & (BATTLE_TYPE_TRAINER | BATTLE_TYPE_LINK))   // wild ones only
+        return;
+    if (!caught && GetBattlerSide(battler) != B_SIDE_OPPONENT)
+        return;
+    species = GetMonData(mon, MON_DATA_SPECIES);
+    StringCopyN(name, gSpeciesNames[species], POKEMON_NAME_LENGTH);
+    name[POKEMON_NAME_LENGTH] = EOS;
+    PcNetSendShiny(caught, species, name);
+}
+
+void Online_ReturnOffline(void)
+{
+    if (!sOffline.valid)
+        return;
+    SetOfflineWarp();
+    DoWarp();
+    ResetInitialPlayerAvatarState();
+}
 
 #ifdef EMERALD
 // Emerald's OPTION screen look: its text palette, background and window frame
@@ -1195,7 +1290,12 @@ static void HandleBusy(void)
             PlaySE(SE_SUCCESS);
             gSpecialVar_Result = TRUE;
             sJoinedWarp = TRUE;
-            ShowMessage(sText_YouAreOn, sText_YouAreOn2, sText_YouAreOn3, TRUE, MODE_SERVERS);
+            RememberOfflinePosition();
+            NoteJoined();
+            if (sFirstJoin)
+                ShowMessage(sText_YouAreOn, sText_YouAreOn2, sText_YouAreOn3, TRUE, MODE_SERVERS);
+            else
+                ShowMessage(sText_YouAreOn, NULL, NULL, TRUE, MODE_SERVERS);
         }
         else
         {
@@ -2591,6 +2691,13 @@ static void Task_OnlineScreen(u8 taskId)
                 gFieldCallback = FieldCB_DefaultWarpExit;
                 SetMainCallback2(CB2_LoadMap);
             }
+            else if (!PcNetConnected() && sOffline.valid)   // left the server
+            {
+                SetOfflineWarp();
+                WarpIntoMap();
+                gFieldCallback = FieldCB_DefaultWarpExit;
+                SetMainCallback2(CB2_LoadMap);
+            }
             else
             {
                 SetMainCallback2(gMain.savedCallback);
@@ -2869,6 +2976,7 @@ void Online_IsConnected(void)
 void Online_BufferServerName(void)
 {
     AsciiToGame(gStringVar1, PcNetConnectedServerName(), 20);
+    gSpecialVar_Result = sFirstJoin;
 }
 
 static bool8 InCableClubRoom(void)
@@ -3386,6 +3494,7 @@ static void TravelJoinHook(void)
     case 2:
         if (PcNetOpStatus() == PC_NET_OP_OK)
         {
+            NoteJoined();
             sShowJoinedMessage = TRUE;
             sStage = 3;
         }
@@ -3415,6 +3524,9 @@ void Online_OverworldUpdate(void)
         for (a = 0; a < MAX_AVATARS; a++)
             if (sAvatarSlot[a])
                 RemoveAvatar(a);
+        if (sOffline.valid && PcFieldIsOnScreen() && !ArePlayerFieldControlsLocked() && !ScriptContext_IsEnabled()
+         && !gPaletteFade.active)
+            ScriptContext_SetupScript(Online_EventScript_LostServer);
         return;
     }
     if (!PcFieldIsOnScreen())
@@ -3952,6 +4064,7 @@ void Online_GtsWithdraw(void)
 // The ARM (GBA) build has no network; the scripts are never reached there.
 void Online_OpenScreen(void) {}
 void Online_IsConnected(void) {}
+void Online_ReturnOffline(void) {}
 void Online_BufferServerName(void) {}
 void Online_BufferTarget(void) {}
 void Online_SendRequest(void) {}

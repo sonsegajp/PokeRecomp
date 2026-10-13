@@ -240,7 +240,12 @@ static void psg_clock(int step)
             psg[0].sweep_timer = psg[0].sweep_period;
             int f = psg[0].freq + psg[0].sweep_dir * (psg[0].freq >> psg[0].sweep_shift);
             if (f > 2047) psg[0].on = 0;
-            else if (f >= 0) psg[0].freq = f;
+            else if (f >= 0) {
+                /* the sweep writes back to NR13/NR14, which the next frame re-reads */
+                psg[0].freq = f;
+                IO8(0x64) = (u8)f;
+                IO8(0x65) = (u8)((IO8(0x65) & ~7) | (f >> 8));
+            }
         }
     }
 }

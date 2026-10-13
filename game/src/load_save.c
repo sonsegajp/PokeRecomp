@@ -1,6 +1,9 @@
 #include "global.h"
 #ifdef PLATFORM_PC
 #include "pc_travel.h"
+#ifdef PLATFORM_PC
+#include "pc_online.h"
+#endif
 #endif
 #include "gflib.h"
 #include "gba/flash_internal.h"
@@ -166,6 +169,7 @@ void SavePlayerParty(void)
 
 #ifdef PLATFORM_PC
     PcTravelOnSave();
+    PcOnlineOnSave();
 #endif
     gSaveBlock1Ptr->playerPartyCount = gPlayerPartyCount;
 

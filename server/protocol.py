@@ -94,6 +94,7 @@ S_LINK_CMD       = 0x45  # u16[8]
 S_LINK_END       = 0x46
 S_LINK_OPEN      = 0x47  # u8 open (this player's end of the cable)
 S_GUILD_CHAT     = 0x48  # text (game charset) -> the sender's guild, on every server
+S_SHINY          = 0x49  # u8 caught, u16 species, name[11] (game charset): a shiny wild Pokemon
 S_WELCOME        = 0xC0  # u16 my_id, name[24] server_name, then u8 has_pos + u8 group, u8 num,
                          #   s16 x, s16 y, u8 facing: where this account last was on this server
 S_PLAYER         = 0xC1  # u16 id, name[8], u16 tag, u8 gender, u8 group, u8 num, s16 x, s16 y, u8 facing, u8 flags, u8 game

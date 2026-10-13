@@ -477,6 +477,18 @@ void PcNetSendGuildChat(const uint8_t *text, int len)
     conn_send(&game, 0x48 /* S_GUILD_CHAT */, text, len);
 }
 
+void PcNetSendShiny(uint8_t caught, uint16_t species, const uint8_t *species_name)
+{
+    uint8_t p[3 + 11];
+    if (!connected) return;
+    p[0] = caught;
+    p[1] = (uint8_t)species;
+    p[2] = (uint8_t)(species >> 8);
+    memcpy(p + 3, species_name, 10);
+    p[13] = 0xFF;
+    conn_send(&game, 0x49 /* S_SHINY */, p, sizeof p);
+}
+
 const struct PcNetPlayer *PcNetGetPlayer(int slot)
 {
     return slot >= 0 && slot < PC_NET_MAX_PLAYERS && players[slot].active ? &players[slot] : NULL;

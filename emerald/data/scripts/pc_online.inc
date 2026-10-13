@@ -26,8 +26,22 @@ Online_EventScript_AttendantJoined::
 Online_EventScript_JoinedMessage::
 	lock
 	special Online_BufferServerName
+	goto_if_eq VAR_RESULT, FALSE, Online_EventScript_JoinedAgain
 	msgbox Online_Text_Joined
 	release
+	end
+
+Online_EventScript_JoinedAgain:
+	msgbox Online_Text_JoinedAgain
+	release
+	end
+
+@ The server went away while out in the field: back to where offline play was.
+Online_EventScript_LostServer::
+	lockall
+	msgbox Online_Text_LostServer
+	closemessage
+	special Online_ReturnOffline
 	end
 
 @ The old local wireless / link cable desks.
@@ -178,6 +192,13 @@ Online_Text_Welcome::
 
 Online_Text_ComeAgain::
 	.string "Please come again!$"
+
+Online_Text_JoinedAgain::
+	.string "You're now on {STR_VAR_1}!$"
+
+Online_Text_LostServer::
+	.string "The connection to the server was\n"
+	.string "lost. Returning to your game…$"
 
 Online_Text_Joined::
 	.string "You're now on {STR_VAR_1}!\p"

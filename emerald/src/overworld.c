@@ -72,6 +72,7 @@
 #include "script_pokemon_util.h"
 #include "constants/items.h"
 #include "pc_online.h"
+#include "pc_net.h"
 #include "pc_travel.h"
 #endif
 
@@ -1495,6 +1496,18 @@ void CB1_Overworld(void)
             ScriptGiveMon(gPcDebugGiveMon[i].species, gPcDebugGiveMon[i].level, ITEM_NONE, 0, 0, 0);
             gPcDebugGiveMon[i].species = 0;
         }
+    }
+    if (gPcDebugWild.species && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked()
+     && (!gPcDebugNet.autojoin || PcNetConnected()))   // with --net-autojoin: once on the server
+    {
+        u32 otId = T1_READ_32(gSaveBlock2Ptr->playerTrainerId);
+        ZeroEnemyPartyMons();
+        // shiny: the personality equal to the trainer id gives a shiny value of 0
+        CreateMon(&gEnemyParty[0], gPcDebugWild.species, gPcDebugWild.level, USE_RANDOM_IVS,
+                  gPcDebugWild.shiny != 0, otId, OT_ID_PLAYER_ID, 0);
+        gPcDebugWild.species = 0;
+        BattleSetup_StartScriptedWildBattle();
+        return;
     }
     if (gPcDebugGiveItem.item && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
     {

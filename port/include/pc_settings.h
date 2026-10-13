@@ -29,6 +29,21 @@ enum PcWidescreen {
     PC_WIDE_COUNT
 };
 
+/* Controls: what each GBA button (and fast-forward) is on the keyboard and on
+ * a controller. Keyboard: SDL scancodes (USB HID usage ids). Controller: SDL
+ * game controller buttons, or the triggers (PC_PAD_LT / PC_PAD_RT). Remapped
+ * in the launcher (Options > Controls) or in game (F1, or hold Back + Start). */
+enum PcBind {
+    PC_BIND_A, PC_BIND_B, PC_BIND_SELECT, PC_BIND_START,
+    PC_BIND_UP, PC_BIND_DOWN, PC_BIND_LEFT, PC_BIND_RIGHT,
+    PC_BIND_L, PC_BIND_R, PC_BIND_TURBO,
+    PC_BIND_COUNT
+};
+#define PC_PAD_LT 100
+#define PC_PAD_RT 101
+#define PC_KEY_MAX 511
+#define PC_PAD_MAX 101
+
 /* Widest field the camera keeps drawn (field_camera.c WIDE_COLS): ~2.7:1.
  * Wider windows get thin side bars. */
 #define PC_WIDE_MAX_WIDTH 432
@@ -44,7 +59,11 @@ struct PcSettings {
     int volume;          /* 0..10 */
     int hq_audio;        /* 1 = 48 kHz interpolated mixer, 0 = GBA-accurate 13 kHz */
     int fast_forward;    /* speed multiplier while the turbo key is held: 2..8 */
+    int key_bind[PC_BIND_COUNT];   /* enum PcBind -> keyboard scancode */
+    int pad_bind[PC_BIND_COUNT];   /* enum PcBind -> controller button / PC_PAD_LT / PC_PAD_RT */
 };
+
+extern const int gPcDefaultKeyBind[PC_BIND_COUNT], gPcDefaultPadBind[PC_BIND_COUNT];
 
 extern struct PcSettings gPcSettings;
 

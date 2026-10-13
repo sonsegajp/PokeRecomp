@@ -31,6 +31,13 @@ DEFAULTS = dict(window_scale=4, fullscreen=0, filter=1, scaling=0,
 RANGES = dict(window_scale=(1, 8), fullscreen=(0, 1), filter=(0, 4),
               scaling=(0, 2), color_correct=(0, 1), widescreen=(0, 3),
               vsync=(0, 1), volume=(0, 10), hq_audio=(0, 1), fast_forward=(2, 8))
+# Controls (port/include/pc_settings.h): key_* are SDL scancodes, pad_* SDL
+# controller buttons (100/101 = left/right trigger).
+BIND_ACTIONS = ("a", "b", "select", "start", "up", "down", "left", "right", "l", "r", "turbo")
+for _action, _key, _pad in zip(BIND_ACTIONS, (27, 29, 42, 40, 82, 81, 80, 79, 4, 22, 43),
+                               (0, 1, 4, 6, 11, 12, 13, 14, 9, 10, 101)):
+    DEFAULTS["key_" + _action], DEFAULTS["pad_" + _action] = _key, _pad
+    RANGES["key_" + _action], RANGES["pad_" + _action] = (0, 511), (0, 101)
 GAME_TITLES = {"ruby": "Pokémon Ruby Version", "sapphire": "Pokémon Sapphire Version",
                "firered": "Pokémon FireRed Version", "leafgreen": "Pokémon LeafGreen Version",
                "emerald": "Pokémon Emerald Version"}

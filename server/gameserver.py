@@ -28,7 +28,7 @@ import time
 from protocol import *  # noqa: F401,F403
 import legality
 import world_config
-from world import World, system_chat
+from world import World, system_chat, to_game
 
 # The PokeRecomp master every world registers with (and players log in to).
 # Not printed anywhere: hosts and players only ever see world names.
@@ -55,6 +55,7 @@ class Player:
         self.pending_to = None              # (target id, kind) we asked
         self.link_queue = collections.deque()
         self.block = None                   # link block being sent: [size, bytearray]
+        self.last_shiny = 0.0               # shiny announcements: at most one every few seconds
 
     def info(self):
         return frame(S_PLAYER, struct.pack("<H", self.id) + self.name + struct.pack("<HB", self.tag, self.gender)
@@ -261,6 +262,19 @@ class GameServer:
             self.broadcast(player.info(), skip=player)
         elif t == S_CHAT:
             self.broadcast(frame(S_CHAT_FROM, struct.pack("<H", player.id) + bytes(p[:64])))
+        elif t == S_SHINY and len(p) >= 4:
+            # "NAME found a shiny PIKACHU!" / "NAME caught a shiny PIKACHU!", to everyone
+            now = time.monotonic()
+            if now - player.last_shiny < 3:
+                return
+            player.last_shiny = now
+            name = player.name.split(b"\xff")[0].rstrip(b"\0")
+            species = bytes(p[3:14]).split(b"\xff")[0][:10]
+            if not species:
+                return
+            verb = " caught a shiny " if p[0] else " found a shiny "
+            line = name + to_game(verb)[:-1] + species + to_game("!")
+            self.broadcast(frame(S_CHAT_FROM, struct.pack("<H", 0) + line[:63] + b"\xff"))
         elif t == S_GUILD_CHAT and player.guild and self.master_writer:
             self.master_writer.write(frame(G_GUILD_CHAT, struct.pack("<I", player.account) + bytes(p[:64])))
         elif t == S_REQUEST and len(p) >= 3:

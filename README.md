@@ -37,6 +37,21 @@ Ruby and Sapphire are shown in the launcher but aren't available yet.
 
 ![Options](docs/screenshots/launcher-options.png)
 
+## Controls
+
+Keyboard and controllers (any number, plugged in any time) both work. Remap every button
+in the launcher (**Options → Control Settings**) or in game (**F1**, or hold **Back + Start**).
+
+| | Keyboard | Controller |
+|---|---|---|
+| A / B | X / Z | A / B |
+| Start / Select | Enter / Backspace | Start / Back |
+| L / R | A / S | LB / RB |
+| Move | Arrow keys | D-pad / left stick |
+| Fast-forward (offline) | hold Tab | hold RT |
+
+**T** opens chat on a world, **F11** toggles fullscreen and **F2** cycles the pixel filter.
+
 ## Online
 
 Go to the desk on the left of any Pokémon Center 2F, the **ONLINE CLUB**. The first time
@@ -53,7 +68,10 @@ you come upstairs, the professor's aide shows you around every desk.
 - **POKéMON MARKET:** buy and sell items with other trainers, at the right desk.
 - **Social:** friends and guilds, with guild chat across worlds.
 - **World events:** a daily shiny-boosted type, and timed mass outbreaks on the routes.
-- **Positions:** a world remembers where you were when you left.
+- **Shiny news:** everyone on the world hears when someone finds or catches a shiny.
+- **Positions:** a world remembers where you were when you left. Your offline game keeps
+  its own spot: leaving a world (or saving while on one) puts you back where you were
+  playing offline.
 
 ![Name tags](docs/screenshots/ingame-nametags.png)
 

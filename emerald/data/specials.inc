@@ -563,3 +563,4 @@ gSpecials::
 	def_special Online_OpenMarket
 	def_special Online_GuideWalk
 	def_special Online_GuideRemove
+	def_special Online_ReturnOffline

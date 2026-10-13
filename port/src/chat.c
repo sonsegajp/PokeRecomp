@@ -9,7 +9,9 @@
 #include <windows.h>
 
 #include "pc_chat.h"
+#include "pc_controls.h"
 #include "pc_net.h"
+#include "pc_settings.h"
 
 /* text.c (PC): glyph data for the game's normal latin font. */
 const uint16_t *PcFontNormalGlyph(uint16_t glyphId, uint8_t *width);
@@ -238,6 +240,54 @@ static const uint8_t sep[] = {0xF0, 0x00, EOS};      /* ": " */
 static const uint8_t prompt[] = {0x86, 0x00, EOS};   /* "> " */
 static const uint8_t caret[] = {0xAE, EOS};          /* "-" */
 
+/* ASCII text in the game's font (characters it doesn't have are dropped) */
+static int ascii_text(int x, int y, const char *s, uint32_t color)
+{
+    uint8_t buf[64];
+    int n = 0;
+    for (; *s && n < 63; s++) {
+        uint8_t g = ascii_to_game((unsigned char)*s);
+        if (g != EOS) buf[n++] = g;
+    }
+    buf[n] = EOS;
+    return text(x, y, buf, color, 255);
+}
+
+#define COL_PANEL 0xE0181818u
+#define COL_PICK  0xFF805820u   /* the selected cell */
+#define COL_DIM   0xFFB0B0B0u
+
+/* the controls panel: actions down the side, keyboard and controller columns */
+static void draw_controls(int w, int h)
+{
+    int column, waiting, row = PcControlsCursor(&column, &waiting);
+    int pw = 420, ph = (PC_BIND_COUNT + 4) * LINE_H + 12;
+    int x0 = (w - pw) / 2, y0 = (h - ph) / 2, y;
+    int cx[2] = {x0 + 150, x0 + 290};
+
+    fill(x0, y0, pw, ph, COL_PANEL);
+    y = y0 + 4;
+    ascii_text(x0 + 10, y, "CONTROLS", COL_SYSTEM);
+    ascii_text(cx[0], y, "Keyboard", COL_NAME);
+    ascii_text(cx[1], y, "Controller", COL_NAME);
+    y += LINE_H + 4;
+    for (int i = 0; i < PC_BIND_COUNT; i++, y += LINE_H) {
+        ascii_text(x0 + 10, y, PcControlsActionName(i), COL_TEXT);
+        for (int c = 0; c < 2; c++) {
+            const char *name = c ? PcControlsPadName(i) : PcControlsKeyName(i);
+            if (i == row && c == column) {
+                fill(cx[c] - 4, y, 132, LINE_H, COL_PICK);
+                if (waiting) name = c ? "Press a button" : "Press a key";
+            }
+            ascii_text(cx[c], y, name, c == column && i == row ? COL_TEXT : COL_DIM);
+        }
+    }
+    y += 6;
+    ascii_text(x0 + 10, y, waiting ? (column ? "Press the new button. B: cancel" : "Press the new key. Esc: cancel")
+                                   : "Enter / A: change    Del / Y: default", COL_DIM);
+    ascii_text(x0 + 10, y + LINE_H, "Esc / F1 / B: close", COL_DIM);
+}
+
 const uint32_t *PcChatOverlay(int w, int h)
 {
     ULONGLONG now = GetTickCount64();
@@ -247,6 +297,11 @@ const uint32_t *PcChatOverlay(int w, int h)
     ov_w = w;
     ov_h = h;
     memset(overlay, 0, (size_t)w * h * 4);
+
+    if (PcControlsActive()) {
+        draw_controls(w, h);
+        return overlay;
+    }
 
     /* name tags: the overlay is 2x the game, centered on the 240-wide screen */
     if (tags.count && now - tags.when < TAG_MS) {

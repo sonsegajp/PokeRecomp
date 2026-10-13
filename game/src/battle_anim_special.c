@@ -16,6 +16,9 @@
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/songs.h"
+#ifdef PLATFORM_PC
+#include "pc_online.h"
+#endif
 
 #define TAG_PARTICLES_POKEBALL    55020
 #define TAG_PARTICLES_GREATBALL   55021
@@ -2057,6 +2060,9 @@ void TryShinyAnimation(u8 battler, struct Pokemon *mon)
 
         if (isShiny)
         {
+#ifdef PLATFORM_PC
+            Online_ShinyEvent(battler, mon, FALSE);
+#endif
             if (GetSpriteTileStartByTag(ANIM_TAG_GOLD_STARS) == 0xFFFF)
             {
                 LoadCompressedSpriteSheetUsingHeap(&gBattleAnimPicTable[ANIM_TAG_GOLD_STARS - ANIM_SPRITES_START]);

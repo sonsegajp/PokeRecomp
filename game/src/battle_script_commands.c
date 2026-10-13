@@ -36,6 +36,9 @@
 #include "constants/abilities.h"
 #include "constants/pokemon.h"
 #include "constants/maps.h"
+#ifdef PLATFORM_PC
+#include "pc_online.h"
+#endif
 
 extern const u8 *const gBattleScriptsForMoveEffects[];
 
@@ -9616,6 +9619,9 @@ static void Cmd_handleballthrow(void)
 
 static void Cmd_givecaughtmon(void)
 {
+#ifdef PLATFORM_PC
+    Online_ShinyEvent(gBattlerAttacker ^ BIT_SIDE, &gEnemyParty[gBattlerPartyIndexes[gBattlerAttacker ^ BIT_SIDE]], TRUE);
+#endif
     if (GiveMonToPlayer(&gEnemyParty[gBattlerPartyIndexes[gBattlerAttacker ^ BIT_SIDE]]) != MON_GIVEN_TO_PARTY)
     {
         if (!ShouldShowBoxWasFullMessage())

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "battle_setup.h"
 #include "gflib.h"
 #include "bg_regs.h"
 #include "cable_club.h"
@@ -44,6 +45,7 @@
 #include "script_pokemon_util.h"
 #include "item.h"
 #include "pc_online.h"
+#include "pc_net.h"
 #include "pc_travel.h"
 #include "start_menu.h"
 #include "tileset_anims.h"
@@ -1483,7 +1485,7 @@ void CB1_Overworld(void)
 #ifdef PLATFORM_PC
     Online_OverworldUpdate();
     // Test hooks (--give-mon, --warp): run once the player can move.
-    if (gPcDebugGiveMon[0].species && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
+    if (gPcDebugGiveMon[0].species && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked() && gQuestLogState == 0)
     {
         int i;
         for (i = 0; i < 6 && gPcDebugGiveMon[i].species; i++)
@@ -1492,12 +1494,24 @@ void CB1_Overworld(void)
             gPcDebugGiveMon[i].species = 0;
         }
     }
-    if (gPcDebugGiveItem.item && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
+    if (gPcDebugWild.species && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked() && gQuestLogState == 0
+     && (!gPcDebugNet.autojoin || PcNetConnected()))   // with --net-autojoin: once on the server
+    {
+        u32 otId = T1_READ_32(gSaveBlock2Ptr->playerTrainerId);
+        ZeroEnemyPartyMons();
+        // shiny: the personality equal to the trainer id gives a shiny value of 0
+        CreateMon(&gEnemyParty[0], gPcDebugWild.species, gPcDebugWild.level, USE_RANDOM_IVS,
+                  gPcDebugWild.shiny != 0, otId, OT_ID_PLAYER_ID, 0);
+        gPcDebugWild.species = 0;
+        StartScriptedWildBattle();
+        return;
+    }
+    if (gPcDebugGiveItem.item && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked() && gQuestLogState == 0)
     {
         AddBagItem(gPcDebugGiveItem.item, gPcDebugGiveItem.count);
         gPcDebugGiveItem.item = 0;
     }
-    if (gPcDebugWarp.pending && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
+    if (gPcDebugWarp.pending && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked() && gQuestLogState == 0)
     {
         gPcDebugWarp.pending = 0;
         SetWarpDestination(gPcDebugWarp.group, gPcDebugWarp.num, -1, gPcDebugWarp.x, gPcDebugWarp.y);

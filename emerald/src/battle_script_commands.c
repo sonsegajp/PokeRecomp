@@ -51,6 +51,9 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
+#ifdef PLATFORM_PC
+#include "pc_online.h"
+#endif
 
 extern const u8 *const gBattleScriptsForMoveEffects[];
 
@@ -10054,6 +10057,9 @@ static void Cmd_handleballthrow(void)
 
 static void Cmd_givecaughtmon(void)
 {
+#ifdef PLATFORM_PC
+    Online_ShinyEvent(BATTLE_OPPOSITE(gBattlerAttacker), &gEnemyParty[gBattlerPartyIndexes[BATTLE_OPPOSITE(gBattlerAttacker)]], TRUE);
+#endif
     if (GiveMonToPlayer(&gEnemyParty[gBattlerPartyIndexes[BATTLE_OPPOSITE(gBattlerAttacker)]]) != MON_GIVEN_TO_PARTY)
     {
         if (!ShouldShowBoxWasFullMessage())

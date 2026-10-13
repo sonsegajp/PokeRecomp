@@ -132,7 +132,7 @@ function bind(){
 }
 function selectMenu(index,sound=true){const buttons=$$('[data-menu]',screen);if(!buttons.length)return;const next=(index+buttons.length)%buttons.length,changed=next!==selected;selected=next;buttons.forEach((b,i)=>b.classList.toggle('selected',i===selected));if(sound&&changed)tone();}
 function back(){if(modalRoot.firstChild){tone();closeDialog();return;}if(route==='notice'){go('title');return;}if(optionsTab){tone();changeScreen(()=>{optionsTab=null;selected=0;return render();});return;}if(route==='storage'){go('boxes');return;}if(route==='main'){go('title');return;}if(route!=='title')go('main');}
-function confirm(){tone();if(route==='notice')go('title');else if(route==='title')go('main');else if(route==='games')launchGame();else if(route==='storage')storageUI?.key('Enter');else if(optionsTab){if(['game','audio','display'].includes(optionsTab))saveSettings();else back();}else $(`[data-menu="${selected}"]`,screen)?.click();}
+function confirm(){tone();if(route==='notice')go('title');else if(route==='title')go('main');else if(route==='games')launchGame();else if(route==='storage')storageUI?.key('Enter');else if(optionsTab){if(['game','audio','display'].includes(optionsTab))saveSettings();else if(optionsTab==='controls'){const f=document.activeElement;if(f?.matches?.('.bind-cell,#reset-binds,[data-action="back"]'))f.click();else $('.bind-cell',screen)?.focus();}else back();}else $(`[data-menu="${selected}"]`,screen)?.click();}
 async function action(name){
   if(pending||navigationPending||sceneTransitions?.busy)return;
   if(name==='notice-continue'){go('title');return;}
@@ -145,7 +145,7 @@ async function action(name){
     return;
   }
   if(name==='import-game'){romDialog();return;}if(name==='import-save'){importDialog('save');return;}
-  if(name==='reset-settings'){dialog('Restore default settings?','This resets display, audio, and fast-forward settings. Your adventure and save data are kept.','Reset settings',async()=>{try{const result=await api('settings',{settings:state.defaults});state.settings=result.settings;closeDialog();toast('Default settings restored.');render();}catch(e){showError(e);}});return;}
+  if(name==='reset-settings'){dialog('Restore default settings?','This resets display, audio, fast-forward and control settings. Your adventure and save data are kept.','Reset settings',async()=>{try{const result=await api('settings',{settings:state.defaults});state.settings=result.settings;closeDialog();toast('Default settings restored.');render();}catch(e){showError(e);}});return;}
   if(name==='gift-receive'){dialog('Receive a Mystery Gift','The original FireRed Mystery Gift menu is available with a saved adventure. Internet gift distribution is not configured for this project.','Open game menu',()=>launch('firered','gifts'));return;}
   if(name==='gift-check'){dialog('Check Gifts','Wonder Cards and Wonder News are stored in your FireRed save. Open the original Mystery Gift menu to view them.','Open game menu',()=>launch('firered','gifts'));return;}
   if(name==='gift-info'){dialog('Mystery Gift','Use the original FireRed Mystery Gift screen to check Wonder Cards and Wonder News in your save.\n\nThis launcher has no configured internet gift service. It will never claim a gift was received unless the game actually receives it.','Got it',closeDialog,false);return;}
@@ -217,15 +217,83 @@ const optionSelect=(key,label,choices)=>`<label class="option-row"><span>${label
 const optionToggle=(key,label)=>`<label class="option-row"><span>${label}</span><input type="checkbox" data-setting="${key}" ${state.settings[key]?'checked':''}></label>`;
 function settingsPanel(){
   let content='',title='';
-  if(optionsTab==='game'){title='Game Settings';content=optionSelect('fast_forward','Fast-forward speed',[[2,'2×'],[3,'3×'],[4,'4×'],[5,'5×'],[6,'6×'],[7,'7×'],[8,'8×']])+'<p class="panel-note">Hold Tab or the right controller trigger to fast-forward. Text speed, battle style, and sound mode are available in the game’s OPTIONS menu.</p>';}
+  if(optionsTab==='game'){title='Game Settings';content=optionSelect('fast_forward','Fast-forward speed',[[2,'2×'],[3,'3×'],[4,'4×'],[5,'5×'],[6,'6×'],[7,'7×'],[8,'8×']])+'<p class="panel-note">Hold the fast-forward button (Tab or RT unless you changed it in Control Settings). Text speed, battle style, and sound mode are available in the game’s OPTIONS menu.</p>';}
   if(optionsTab==='display'){title='Display Settings';content=(!state.embedded?optionSelect('window_scale','Window size',[[1,'240 × 160'],[2,'480 × 320'],[3,'720 × 480'],[4,'960 × 640'],[5,'1200 × 800'],[6,'1440 × 960'],[7,'1680 × 1120'],[8,'1920 × 1280']]):'')+optionSelect('filter','Pixel filter',[[0,'Nearest'],[1,'Sharp'],[2,'Smooth'],[3,'LCD'],[4,'CRT']])+optionSelect('scaling','Scaling',[[0,'Fit'],[1,'Integer'],[2,'Stretch']])+optionSelect('widescreen','Field aspect ratio',[[0,'Original 3:2'],[1,'16:10'],[2,'16:9'],[3,'Match window']])+optionToggle('fullscreen','Fullscreen')+optionToggle('vsync','VSync')+optionToggle('color_correct','GBA color correction');}
   if(optionsTab==='audio'){title='Audio Settings';content=`<label class="option-row"><span>Master volume</span><span class="range-wrap"><input type="range" min="0" max="10" step="1" value="${state.settings.volume??8}" data-setting="volume"><output>${(state.settings.volume??8)*10}%</output></span></label>`+optionSelect('hq_audio','Audio quality',[[1,'High quality · 48 kHz'],[0,'Original GBA']])+'<p class="panel-note">Master volume also controls launcher music and menu sounds. Audio quality applies to your next game session.</p>';}
-  if(optionsTab==='controls'){title='Control Settings';content='<table class="controls-table"><thead><tr><th>Action</th><th>Keyboard</th><th>Controller</th></tr></thead><tbody><tr><td>Move</td><td>Arrow keys</td><td>D-pad / stick</td></tr><tr><td>Confirm / A</td><td>X</td><td>A</td></tr><tr><td>Back / B</td><td>Z</td><td>B</td></tr><tr><td>Start / Select</td><td>Enter / Backspace</td><td>Start / Back</td></tr><tr><td>L / R</td><td>A / S</td><td>LB / RB</td></tr><tr><td>Fast-forward</td><td>Hold Tab</td><td>Hold RT</td></tr><tr><td>Fullscreen</td><td>F11</td><td>—</td></tr><tr><td>Cycle filter</td><td>F2</td><td>—</td></tr></tbody></table><p class="panel-note">The game uses these fixed bindings. In the launcher, Enter confirms and Escape goes back.</p>';}
+  if(optionsTab==='controls'){title='Control Settings';content=controlsPanel();}
   if(optionsTab==='language'){title='Language';content='<label class="option-row"><span>Game language</span><select aria-label="Game language"><option>English</option></select></label><p class="panel-note">This native build includes the original English game data.</p>';}
   const editable=['game','display','audio'].includes(optionsTab);
-  return `<section class="options-panel" aria-label="${title}"><h2>${title}</h2>${content}<div class="panel-actions"><button class="menu-button" data-action="back">Back</button>${editable?'<button class="menu-button selected" id="save-settings">Save settings</button>':''}</div></section>`;
+  return `<section class="options-panel${optionsTab==='controls'?' controls-panel':''}" aria-label="${title}"><h2>${title}</h2>${content}<div class="panel-actions"><button class="menu-button" data-action="back">Back</button>${optionsTab==='controls'?'<button class="menu-button" id="reset-binds">Default controls</button>':''}${editable?'<button class="menu-button selected" id="save-settings">Save settings</button>':''}</div></section>`;
 }
-function bindSettings(){ $('#save-settings')?.addEventListener('click',saveSettings);$$('input[type=range]',screen).forEach(i=>i.addEventListener('input',()=>{i.nextElementSibling.textContent=`${i.value*10}%`;if(i.dataset.setting==='volume'){previewVolume=Number(i.value);syncAudio();}}));}
+// ---- controls: keyboard keys and controller buttons for each GBA button ----
+// Keyboard: KeyboardEvent.code -> SDL scancode (what settings.ini stores) and its label.
+const SCANCODES={Enter:[40,'Enter'],Backspace:[42,'Backspace'],Tab:[43,'Tab'],Space:[44,'Space'],Minus:[45,'-'],Equal:[46,'='],BracketLeft:[47,'['],BracketRight:[48,']'],Backslash:[49,'\\'],Semicolon:[51,';'],Quote:[52,"'"],Backquote:[53,'`'],Comma:[54,','],Period:[55,'.'],Slash:[56,'/'],CapsLock:[57,'Caps Lock'],Insert:[73,'Insert'],Home:[74,'Home'],PageUp:[75,'Page Up'],Delete:[76,'Delete'],End:[77,'End'],PageDown:[78,'Page Down'],ArrowRight:[79,'Right'],ArrowLeft:[80,'Left'],ArrowDown:[81,'Down'],ArrowUp:[82,'Up'],NumpadDivide:[84,'Keypad /'],NumpadMultiply:[85,'Keypad *'],NumpadSubtract:[86,'Keypad -'],NumpadAdd:[87,'Keypad +'],NumpadEnter:[88,'Keypad Enter'],NumpadDecimal:[99,'Keypad .'],ControlLeft:[224,'Left Ctrl'],ShiftLeft:[225,'Left Shift'],AltLeft:[226,'Left Alt'],ControlRight:[228,'Right Ctrl'],ShiftRight:[229,'Right Shift'],AltRight:[230,'Right Alt']};
+for(let i=0;i<26;i++)SCANCODES['Key'+String.fromCharCode(65+i)]=[4+i,String.fromCharCode(65+i)];
+for(let i=1;i<=9;i++){SCANCODES['Digit'+i]=[29+i,String(i)];SCANCODES['Numpad'+i]=[88+i,'Keypad '+i];}
+SCANCODES.Digit0=[39,'0'];SCANCODES.Numpad0=[98,'Keypad 0'];
+for(const f of [3,4,5,6,7,8,9,10,12])SCANCODES['F'+f]=[57+f,'F'+f];
+const KEY_RESERVED=new Set(['Escape','F1','F2','F11','KeyT']);   // cancel, controls panel, filter, fullscreen, chat
+const keyLabel=sc=>Object.values(SCANCODES).find(([v])=>v===sc)?.[1]??`Key ${sc}`;
+// Controller: Gamepad API standard button -> SDL game controller button.
+const PAD_FROM_STANDARD=[0,1,2,3,9,10,100,101,4,6,7,8,11,12,13,14,5];
+const PAD_LABELS={0:'A',1:'B',2:'X',3:'Y',4:'Back',5:'Guide',6:'Start',7:'Left Stick',8:'Right Stick',9:'LB',10:'RB',11:'D-pad Up',12:'D-pad Down',13:'D-pad Left',14:'D-pad Right',100:'LT',101:'RT'};
+const BIND_ROWS=[['a','A'],['b','B'],['select','Select'],['start','Start'],['up','Up'],['down','Down'],['left','Left'],['right','Right'],['l','L'],['r','R'],['turbo','Fast-forward (hold)']];
+let capture=null;   // {bind:'key_a'|'pad_a', base:Set of pad buttons held when it started}
+function bindCell(bind){
+  const v=state.settings[bind]??state.defaults?.[bind],pad=bind.startsWith('pad_');
+  const label=capture?.bind===bind?(pad?'Press a button…':'Press a key…'):pad?(PAD_LABELS[v]??`Button ${v}`):keyLabel(v);
+  return `<button class="bind-cell${capture?.bind===bind?' capturing':''}" data-bind="${bind}">${label}</button>`;
+}
+function controlsPanel(){
+  return `<table class="controls-table binds"><thead><tr><th>Button</th><th>Keyboard</th><th>Controller</th></tr></thead><tbody>${BIND_ROWS.map(([a,name])=>`<tr><td>${name}</td><td>${bindCell('key_'+a)}</td><td>${bindCell('pad_'+a)}</td></tr>`).join('')}</tbody></table><p class="panel-note">Select a box, then press the new key or button (Esc cancels). In game: F1 or hold Back + Start opens these controls; T chats online.</p>`;
+}
+function padsHeld(){const held=new Set();for(const p of navigator.getGamepads?.()||[])if(p)p.buttons.forEach((b,i)=>{if(b.pressed)held.add(i);});return held;}
+function startCapture(bind){capture={bind,base:padsHeld()};refreshBinds(bind);}
+function endCapture(){const bind=capture?.bind;capture=null;refreshBinds(bind);}
+function refreshBinds(focus){
+  const table=$('.binds',screen);if(!table)return;
+  table.outerHTML=controlsPanel().replace(/<p class="panel-note">[\s\S]*$/,'');
+  bindControls();$(`[data-bind="${focus}"]`,screen)?.focus();
+}
+async function saveBind(bind,value){
+  const settings={...state.defaults,...state.settings},old=settings[bind],kind=bind.slice(0,4);
+  // whatever already had this key/button gets this one's old one (a swap)
+  for(const[a]of BIND_ROWS)if(kind+a!==bind&&settings[kind+a]===value)settings[kind+a]=old;
+  settings[bind]=value;capture=null;
+  try{const result=await api('settings',{settings});state.settings=result.settings;tone(true);}catch(e){showError(e);}
+  refreshBinds(bind);
+}
+function captureKey(event){
+  event.preventDefault();if(event.repeat)return;
+  if(event.code==='Escape'){endCapture();return;}
+  if(!capture.bind.startsWith('key_'))return;
+  const sc=SCANCODES[event.code];
+  if(!sc||KEY_RESERVED.has(event.code)){toast('That key is used for something else. Pick another.');return;}
+  saveBind(capture.bind,sc[0]);
+}
+function capturePad(){
+  const held=padsHeld();
+  for(const i of [...capture.base])if(!held.has(i))capture.base.delete(i);   // let go: can count again
+  const fresh=[...held].find(i=>!capture.base.has(i));
+  if(fresh===undefined)return;
+  if(capture.bind.startsWith('pad_')&&PAD_FROM_STANDARD[fresh]!==undefined)saveBind(capture.bind,PAD_FROM_STANDARD[fresh]);
+  else if(fresh===1)endCapture();   // B cancels a keyboard capture
+  else capture.base.add(fresh);
+}
+function moveBindFocus(key){
+  const items=[...$$('.bind-cell',screen),$('#reset-binds',screen),$('[data-action="back"]',screen)].filter(Boolean);
+  let i=items.indexOf(document.activeElement),cells=$$('.bind-cell',screen).length;
+  if(i<0){items[0]?.focus();return;}
+  if(key==='ArrowUp')i=i>=cells?cells-1:i-2;else if(key==='ArrowDown')i=i<cells?i+2:i;else if(key==='ArrowLeft')i--;else if(key==='ArrowRight')i++;
+  items[Math.max(0,Math.min(items.length-1,i))]?.focus();
+}
+function bindControls(){$$('.bind-cell',screen).forEach(b=>b.addEventListener('click',()=>startCapture(b.dataset.bind)));}
+async function resetBinds(){
+  const settings={...state.defaults,...state.settings};
+  for(const[a]of BIND_ROWS){settings['key_'+a]=state.defaults['key_'+a];settings['pad_'+a]=state.defaults['pad_'+a];}
+  try{const result=await api('settings',{settings});state.settings=result.settings;tone(true);toast('Default controls restored.');refreshBinds();}catch(e){showError(e);}
+}
+function bindSettings(){ bindControls();$('#reset-binds')?.addEventListener('click',resetBinds);$('#save-settings')?.addEventListener('click',saveSettings);$$('input[type=range]',screen).forEach(i=>i.addEventListener('input',()=>{i.nextElementSibling.textContent=`${i.value*10}%`;if(i.dataset.setting==='volume'){previewVolume=Number(i.value);syncAudio();}}));}
 async function saveSettings(){const settings={...state.settings};$$('[data-setting]',screen).forEach(input=>settings[input.dataset.setting]=input.type==='checkbox'?Number(input.checked):Number(input.value));try{const result=await api('settings',{settings});state.settings=result.settings;previewVolume=null;syncAudio();tone(true);toast('Settings saved. They will apply when you next open the game.');}catch(e){showError(e);}}
 function navigate(key){
   if(navigationPending||sceneTransitions?.busy)return;
@@ -233,18 +301,20 @@ function navigate(key){
   if(route==='notice'){if(key==='confirm')go('title');return;}
   if(route==='title'){go('main');return;}
   if(route==='storage'&&storageUI){if(storageUI.key(key==='confirm'?'Enter':key==='back'?'Escape':key)){tone();return;}}
+  if(optionsTab==='controls'&&key.startsWith?.('Arrow')){moveBindFocus(key);return;}
   if(key==='Escape'||key==='back'){back();return;}if(key==='confirm'){confirm();return;}
   if(route==='games'&&['ArrowLeft','ArrowRight'].includes(key)){selectGame(gameIndex+(key==='ArrowRight'?1:-1));return;}
   if(['ArrowUp','ArrowDown'].includes(key)&&!optionsTab){selectMenu(selected+(key==='ArrowDown'?1:-1));return;}
 }
 document.addEventListener('keydown',event=>{
+  if(capture){captureKey(event);return;}
   if(['INPUT','SELECT','TEXTAREA'].includes(event.target.tagName)){if(event.key==='Escape'){event.preventDefault();back();}return;}
   if(modalRoot.firstChild&&event.key==='Tab'){const focusable=$$('button,input,select',modalRoot).filter(x=>!x.disabled);const first=focusable[0],last=focusable.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}return;}
   if(event.repeat)return;
   if(route==='title'&&!['Tab','Shift','Control','Alt','Meta','F11','F12'].includes(event.key)){event.preventDefault();navigate('confirm');return;}
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','PageUp','PageDown','Escape','Backspace','Enter','x','X','z','Z'].includes(event.key)){
     if(event.key==='Enter'&&document.activeElement?.tagName==='BUTTON')return;
-    if(optionsTab&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key))return;
+    if(optionsTab&&optionsTab!=='controls'&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key))return;
     event.preventDefault();navigate(['x','X','Enter'].includes(event.key)?'confirm':['z','Z','Backspace'].includes(event.key)?'back':event.key);
   }
 });
@@ -252,6 +322,7 @@ document.addEventListener('click',event=>{if(event.target.closest?.('button')&&e
 let lastPadTime=0,lastPadAction='';
 function gamepads(time){
   if(document.hidden||state.running){lastPadAction='';requestAnimationFrame(gamepads);return;}
+  if(capture){capturePad();lastPadAction='busy';requestAnimationFrame(gamepads);return;}
   const pad=[...(navigator.getGamepads?.()||[])].find(Boolean);
   if(pad){const down=i=>pad.buttons[i]?.pressed;const key=down(0)?'confirm':down(1)?'back':down(4)?'PageUp':down(5)?'PageDown':down(12)||pad.axes[1]<-.55?'ArrowUp':down(13)||pad.axes[1]>.55?'ArrowDown':down(14)||pad.axes[0]<-.55?'ArrowLeft':down(15)||pad.axes[0]>.55?'ArrowRight':'';
     if(key&&(key!==lastPadAction||(time-lastPadTime>230&&key.startsWith('Arrow')))){launcherAudio?.unlock();navigate(key);lastPadTime=time;}lastPadAction=key;
