@@ -120,7 +120,7 @@ void PcWaitForInterrupt(unsigned short mask)
 
 static int spin_count;
 struct PcDebugWarp gPcDebugWarp;
-struct PcDebugGiveMon gPcDebugGiveMon;
+struct PcDebugGiveMon gPcDebugGiveMon[6];
 struct PcDebugGiveItem gPcDebugGiveItem;
 
 void PcSpinWait(void)
@@ -239,8 +239,13 @@ int main(int argc, char *argv[])
             gPcDebugGiveItem.count = atoi(argv[++i]);
         }
         else if (!strcmp(argv[i], "--give-mon") && i + 2 < argc) {
-            gPcDebugGiveMon.species = atoi(argv[++i]);
-            gPcDebugGiveMon.level = atoi(argv[++i]);
+            static int n;
+            int species = atoi(argv[++i]), level = atoi(argv[++i]);
+            if (n < 6) {
+                gPcDebugGiveMon[n].species = species;
+                gPcDebugGiveMon[n].level = level;
+                n++;
+            }
         }
         else if (!strcmp(argv[i], "--field-width") && i + 1 < argc) test_width = atoi(argv[++i]); /* test: widescreen field width */
         else if (!strcmp(argv[i], "--shots") && i + 2 < argc) {

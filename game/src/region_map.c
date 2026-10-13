@@ -2922,6 +2922,10 @@ static u16 GetMapCursorY(void)
 static u16 GetMapsecUnderCursor(void)
 {
     u8 mapsec;
+#ifdef PLATFORM_PC
+    if (sMapCursor == NULL) // asked before the cursor exists
+        return MAPSEC_NONE;
+#endif
     if (sMapCursor->y < 0
      || sMapCursor->y >= MAP_HEIGHT
      || sMapCursor->x < 0
@@ -2937,6 +2941,10 @@ static u16 GetMapsecUnderCursor(void)
 static u16 GetDungeonMapsecUnderCursor(void)
 {
     u8 mapsec;
+#ifdef PLATFORM_PC
+    if (sMapCursor == NULL) // asked before the cursor exists
+        return MAPSEC_NONE;
+#endif
     if (sMapCursor->y < 0
      || sMapCursor->y >= MAP_HEIGHT
      || sMapCursor->x < 0
@@ -3614,12 +3622,18 @@ static void SetFlyIconInvisibility(u8 whichMap, u8 iconNum, bool8 invisible)
         for (i = 0; i < NELEMS(sMapIcons->flyIcons); i++)
         {
             if (sMapIcons->flyIcons[i].region == whichMap || whichMap == 0xFF)
+#ifdef PLATFORM_PC
+                if (sMapIcons->flyIcons[i].sprite != NULL) // icons that were never created
+#endif
                 sMapIcons->flyIcons[i].sprite->invisible = invisible;
         }
     }
     else
     {
         if (sMapIcons->flyIcons[iconNum].region == whichMap)
+#ifdef PLATFORM_PC
+            if (sMapIcons->flyIcons[iconNum].sprite != NULL) // icons that were never created
+#endif
             sMapIcons->flyIcons[iconNum].sprite->invisible = invisible;
     }
 }
@@ -3633,12 +3647,18 @@ static void SetDungeonIconInvisibility(u8 whichMap, u8 iconNum, bool8 invisible)
         for (i = 0; i < NELEMS(sMapIcons->dungeonIcons); i++)
         {
             if (sMapIcons->dungeonIcons[i].region == whichMap || whichMap == 0xFF)
+#ifdef PLATFORM_PC
+                if (sMapIcons->dungeonIcons[i].sprite != NULL) // icons that were never created
+#endif
                 sMapIcons->dungeonIcons[i].sprite->invisible = invisible;
         }
     }
     else
     {
         if (sMapIcons->dungeonIcons[iconNum].region != whichMap)
+#ifdef PLATFORM_PC
+            if (sMapIcons->dungeonIcons[iconNum].sprite != NULL) // icons that were never created
+#endif
             sMapIcons->dungeonIcons[iconNum].sprite->invisible = invisible;
     }
 }

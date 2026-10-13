@@ -1480,10 +1480,14 @@ void CB1_Overworld(void)
 {
 #ifdef PLATFORM_PC
     // Test hooks (--give-mon, --warp): run once the player can move.
-    if (gPcDebugGiveMon.species && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
+    if (gPcDebugGiveMon[0].species && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
     {
-        ScriptGiveMon(gPcDebugGiveMon.species, gPcDebugGiveMon.level, 0, 0, 0, 0); // no held item
-        gPcDebugGiveMon.species = 0;
+        int i;
+        for (i = 0; i < 6 && gPcDebugGiveMon[i].species; i++)
+        {
+            ScriptGiveMon(gPcDebugGiveMon[i].species, gPcDebugGiveMon[i].level, 0, 0, 0, 0); // no held item
+            gPcDebugGiveMon[i].species = 0;
+        }
     }
     if (gPcDebugGiveItem.item && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
     {

@@ -49,9 +49,10 @@ void PcSpinWait(void);
  * soon as they can move. */
 struct PcDebugWarp { int pending, group, num, x, y; };
 extern struct PcDebugWarp gPcDebugWarp;
-/* Test hook (--give-mon SPECIES LEVEL): added to the party the same way. */
+/* Test hook (--give-mon SPECIES LEVEL, repeatable up to 6): added to the
+ * party the same way. */
 struct PcDebugGiveMon { int species, level; };
-extern struct PcDebugGiveMon gPcDebugGiveMon;
+extern struct PcDebugGiveMon gPcDebugGiveMon[6];
 /* Test hook (--give-item ITEM COUNT): added to the bag the same way. */
 struct PcDebugGiveItem { int item, count; };
 extern struct PcDebugGiveItem gPcDebugGiveItem;

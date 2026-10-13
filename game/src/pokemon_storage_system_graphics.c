@@ -929,6 +929,10 @@ bool8 ResetReleaseMonSpritePtr(void)
 
 void SetMovingMonPriority(u8 priority)
 {
+#ifdef PLATFORM_PC
+    if (gStorage->movingMonSprite == NULL) // not holding a mon
+        return;
+#endif
     gStorage->movingMonSprite->oam.priority = priority;
 }
 

@@ -395,12 +395,22 @@ static void VBlankCB_PokeStorage(void)
     ProcessSpriteCopyRequests();
     UnkUtil_Run();
     TransferPlttBuffer();
+#ifdef PLATFORM_PC
+    if (gStorage == NULL) // one more VBlank after the exit task freed it
+        return;
+#endif
     SetGpuReg(REG_OFFSET_BG2HOFS, gStorage->bg2_X);
 }
 
 static void CB2_PokeStorage(void)
 {
     RunTasks();
+#ifdef PLATFORM_PC
+    // The exit task frees gStorage (and switches callback2) inside RunTasks;
+    // the rest of this frame would scroll/animate through the freed pointer.
+    if (gStorage == NULL)
+        return;
+#endif
     DoScheduledBgTilemapCopiesToVram();
     ScrollBackground();
     UpdateCloseBoxButtonFlash();
