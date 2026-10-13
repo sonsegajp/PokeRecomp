@@ -28,7 +28,7 @@ enum {
     M_REGISTERED = 0x81, M_LOGIN_OK = 0x82, M_SERVER_LIST = 0x83, M_RENAMED = 0x85, M_ERROR = 0x8F,
     S_JOIN = 0x40, S_POS = 0x41, S_CHAT = 0x42, S_REQUEST = 0x43, S_RESPOND = 0x44, S_LINK_CMD = 0x45, S_LINK_END = 0x46,
     S_WELCOME = 0xC0, S_PLAYER = 0xC1, S_PLAYER_GONE = 0xC2, S_CHAT_FROM = 0xC3, S_REQUESTED = 0xC4, S_DECLINED = 0xC5,
-    S_SESSION = 0xC6, S_LINK_FRAME = 0xC7, S_SESSION_END = 0xC8, S_LINK_STATE = 0xC9, S_WORLD = 0xCA, S_ERROR = 0xCF,
+    S_SESSION = 0xC6, S_LINK_FRAME = 0xC7, S_SESSION_END = 0xC8, S_LINK_STATE = 0xC9, S_WORLD = 0xCA, S_GUILD_CHAT_FROM = 0xCB, S_ERROR = 0xCF,
     S_LINK_OPEN = 0x47,
 };
 
@@ -408,6 +408,13 @@ void PcNetSendChat(const uint8_t *text, int len)
     conn_send(&game, S_CHAT, text, len);
 }
 
+void PcNetSendGuildChat(const uint8_t *text, int len)
+{
+    if (!connected || len <= 0) return;
+    if (len > 64) len = 64;
+    conn_send(&game, 0x48 /* S_GUILD_CHAT */, text, len);
+}
+
 const struct PcNetPlayer *PcNetGetPlayer(int slot)
 {
     return slot >= 0 && slot < PC_NET_MAX_PLAYERS && players[slot].active ? &players[slot] : NULL;
@@ -551,7 +558,9 @@ static void handle_master(uint8_t type, const uint8_t *p, int len)
         if (op == OP_REGISTER || op == OP_LOGIN || op == OP_RENAME) finish_op(PC_NET_OP_OK);
         break;
     }
+    case 0x84:                                                /* M_FRIENDS */
     case 0x86: case 0x87: case 0x88: case 0x89: case 0x8A:   /* M_WONDER_RESULT .. M_GTS_RESULT */
+    case 0x8B:                                                /* M_GUILD */
         if (op == OP_REQUEST) {
             reply_type = type;
             reply_len = len > (int)sizeof reply_data ? (int)sizeof reply_data : len;
@@ -612,6 +621,15 @@ static void handle_game(uint8_t type, const uint8_t *p, int len)
                 PcChatReceive(my_name, my_tag, text);
             else if ((pl = player_slot(id, 0)) != NULL)
                 PcChatReceive(pl->name, pl->tag, text);
+        }
+        break;
+    case S_GUILD_CHAT_FROM:
+        if (len >= PC_NET_NAME_LEN + 3) {
+            uint8_t text[65];
+            int n = len - PC_NET_NAME_LEN - 2 > 64 ? 64 : len - PC_NET_NAME_LEN - 2;
+            memcpy(text, p + PC_NET_NAME_LEN + 2, n);
+            text[n] = 0xFF;
+            PcChatReceiveGuild(p, get16(p + PC_NET_NAME_LEN), text);
         }
         break;
     case S_PLAYER_GONE:

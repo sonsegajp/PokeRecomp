@@ -403,9 +403,11 @@ static const struct MenuAction sMultichoiceList_TradeColosseum_2[] = {
 static const u8 sText_OnlineBattle[] = _("BATTLE");
 static const u8 sText_OnlineTrade[] = _("TRADE");
 static const u8 sText_OnlineCancel[] = _("CANCEL");
+static const u8 sText_OnlineAddFriend[] = _("ADD FRIEND");
 static const struct MenuAction sMultichoiceList_OnlinePlayer[] = {
     { sText_OnlineBattle },
     { sText_OnlineTrade },
+    { sText_OnlineAddFriend },
     { sText_OnlineCancel }
 };
 

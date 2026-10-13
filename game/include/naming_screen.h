@@ -8,6 +8,9 @@
 #define NAMING_SCREEN_CAUGHT_MON    2
 #define NAMING_SCREEN_NICKNAME      3
 #define NAMING_SCREEN_RIVAL         4
+#ifdef PLATFORM_PC
+#define NAMING_SCREEN_GUILD         5   // online guild names
+#endif
 
 void DoNamingScreen(u8 templateNum, u8 *destBuffer, u16 monSpecies, u16 monGender, u32 monPersonality, MainCallback returnCallback);
 

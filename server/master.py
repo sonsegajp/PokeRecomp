@@ -22,6 +22,7 @@ import time
 
 from protocol import *  # noqa: F401,F403
 from trades import Trades
+from social import Guilds
 
 TOKEN_TTL = 24 * 3600
 SERVER_TIMEOUT = 30
@@ -48,6 +49,7 @@ class Master:
         self.servers = {}      # writer -> dict(name, host, port, max, players, seen)
         self.online = {}       # account_id -> server name
         self.trades = Trades(self.db)
+        self.guilds = Guilds(self.db)
 
     # ---- accounts ----------------------------------------------------------
 
@@ -98,6 +100,17 @@ class Master:
         self.db.execute("INSERT OR IGNORE INTO friends(a, b) VALUES (?,?)", (me, row[0]))
         self.db.commit()
         return True
+
+    def remove_friend(self, me, other):
+        self.db.execute("DELETE FROM friends WHERE a=? AND b=?", (me, other))
+        self.db.commit()
+
+    def to_servers(self, data):
+        for w in list(self.servers):
+            try:
+                w.write(data)
+            except Exception:
+                pass
 
     def friend_list(self, me):
         out = []
@@ -179,6 +192,16 @@ class Master:
             return frame(M_FRIENDS, self.friends_frame(account_id)) if ok else frame(M_ERROR, bytes([ERR_NOT_FOUND]))
         if t == M_FRIEND_LIST and account_id:
             return frame(M_FRIENDS, self.friends_frame(account_id))
+        if t == M_FRIEND_REMOVE and account_id and len(p) >= 4:
+            self.remove_friend(account_id, struct.unpack_from("<I", p)[0])
+            return frame(M_FRIENDS, self.friends_frame(account_id))
+        if account_id and M_GUILD_INFO <= t <= M_GUILD_LEAVE:
+            result = self.guilds.dispatch(account_id, t, p, lambda a: self.account(a) or (b"", 0), self.online)
+            if result:
+                reply, changed = result
+                if changed:
+                    self.to_servers(frame(G_GUILD_SET, struct.pack("<II", account_id, self.guilds.guild_of(account_id))))
+                return reply
 
         # game servers
         if t == G_REGISTER and len(p) >= 32 + 24 + 64 + 4:
@@ -199,8 +222,11 @@ class Master:
                 entry = self.tokens.get(token)
                 if entry and entry[1] > time.time():
                     name, tag = self.account(entry[0])
-                    return frame(G_VERIFIED, struct.pack("<IBI", req, 1, entry[0]) + fixed(name, NAME_LEN) + struct.pack("<H", tag))
-                return frame(G_VERIFIED, struct.pack("<IBI", req, 0, 0) + bytes(NAME_LEN) + b"\0\0")
+                    return frame(G_VERIFIED, struct.pack("<IBI", req, 1, entry[0]) + fixed(name, NAME_LEN)
+                                 + struct.pack("<HI", tag, self.guilds.guild_of(entry[0])))
+                return frame(G_VERIFIED, struct.pack("<IBI", req, 0, 0) + bytes(NAME_LEN) + bytes(6))
+            elif t == G_GUILD_CHAT and len(p) >= 4 + NAME_LEN + 2:
+                self.to_servers(frame(G_GUILD_CHAT, bytes(p[:4 + NAME_LEN + 2 + 64])))
             elif t == G_PRESENCE:
                 aid, on = struct.unpack_from("<IB", p)
                 if on:

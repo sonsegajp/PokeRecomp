@@ -39,6 +39,7 @@ class Player:
         self.account = 0
         self.name = bytes(NAME_LEN)
         self.tag = 0
+        self.guild = 0
         self.gender = 0
         self.pos = (0, 0, 0, 0, 0, 0)       # group, num, x, y, facing, flags
         self.session = None
@@ -100,9 +101,21 @@ class GameServer:
                     t, p = msg
                     if t == G_VERIFIED:
                         req, ok, aid = struct.unpack_from("<IBI", p)
+                        tag, guild = struct.unpack_from("<HI", p, 9 + NAME_LEN)
                         fut = self.verify_waits.pop(req, None)
                         if fut and not fut.done():
-                            fut.set_result((ok, aid, bytes(p[9:9 + NAME_LEN]), struct.unpack_from("<H", p, 9 + NAME_LEN)[0]))
+                            fut.set_result((ok, aid, bytes(p[9:9 + NAME_LEN]), tag, guild))
+                    elif t == G_GUILD_SET:
+                        aid, guild = struct.unpack_from("<II", p)
+                        for pl in self.players.values():
+                            if pl.account == aid:
+                                pl.guild = guild
+                    elif t == G_GUILD_CHAT:
+                        (guild,) = struct.unpack_from("<I", p)
+                        data = frame(S_GUILD_CHAT_FROM, bytes(p[4:]))
+                        for pl in self.players.values():
+                            if guild and pl.guild == guild:
+                                pl.send(data)
                     elif t == M_ERROR:
                         print("game: master refused us (bad server key?)")
                 beat.cancel()
@@ -125,10 +138,10 @@ class GameServer:
         self.verify_waits[req] = fut
         self.master_writer.write(frame(G_VERIFY, struct.pack("<I", req) + token))
         try:
-            ok, aid, name, tag = await asyncio.wait_for(fut, 10)
+            ok, aid, name, tag, guild = await asyncio.wait_for(fut, 10)
         except asyncio.TimeoutError:
             return None
-        return (aid, name, tag) if ok else None
+        return (aid, name, tag, guild) if ok else None
 
     def presence(self, player, online):
         if self.master_writer and player.account:
@@ -159,7 +172,7 @@ class GameServer:
                     other.writer.close()
             player = Player(self.next_id, writer)
             self.next_id = self.next_id % 60000 + 1
-            player.account, player.name, player.tag = who
+            player.account, player.name, player.tag, player.guild = who
             player.gender = gender
             self.players[player.id] = player
             self.presence(player, 1)
@@ -194,6 +207,9 @@ class GameServer:
             self.broadcast(player.info(), skip=player)
         elif t == S_CHAT:
             self.broadcast(frame(S_CHAT_FROM, struct.pack("<H", player.id) + bytes(p[:64])))
+        elif t == S_GUILD_CHAT and player.guild and self.master_writer:
+            self.master_writer.write(frame(G_GUILD_CHAT, struct.pack("<I", player.guild) + player.name
+                                           + struct.pack("<H", player.tag) + bytes(p[:64])))
         elif t == S_REQUEST and len(p) >= 3:
             target_id, kind = struct.unpack_from("<HB", p)
             target = self.players.get(target_id)

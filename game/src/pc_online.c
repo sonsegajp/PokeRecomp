@@ -84,6 +84,8 @@ static const u8 sText_JoinFailed1[] = _("Couldn't join that server.");
 static const u8 sText_JoinFailed2[] = _("It may be full or offline.");
 static const u8 sText_Registered[] = _("Registered! Your online name is");
 static const u8 sText_Here[] = _("{RIGHT_ARROW}");
+static const u8 sText_Friends[] = _("FRIENDS");
+static const u8 sText_Guild[] = _("GUILD");
 static const u8 sText_GtsSearching[] = _("Searching the GTS…");
 
 static const u8 sTextColor[] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_LIGHT_GRAY};
@@ -131,16 +133,37 @@ static u8 *CopyNameWithTag(u8 *dst, const u8 *name, u16 tag)
 
 // ---- the ONLINE CLUB screen ---------------------------------------------------------------
 
-enum { MODE_BUSY, MODE_REGISTER, MODE_SERVERS, MODE_MESSAGE, MODE_GTS_PICK, MODE_GTS_WANT, MODE_GTS_LIST };
-enum { BUSY_LOGIN, BUSY_REGISTER, BUSY_JOIN, BUSY_RENAME, BUSY_GTS_SEARCH, BUSY_GTS_MINE };
+enum { MODE_BUSY, MODE_REGISTER, MODE_SERVERS, MODE_MESSAGE, MODE_GTS_PICK, MODE_GTS_WANT, MODE_GTS_LIST,
+       MODE_FRIENDS, MODE_FRIEND_MENU, MODE_GUILD, MODE_CONFIRM };
+enum { BUSY_LOGIN, BUSY_REGISTER, BUSY_JOIN, BUSY_RENAME, BUSY_GTS_SEARCH, BUSY_GTS_MINE, BUSY_FRIENDS, BUSY_GUILD };
 enum { GTS_NONE, GTS_DEPOSIT, GTS_SEARCH, GTS_MINE };   // the GTS screen: VAR_0x8006 + 1
-enum { ROW_SERVER, ROW_REFRESH, ROW_RENAME, ROW_DISCONNECT, ROW_BACK };
-enum { NAMING_NONE, NAMING_REGISTER, NAMING_RENAME };
+enum { ROW_SERVER, ROW_REFRESH, ROW_RENAME, ROW_DISCONNECT, ROW_BACK, ROW_FRIENDS, ROW_GUILD };
+enum { NAMING_NONE, NAMING_REGISTER, NAMING_RENAME, NAMING_GUILD_CREATE, NAMING_GUILD_JOIN };
+
+#define GUILD_NAME_LEN 10   // 8 letters + EOS (server/protocol.py)
+#define MAX_FRIENDS 32
+#define MAX_MEMBERS 32
 
 #define VISIBLE_ROWS 7
 #define WIN_HEADER 0
 #define WIN_LIST   1
 #define WIN_HINT   2
+
+struct OnlineFriend
+{
+    u32 id;
+    u8 name[PLAYER_NAME_LENGTH + 1];
+    u16 tag;
+    u8 online;
+    char server[25];
+};
+
+struct OnlineMember
+{
+    u8 name[PLAYER_NAME_LENGTH + 1];
+    u16 tag;
+    u8 online, owner;
+};
 
 struct OnlineScreen
 {
@@ -150,14 +173,19 @@ struct OnlineScreen
     u8 cursor;
     u8 scroll;
     u8 rowCount;
-    u8 rows[PC_NET_MAX_SERVERS + 3];
-    u8 serverOf[PC_NET_MAX_SERVERS + 3];
+    u8 rows[PC_NET_MAX_SERVERS + 6];
+    u8 serverOf[PC_NET_MAX_SERVERS + 6];
     u8 messageExit;      // A on the message leaves the screen
     u8 messageMode;      // otherwise, the mode to go back to
     const u8 *message[3];
     u16 timer;
     u8 naming;           // coming back from the naming screen: what for
     u8 gtsMode;          // GTS_* when this is the GTS screen
+    u8 friendCount, friendSel;
+    struct OnlineFriend friends[MAX_FRIENDS];
+    u8 inGuild, memberCount, guildOp, confirmAction;
+    u8 guildName[GUILD_NAME_LEN];
+    struct OnlineMember members[MAX_MEMBERS];
 };
 
 static EWRAM_DATA struct OnlineScreen *sOnline = NULL;
@@ -281,6 +309,8 @@ static void BuildServerRows(void)
         sOnline->rows[n] = ROW_SERVER;
         sOnline->serverOf[n] = i;
     }
+    sOnline->rows[n++] = ROW_FRIENDS;
+    sOnline->rows[n++] = ROW_GUILD;
     sOnline->rows[n++] = ROW_REFRESH;
     sOnline->rows[n++] = ROW_RENAME;
     if (PcNetConnected())
@@ -325,6 +355,8 @@ static void DrawServers(void)
                                          sValueColor, TEXT_SKIP_DRAW, count);
             break;
         }
+        case ROW_FRIENDS:    PrintLine(line, sText_Friends, sTextColor); break;
+        case ROW_GUILD:      PrintLine(line, sText_Guild, sTextColor); break;
         case ROW_REFRESH:    PrintLine(line, sText_Refresh, sTextColor); break;
         case ROW_RENAME:     PrintLine(line, sText_ChangeName, sTextColor); break;
         case ROW_DISCONNECT: PrintLine(line, sText_Disconnect, sTextColor); break;
@@ -436,14 +468,516 @@ static void LeaveScreen(u8 taskId)
     gTasks[taskId].data[0] = 1;
 }
 
+// ---- FRIENDS and GUILD pages (lists from the master server) ---------------------------------
+
+enum { MSG_FRIEND_ADD = 0x05, MSG_FRIEND_LIST = 0x06, MSG_FRIEND_REMOVE = 0x0F,
+       MSG_GUILD_INFO = 0x10, MSG_GUILD_CREATE = 0x11, MSG_GUILD_JOIN = 0x12, MSG_GUILD_LEAVE = 0x13 };
+enum { NET_ERR_NOT_FOUND = 4, NET_ERR_FULL = 5 };
+enum { CONFIRM_REMOVE_FRIEND, CONFIRM_LEAVE_GUILD };
+enum { FMENU_JOIN, FMENU_REMOVE, FMENU_BACK };
+
+static const u8 sText_Offline[] = _("OFFLINE");
+static const u8 sText_Online[] = _("ONLINE");
+static const u8 sText_Leader[] = _("LEADER");
+static const u8 sText_NoFriends1[] = _("No friends yet. Press {A_BUTTON} on a");
+static const u8 sText_NoFriends2[] = _("trainer on a server to add one.");
+static const u8 sText_JoinTheirServer[] = _("JOIN THEIR SERVER");
+static const u8 sText_RemoveFriend[] = _("REMOVE FRIEND");
+static const u8 sText_NoGuild1[] = _("You are not in a GUILD.");
+static const u8 sText_NoGuild2[] = _("Make one, or join one by name.");
+static const u8 sText_CreateGuild[] = _("CREATE GUILD");
+static const u8 sText_JoinGuild[] = _("JOIN GUILD");
+static const u8 sText_LeaveGuild[] = _("LEAVE GUILD");
+static const u8 sText_HintGuild[] = _("/G: GUILD CHAT {A_BUTTON}OK {B_BUTTON}BACK");
+static const u8 sText_Yes[] = _("YES");
+static const u8 sText_No[] = _("NO");
+static const u8 sText_RemoveAsk[] = _("Remove this trainer from FRIENDS?");
+static const u8 sText_LeaveAsk[] = _("Really leave the GUILD?");
+static const u8 sText_GuildTaken1[] = _("A GUILD with that name");
+static const u8 sText_GuildTaken2[] = _("already exists.");
+static const u8 sText_GuildFull[] = _("That GUILD is full.");
+static const u8 sText_GuildNone1[] = _("There is no GUILD");
+static const u8 sText_GuildNone2[] = _("with that name.");
+
+static EWRAM_DATA u8 sGuildNameBuf[GUILD_NAME_LEN] = {0};   // edited on the naming screen
+
+static void CopyNetName(u8 *dst, const u8 *src)
+{
+    int i;
+    for (i = 0; i < PLAYER_NAME_LENGTH && src[i] != EOS; i++)
+        dst[i] = src[i];
+    dst[i] = EOS;
+}
+
+static void StartSocial(u8 msg, const void *payload, int len, u8 busyOp)
+{
+    PcNetMasterRequest(msg, payload, len);
+    StartBusy(busyOp);
+}
+
+// M_FRIENDS: u8 n, n x (u32 id, name[8], u16 tag, u8 online, char server[24])
+static void ParseFriends(const u8 *p, int len)
+{
+    int i, n = len >= 1 ? p[0] : 0;
+    sOnline->friendCount = 0;
+    for (i = 0; i < n && i < MAX_FRIENDS && 1 + (i + 1) * 39 <= len; i++)
+    {
+        const u8 *e = p + 1 + i * 39;
+        struct OnlineFriend *f = &sOnline->friends[i];
+        f->id = e[0] | (e[1] << 8) | (e[2] << 16) | ((u32)e[3] << 24);
+        CopyNetName(f->name, e + 4);
+        f->tag = e[12] | (e[13] << 8);
+        f->online = e[14];
+        memcpy(f->server, e + 15, 24);
+        f->server[24] = 0;
+        sOnline->friendCount++;
+    }
+}
+
+// M_GUILD: u8 in_guild, name[10], u8 n, n x (name[8], u16 tag, u8 online, u8 owner)
+static void ParseGuild(const u8 *p, int len)
+{
+    int i, n;
+    sOnline->inGuild = len >= 1 + GUILD_NAME_LEN + 1 && p[0];
+    sOnline->memberCount = 0;
+    if (!sOnline->inGuild)
+        return;
+    for (i = 0; i < GUILD_NAME_LEN - 1 && p[1 + i] != EOS; i++)
+        sOnline->guildName[i] = p[1 + i];
+    sOnline->guildName[i] = EOS;
+    n = p[1 + GUILD_NAME_LEN];
+    p += 2 + GUILD_NAME_LEN;
+    len -= 2 + GUILD_NAME_LEN;
+    for (i = 0; i < n && i < MAX_MEMBERS && (i + 1) * 12 <= len; i++)
+    {
+        struct OnlineMember *m = &sOnline->members[i];
+        CopyNetName(m->name, p + i * 12);
+        m->tag = p[i * 12 + 8] | (p[i * 12 + 9] << 8);
+        m->online = p[i * 12 + 10];
+        m->owner = p[i * 12 + 11];
+        sOnline->memberCount++;
+    }
+}
+
+static void ClampList(u8 count)
+{
+    if (sOnline->cursor >= count)
+        sOnline->cursor = count - 1;
+    if (sOnline->scroll > sOnline->cursor)
+        sOnline->scroll = sOnline->cursor;
+    if (sOnline->cursor >= sOnline->scroll + VISIBLE_ROWS)
+        sOnline->scroll = sOnline->cursor - VISIBLE_ROWS + 1;
+}
+
+static bool8 ListMove(u8 count)
+{
+    if (!JOY_REPT(DPAD_UP) && !JOY_REPT(DPAD_DOWN))
+        return FALSE;
+    if (JOY_REPT(DPAD_UP))
+        sOnline->cursor = sOnline->cursor == 0 ? count - 1 : sOnline->cursor - 1;
+    else
+        sOnline->cursor = sOnline->cursor + 1 >= count ? 0 : sOnline->cursor + 1;
+    ClampList(count);
+    PlaySE(SE_SELECT);
+    return TRUE;
+}
+
+static void PrintRight(int line, const u8 *text, const u8 *color)
+{
+    AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0xC0 - GetStringWidth(FONT_NORMAL, text, 0),
+                                 line * RowHeight() + 2, color, TEXT_SKIP_DRAW, text);
+}
+
+// -- FRIENDS: one row per friend, then BACK
+
+static void DrawFriends(void)
+{
+    int i, count = sOnline->friendCount + 1;
+    u8 buf[32];
+
+    PrintHeader(sText_Friends);
+    FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
+    if (sOnline->friendCount == 0)
+    {
+        PrintLine(0, sText_NoFriends1, sTextColor);
+        PrintLine(1, sText_NoFriends2, sTextColor);
+        PrintLine(3, sText_Back, sTextColor);
+        FinishList();
+        SetHighlight(3);
+        PrintHint(sText_HintBrowse);
+        return;
+    }
+    for (i = 0; i < VISIBLE_ROWS && sOnline->scroll + i < count; i++)
+    {
+        int row = sOnline->scroll + i;
+        if (row == sOnline->friendCount)
+        {
+            PrintLine(i, sText_Back, sTextColor);
+            continue;
+        }
+        CopyNameWithTag(buf, sOnline->friends[row].name, sOnline->friends[row].tag);
+        PrintLine(i, buf, sTextColor);
+        if (sOnline->friends[row].online)
+        {
+            AsciiToGame(buf, sOnline->friends[row].server, 14);
+            PrintRight(i, buf, sValueColor);
+        }
+        else
+        {
+            PrintRight(i, sText_Offline, sTextColor);
+        }
+    }
+    FinishList();
+    SetHighlight(sOnline->cursor - sOnline->scroll);
+    PrintHint(sText_HintBrowse);
+}
+
+static void ShowFriends(void)
+{
+    sOnline->mode = MODE_FRIENDS;
+    ClampList(sOnline->friendCount + 1);
+    DrawFriends();
+}
+
+// The server a friend is on, as an index in our server list (or -1).
+static int FriendServerIndex(const struct OnlineFriend *f)
+{
+    int i;
+    if (!f->online)
+        return -1;
+    if (PcNetConnected() && strcmp(PcNetConnectedServerName(), f->server) == 0)
+        return -1;   // already there
+    for (i = 0; i < PcNetServerCount(); i++)
+        if (strcmp(PcNetServerName(i), f->server) == 0)
+            return i;
+    return -1;
+}
+
+static void BuildFriendMenu(void)
+{
+    int n = 0;
+    if (FriendServerIndex(&sOnline->friends[sOnline->friendSel]) >= 0)
+        sOnline->rows[n++] = FMENU_JOIN;
+    sOnline->rows[n++] = FMENU_REMOVE;
+    sOnline->rows[n++] = FMENU_BACK;
+    sOnline->rowCount = n;
+}
+
+static void DrawFriendMenu(void)
+{
+    const struct OnlineFriend *f = &sOnline->friends[sOnline->friendSel];
+    u8 buf[32];
+    int i;
+
+    PrintHeader(sText_Friends);
+    FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
+    CopyNameWithTag(buf, f->name, f->tag);
+    PrintLine(0, buf, sValueColor);
+    if (f->online)
+        AsciiToGame(buf, f->server, 20);
+    PrintLine(1, f->online ? buf : sText_Offline, sTextColor);
+    for (i = 0; i < sOnline->rowCount; i++)
+        PrintLine(3 + i, sOnline->rows[i] == FMENU_JOIN ? sText_JoinTheirServer
+                       : sOnline->rows[i] == FMENU_REMOVE ? sText_RemoveFriend : sText_Back, sTextColor);
+    FinishList();
+    SetHighlight(3 + sOnline->cursor);
+    PrintHint(sText_HintBrowse);
+}
+
+static void ShowFriendMenu(void)
+{
+    sOnline->mode = MODE_FRIEND_MENU;
+    BuildFriendMenu();
+    sOnline->cursor = 0;
+    DrawFriendMenu();
+}
+
+// -- GUILD: not in one -> CREATE / JOIN / BACK; in one -> members, LEAVE, BACK
+
+static u8 GuildRowCount(void)
+{
+    return sOnline->inGuild ? sOnline->memberCount + 2 : 3;
+}
+
+static void DrawGuild(void)
+{
+    int i;
+    u8 buf[32];
+
+    FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
+    if (!sOnline->inGuild)
+    {
+        PrintHeader(sText_Guild);
+        PrintLine(0, sText_NoGuild1, sTextColor);
+        PrintLine(1, sText_NoGuild2, sTextColor);
+        PrintLine(3, sText_CreateGuild, sTextColor);
+        PrintLine(4, sText_JoinGuild, sTextColor);
+        PrintLine(5, sText_Back, sTextColor);
+        FinishList();
+        SetHighlight(3 + sOnline->cursor);
+        PrintHint(sText_HintBrowse);
+        return;
+    }
+    {
+        u8 *end = StringCopy(buf, sText_Guild);
+        *end++ = CHAR_COLON;
+        *end++ = CHAR_SPACE;
+        StringCopy(end, sOnline->guildName);
+        PrintHeader(buf);
+    }
+    for (i = 0; i < VISIBLE_ROWS && sOnline->scroll + i < GuildRowCount(); i++)
+    {
+        int row = sOnline->scroll + i;
+        if (row == sOnline->memberCount)
+            PrintLine(i, sText_LeaveGuild, sTextColor);
+        else if (row == sOnline->memberCount + 1)
+            PrintLine(i, sText_Back, sTextColor);
+        else
+        {
+            const struct OnlineMember *m = &sOnline->members[row];
+            CopyNameWithTag(buf, m->name, m->tag);
+            PrintLine(i, buf, m->owner ? sValueColor : sTextColor);
+            PrintRight(i, m->online ? sText_Online : sText_Offline, m->online ? sValueColor : sTextColor);
+        }
+    }
+    FinishList();
+    SetHighlight(sOnline->cursor - sOnline->scroll);
+    PrintHint(sText_HintGuild);
+}
+
+static void ShowGuild(void)
+{
+    sOnline->mode = MODE_GUILD;
+    ClampList(GuildRowCount());
+    DrawGuild();
+}
+
+// -- YES / NO
+
+static void DrawConfirm(void)
+{
+    PrintHeader(sOnline->confirmAction == CONFIRM_LEAVE_GUILD ? sText_Guild : sText_Friends);
+    FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
+    PrintLine(1, sOnline->confirmAction == CONFIRM_LEAVE_GUILD ? sText_LeaveAsk : sText_RemoveAsk, sTextColor);
+    PrintLine(3, sText_Yes, sTextColor);
+    PrintLine(4, sText_No, sTextColor);
+    FinishList();
+    SetHighlight(3 + sOnline->cursor);
+    PrintHint(sText_HintBrowse);
+}
+
+static void ShowConfirm(u8 action)
+{
+    sOnline->mode = MODE_CONFIRM;
+    sOnline->confirmAction = action;
+    sOnline->cursor = 1;   // NO first
+    DrawConfirm();
+}
+
+static void SocialHandleBusy(void)
+{
+    int status = PcNetOpStatus();
+    u8 type;
+    const u8 *reply;
+    int len;
+
+    if (status == PC_NET_OP_PENDING)
+        return;
+    len = status == PC_NET_OP_OK ? PcNetMasterReply(&type, &reply) : 0;
+    if (sOnline->busyOp == BUSY_FRIENDS)
+    {
+        if (status != PC_NET_OP_OK)
+        {
+            ShowMessage(sText_CantReach1, sText_CantReach2, NULL, FALSE, MODE_SERVERS);
+            return;
+        }
+        ParseFriends(reply, len);
+        ShowFriends();
+        return;
+    }
+    // BUSY_GUILD
+    if (status == PC_NET_OP_OK)
+    {
+        ParseGuild(reply, len);
+        ShowGuild();
+        return;
+    }
+    switch (PcNetMasterError())
+    {
+    case NET_ERR_FULL:
+        if (sOnline->guildOp == MSG_GUILD_CREATE)
+            ShowMessage(sText_GuildTaken1, sText_GuildTaken2, NULL, FALSE, MODE_GUILD);
+        else
+            ShowMessage(sText_GuildFull, NULL, NULL, FALSE, MODE_GUILD);
+        break;
+    case NET_ERR_NOT_FOUND:
+        ShowMessage(sText_GuildNone1, sText_GuildNone2, NULL, FALSE, MODE_GUILD);
+        break;
+    default:
+        ShowMessage(sText_CantReach1, sText_CantReach2, NULL, FALSE, MODE_SERVERS);
+        break;
+    }
+}
+
+static void GuildRequest(u8 msg, const u8 *name)
+{
+    sOnline->guildOp = msg;
+    StartSocial(msg, name, name ? GUILD_NAME_LEN : 0, BUSY_GUILD);
+}
+
+static void FriendsInput(u8 taskId)
+{
+    u8 count = sOnline->friendCount + 1;
+    if (sOnline->friendCount == 0)
+    {
+        if (JOY_NEW(A_BUTTON) || JOY_NEW(B_BUTTON))
+        {
+            PlaySE(SE_SELECT);
+            ShowServers();
+        }
+        return;
+    }
+    if (ListMove(count))
+        DrawFriends();
+    else if (JOY_NEW(B_BUTTON) || (JOY_NEW(A_BUTTON) && sOnline->cursor == sOnline->friendCount))
+    {
+        PlaySE(SE_SELECT);
+        sOnline->cursor = 0;
+        sOnline->scroll = 0;
+        ShowServers();
+    }
+    else if (JOY_NEW(A_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        sOnline->friendSel = sOnline->cursor;
+        ShowFriendMenu();
+    }
+}
+
+static void FriendMenuInput(u8 taskId)
+{
+    if (JOY_NEW(DPAD_UP) || JOY_NEW(DPAD_DOWN))
+    {
+        sOnline->cursor = (sOnline->cursor + (JOY_NEW(DPAD_UP) ? sOnline->rowCount - 1 : 1)) % sOnline->rowCount;
+        PlaySE(SE_SELECT);
+        DrawFriendMenu();
+    }
+    else if (JOY_NEW(B_BUTTON) || (JOY_NEW(A_BUTTON) && sOnline->rows[sOnline->cursor] == FMENU_BACK))
+    {
+        PlaySE(SE_SELECT);
+        sOnline->cursor = sOnline->friendSel;
+        ShowFriends();
+    }
+    else if (JOY_NEW(A_BUTTON) && sOnline->rows[sOnline->cursor] == FMENU_REMOVE)
+    {
+        PlaySE(SE_SELECT);
+        ShowConfirm(CONFIRM_REMOVE_FRIEND);
+    }
+    else if (JOY_NEW(A_BUTTON))   // JOIN THEIR SERVER
+    {
+        int s = FriendServerIndex(&sOnline->friends[sOnline->friendSel]);
+        PlaySE(SE_SELECT);
+        if (s >= 0)
+        {
+            PcNetBeginJoin(s, gSaveBlock2Ptr->playerGender);
+            StartBusy(BUSY_JOIN);
+        }
+    }
+}
+
+static void GuildInput(u8 taskId)
+{
+    if (ListMove(GuildRowCount()))
+    {
+        DrawGuild();
+        return;
+    }
+    if (JOY_NEW(B_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        sOnline->cursor = 0;
+        sOnline->scroll = 0;
+        ShowServers();
+        return;
+    }
+    if (!JOY_NEW(A_BUTTON))
+        return;
+    if (!sOnline->inGuild)
+    {
+        PlaySE(SE_SELECT);
+        if (sOnline->cursor == 2)
+        {
+            sOnline->cursor = 0;
+            ShowServers();
+        }
+        else
+        {
+            memset(sGuildNameBuf, EOS, sizeof(sGuildNameBuf));
+            OpenNaming(taskId, sOnline->cursor == 0 ? NAMING_GUILD_CREATE : NAMING_GUILD_JOIN);
+        }
+    }
+    else if (sOnline->cursor == sOnline->memberCount)
+    {
+        PlaySE(SE_SELECT);
+        ShowConfirm(CONFIRM_LEAVE_GUILD);
+    }
+    else if (sOnline->cursor == sOnline->memberCount + 1)
+    {
+        PlaySE(SE_SELECT);
+        sOnline->cursor = 0;
+        sOnline->scroll = 0;
+        ShowServers();
+    }
+}
+
+static void ConfirmInput(u8 taskId)
+{
+    if (JOY_NEW(DPAD_UP) || JOY_NEW(DPAD_DOWN))
+    {
+        sOnline->cursor ^= 1;
+        PlaySE(SE_SELECT);
+        DrawConfirm();
+    }
+    else if (JOY_NEW(B_BUTTON) || (JOY_NEW(A_BUTTON) && sOnline->cursor == 1))
+    {
+        PlaySE(SE_SELECT);
+        sOnline->cursor = 0;
+        if (sOnline->confirmAction == CONFIRM_LEAVE_GUILD)
+            ShowGuild();
+        else
+            ShowFriendMenu();
+    }
+    else if (JOY_NEW(A_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        sOnline->cursor = 0;
+        sOnline->scroll = 0;
+        if (sOnline->confirmAction == CONFIRM_LEAVE_GUILD)
+        {
+            GuildRequest(MSG_GUILD_LEAVE, NULL);
+        }
+        else
+        {
+            u32 id = sOnline->friends[sOnline->friendSel].id;
+            u8 payload[4] = {id, id >> 8, id >> 16, id >> 24};
+            StartSocial(MSG_FRIEND_REMOVE, payload, sizeof(payload), BUSY_FRIENDS);
+        }
+    }
+}
+
 static void GtsHandleBusy(void);
 
 static void HandleBusy(void)
 {
     int status = PcNetOpStatus();
-    if (sOnline->busyOp >= BUSY_GTS_SEARCH)
+    if (sOnline->busyOp == BUSY_GTS_SEARCH || sOnline->busyOp == BUSY_GTS_MINE)
     {
         GtsHandleBusy();
+        return;
+    }
+    if (sOnline->busyOp == BUSY_FRIENDS || sOnline->busyOp == BUSY_GUILD)
+    {
+        SocialHandleBusy();
         return;
     }
     if (status == PC_NET_OP_PENDING)
@@ -528,6 +1062,14 @@ static void HandleServerInput(u8 taskId)
         case ROW_SERVER:
             PcNetBeginJoin(sOnline->serverOf[sOnline->cursor], gSaveBlock2Ptr->playerGender);
             StartBusy(BUSY_JOIN);
+            break;
+        case ROW_FRIENDS:
+            sOnline->cursor = sOnline->scroll = 0;
+            StartSocial(MSG_FRIEND_LIST, NULL, 0, BUSY_FRIENDS);
+            break;
+        case ROW_GUILD:
+            sOnline->cursor = sOnline->scroll = 0;
+            GuildRequest(MSG_GUILD_INFO, NULL);
             break;
         case ROW_REFRESH:
             StartLogin();
@@ -1061,7 +1603,10 @@ static void Task_OnlineScreen(u8 taskId)
         {
             FreeAllWindowBuffers();
             DestroyTask(taskId);
-            DoNamingScreen(NAMING_SCREEN_PLAYER, sOnlineName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_OnlineAfterNaming);
+            if (sOnline->naming == NAMING_GUILD_CREATE || sOnline->naming == NAMING_GUILD_JOIN)
+                DoNamingScreen(NAMING_SCREEN_GUILD, sGuildNameBuf, gSaveBlock2Ptr->playerGender, 0, 0, CB2_OnlineAfterNaming);
+            else
+                DoNamingScreen(NAMING_SCREEN_PLAYER, sOnlineName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_OnlineAfterNaming);
         }
         return;
     }
@@ -1133,9 +1678,23 @@ static void Task_OnlineScreen(u8 taskId)
                 LeaveScreen(taskId);
             else if (sOnline->messageMode == MODE_GTS_PICK)
                 GtsShowPick();
+            else if (sOnline->messageMode == MODE_GUILD)
+                ShowGuild();
             else
                 ShowServers();
         }
+        break;
+    case MODE_FRIENDS:
+        FriendsInput(taskId);
+        break;
+    case MODE_FRIEND_MENU:
+        FriendMenuInput(taskId);
+        break;
+    case MODE_GUILD:
+        GuildInput(taskId);
+        break;
+    case MODE_CONFIRM:
+        ConfirmInput(taskId);
         break;
     case MODE_GTS_PICK:
         GtsPickInput(taskId);
@@ -1199,6 +1758,20 @@ static void CB2_OnlineInit(void)
         if (sOnline->gtsMode)
         {
             GtsStart();
+        }
+        else if (sOnline->naming == NAMING_GUILD_CREATE || sOnline->naming == NAMING_GUILD_JOIN)
+        {
+            u8 op = sOnline->naming == NAMING_GUILD_CREATE ? MSG_GUILD_CREATE : MSG_GUILD_JOIN;
+            int i;
+            sOnline->naming = NAMING_NONE;
+            for (i = 0; i < GUILD_NAME_LEN && sGuildNameBuf[i] != EOS; i++)
+                ;
+            for (; i < GUILD_NAME_LEN; i++)
+                sGuildNameBuf[i] = EOS;
+            if (sGuildNameBuf[0] != EOS)
+                GuildRequest(op, sGuildNameBuf);
+            else
+                ShowGuild();
         }
         else if (sOnline->naming == NAMING_REGISTER)
         {
@@ -1594,6 +2167,41 @@ static void Task_WaitRequest(u8 taskId)
     gSpecialVar_Result = result == 1;
     DestroyTask(taskId);
     ScriptContext_Enable();
+}
+
+static void ResumeScriptNextFrame(void);
+
+// special Online_AddFriend (the trainer from Online_BufferTarget; then waitstate):
+// VAR_RESULT = TRUE if they are now on the FRIENDS list.
+static void Task_AddFriend(u8 taskId)
+{
+    int status = PcNetOpStatus();
+    if (status == PC_NET_OP_PENDING)
+        return;
+    gSpecialVar_Result = status == PC_NET_OP_OK;
+    DestroyTask(taskId);
+    ScriptContext_Enable();
+}
+
+void Online_AddFriend(void)
+{
+    int s;
+    for (s = 0; s < PC_NET_MAX_PLAYERS; s++)
+    {
+        const struct PcNetPlayer *p = PcNetGetPlayer(s);
+        if (p && p->id == sTargetPlayerId)
+        {
+            u8 payload[PC_NET_NAME_LEN + 2];
+            memcpy(payload, p->name, PC_NET_NAME_LEN);
+            payload[PC_NET_NAME_LEN] = p->tag;
+            payload[PC_NET_NAME_LEN + 1] = p->tag >> 8;
+            PcNetMasterRequest(MSG_FRIEND_ADD, payload, sizeof(payload));
+            CreateTask(Task_AddFriend, 80);
+            return;
+        }
+    }
+    gSpecialVar_Result = FALSE;   // they left
+    ResumeScriptNextFrame();
 }
 
 // special Online_SendRequest (VAR_0x8004 = kind; then waitstate).
@@ -2018,4 +2626,5 @@ void Online_GtsCheckOffer(void) {}
 void Online_GtsDeposit(void) {}
 void Online_GtsOffer(void) {}
 void Online_GtsWithdraw(void) {}
+void Online_AddFriend(void) {}
 #endif

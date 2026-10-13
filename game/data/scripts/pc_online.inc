@@ -43,11 +43,28 @@ Online_EventScript_TalkToPlayer::
 	special Online_BufferTarget
 	message Online_Text_WhatToDo
 	waitmessage
-	multichoice 19, 6, MULTICHOICE_ONLINE_PLAYER, FALSE
+	multichoice 19, 4, MULTICHOICE_ONLINE_PLAYER, FALSE
 	switch VAR_RESULT
 	case 0, Online_EventScript_AskBattle
 	case 1, Online_EventScript_AskTrade
+	case 2, Online_EventScript_AddFriend
 	goto Online_EventScript_End
+
+Online_EventScript_AddFriend::
+	message Online_Text_Connecting
+	waitmessage
+	special Online_AddFriend
+	waitstate
+	special Online_BufferTarget
+	goto_if_eq VAR_RESULT, FALSE, Online_EventScript_AddFriendFailed
+	msgbox Online_Text_FriendAdded
+	release
+	end
+
+Online_EventScript_AddFriendFailed::
+	msgbox Online_Text_GlobalFailed
+	release
+	end
 
 Online_EventScript_AskBattle::
 	setvar VAR_0x8004, 1
@@ -577,3 +594,7 @@ Online_Text_MailboxDone::
 Online_Text_MailboxNoRoom::
 	.string "There's no room for more POKéMON.\n"
 	.string "Make space in your PC, then come back.$"
+
+Online_Text_FriendAdded::
+	.string "{STR_VAR_1} is now on your\n"
+	.string "FRIENDS list!$"

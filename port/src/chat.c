@@ -27,11 +27,13 @@ const uint16_t *PcFontNormalGlyph(uint16_t glyphId, uint8_t *width);
 #define COL_SHADOW 0xFF404040u
 #define COL_NAME   0xFFF8C878u   /* 0xAABBGGRR: sky blue */
 #define COL_SYSTEM 0xFF60D8F8u   /* gold: the server's announcements */
+#define COL_GUILD  0xFF78F088u   /* green: guild chat */
 #define COL_BOX    0x99000000u
 #define COL_INPUT  0xCC181818u
 
 struct Line {
     uint8_t system;          /* from the server, not a player */
+    uint8_t guild;           /* guild chat */
     uint8_t name[8];
     uint16_t tag;
     uint8_t text[MAX_INPUT + 1];
@@ -108,9 +110,13 @@ void PcChatBackspace(void)
     if (input_len > 0) input[--input_len] = EOS;
 }
 
+/* "/g text" (or "/G") goes to your guild, on every server */
 void PcChatSubmit(void)
 {
-    if (input_len > 0) PcNetSendChat(input, input_len + 1);
+    if (input_len > 3 && input[0] == 0xBA && (input[1] == 0xDB || input[1] == 0xC1) && input[2] == 0x00)
+        PcNetSendGuildChat(input + 3, input_len - 2);
+    else if (input_len > 0)
+        PcNetSendChat(input, input_len + 1);
     input_open = 0;
 }
 
@@ -127,11 +133,18 @@ void PcChatReceive(const uint8_t *name, uint16_t tag, const uint8_t *text)
     }
     l = &log_lines[log_count++];
     l->system = name == NULL;
+    l->guild = 0;
     if (name) memcpy(l->name, name, 8);
     l->tag = tag;
     for (i = 0; i < MAX_INPUT && text[i] != EOS; i++) l->text[i] = text[i];
     l->text[i] = EOS;
     l->when = GetTickCount64();
+}
+
+void PcChatReceiveGuild(const uint8_t *name, uint16_t tag, const uint8_t *text)
+{
+    PcChatReceive(name, tag, text);
+    log_lines[log_count - 1].guild = 1;
 }
 
 /* ---- drawing -------------------------------------------------------------------------- */
@@ -242,9 +255,9 @@ const uint32_t *PcChatOverlay(int w, int h)
         name[n] = EOS;
         width = text_width(name) + text_width(sep) + text_width(l->text);
         fill(MARGIN - 2, y - 1, width + 4, LINE_H, fade(COL_BOX, alpha));
-        x = text(MARGIN, y, name, COL_NAME, alpha);
+        x = text(MARGIN, y, name, l->guild ? COL_GUILD : COL_NAME, alpha);
         x = text(x, y, sep, COL_TEXT, alpha);
-        text(x, y, l->text, COL_TEXT, alpha);
+        text(x, y, l->text, l->guild ? COL_GUILD : COL_TEXT, alpha);
         y -= LINE_H;
         shown = 1;
     }
