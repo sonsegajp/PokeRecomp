@@ -1,4 +1,8 @@
 #include "global.h"
+#ifdef PLATFORM_PC
+#include "pc_travel_game.h"
+#include "../../xgfx/pc_visitor_gfx.h"
+#endif
 #include "malloc.h"
 #include "battle_pyramid.h"
 #include "berry.h"
@@ -524,6 +528,13 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_Lugia,                 OBJ_EVENT_PAL_TAG_LUGIA},
     {gObjectEventPal_RubySapphireBrendan,   OBJ_EVENT_PAL_TAG_RS_BRENDAN},
     {gObjectEventPal_RubySapphireMay,       OBJ_EVENT_PAL_TAG_RS_MAY},
+#ifdef PLATFORM_PC
+    // a visitor from the other region: their own player sprites' palettes
+    {gPcVisitorPal[0],                        PC_VISITOR_PAL_TAG(MALE)},
+    {gPcVisitorPal[1],                        PC_VISITOR_REFLECTION_PAL_TAG(MALE)},
+    {gPcVisitorPal[2],                        PC_VISITOR_PAL_TAG(FEMALE)},
+    {gPcVisitorPal[3],                        PC_VISITOR_REFLECTION_PAL_TAG(FEMALE)},
+#endif
 #ifdef BUGFIX
     {NULL,                                  OBJ_EVENT_PAL_TAG_NONE},
 #else
@@ -553,10 +564,23 @@ static const u16 sReflectionPaletteTags_PlayerUnderwater[] = {
     OBJ_EVENT_PAL_TAG_PLAYER_UNDERWATER,
 };
 
+#ifdef PLATFORM_PC
+static const u16 sPcVisitorReflectionPaletteTags[2][4] = {
+    {PC_VISITOR_REFLECTION_PAL_TAG(MALE), PC_VISITOR_REFLECTION_PAL_TAG(MALE),
+     PC_VISITOR_REFLECTION_PAL_TAG(MALE), PC_VISITOR_REFLECTION_PAL_TAG(MALE)},
+    {PC_VISITOR_REFLECTION_PAL_TAG(FEMALE), PC_VISITOR_REFLECTION_PAL_TAG(FEMALE),
+     PC_VISITOR_REFLECTION_PAL_TAG(FEMALE), PC_VISITOR_REFLECTION_PAL_TAG(FEMALE)},
+};
+#endif
+
 static const struct PairedPalettes sPlayerReflectionPaletteSets[] = {
     {OBJ_EVENT_PAL_TAG_BRENDAN,           sReflectionPaletteTags_Brendan},
     {OBJ_EVENT_PAL_TAG_MAY,               sReflectionPaletteTags_May},
     {OBJ_EVENT_PAL_TAG_PLAYER_UNDERWATER, sReflectionPaletteTags_PlayerUnderwater},
+#ifdef PLATFORM_PC
+    {PC_VISITOR_PAL_TAG(MALE),               sPcVisitorReflectionPaletteTags[MALE]},
+    {PC_VISITOR_PAL_TAG(FEMALE),             sPcVisitorReflectionPaletteTags[FEMALE]},
+#endif
     {OBJ_EVENT_PAL_TAG_NONE,              NULL},
 };
 
@@ -1937,7 +1961,7 @@ const struct ObjectEventGraphicsInfo *GetObjectEventGraphicsInfo(u8 graphicsId)
     if (graphicsId >= NUM_OBJ_EVENT_GFX)
         graphicsId = OBJ_EVENT_GFX_NINJA_BOY;
 
-    return gObjectEventGraphicsInfoPointers[graphicsId];
+    return PC_GFX_INFO(graphicsId, gObjectEventGraphicsInfoPointers[graphicsId]);
 }
 
 static void SetObjectEventDynamicGraphicsId(struct ObjectEvent *objectEvent)
@@ -4564,6 +4588,7 @@ static const struct StepAnimTable *GetStepAnimTable(const union AnimCmd *const *
 {
     const struct StepAnimTable *stepTable;
 
+    anims = PC_STEP_ANIMS(anims);   // a visitor's sprites step like the game's own
     for (stepTable = sStepAnimTables; stepTable->anims != NULL; stepTable++)
     {
         if (stepTable->anims == anims)

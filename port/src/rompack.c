@@ -9,6 +9,11 @@
  * from the .pkmn before any game code runs; a checksum proves the result is
  * exactly what was taken out. A development build without the table runs
  * as is.
+ *
+ * A second, "foreign" layer holds the other region's player sprites, built in
+ * for visitors (xgfx/): it comes from the player's copy of that game, into
+ * <game>_<region>.pkmn (made when that ROM is imported). Without it the game
+ * runs the same; a visitor just isn't drawn with their own sprites.
  */
 #include <stdint.h>
 #include <stdio.h>
@@ -31,6 +36,7 @@
 #define PACK_NAME L"firered.pkmn"
 #endif
 #define PACK_MAGIC "PKMN\0\0\0\1"
+#define XPACK_MAGIC "PKMX\0\0\0\1"
 
 struct Range { uint32_t rva, len; };
 struct Piece { uint32_t rva, len, rom; };
@@ -42,6 +48,15 @@ static uint64_t total, check;
 static const struct Range *ranges;
 static struct Table tables[4];
 static int headless;
+
+/* the foreign layer (PRPX), if the build has one */
+static uint8_t *xoverlay;
+static char xid[16];
+static uint32_t xnranges, xntables;
+static uint64_t xtotal, xcheck;
+static const struct Range *xranges;
+static struct Table xtables[4];
+static int foreign_ready = 1;   /* no foreign layer: the sprites are inside */
 
 /* ---- helpers ---------------------------------------------------------------------------- */
 
@@ -111,54 +126,88 @@ static void complain(const wchar_t *text)
 
 /* ---- the table appended to the exe ---------------------------------------------------------- */
 
+static const uint8_t *parse_tables(const uint8_t *p, uint32_t n, struct Table *t)
+{
+    for (uint32_t i = 0; i < n && i < 4; i++) {
+        memcpy(t[i].sha1, p, 20); p += 20;
+        memcpy(&t[i].romsize, p, 4); p += 4;
+        memcpy(&t[i].count, p, 4); p += 4;
+        t[i].pieces = (const struct Piece *)p;
+        p += (size_t)t[i].count * sizeof(struct Piece);
+    }
+    return p;
+}
+
+/* The overlay ending at `end` in the file, if it ends with `tail_magic`. */
+static uint8_t *read_tail(FILE *f, long end, const char *tail_magic, const char *magic, uint32_t *size)
+{
+    uint8_t tail[12], *buf;
+    if (end < 12 || fseek(f, end - 12, SEEK_SET) || fread(tail, 1, 12, f) != 12 || memcmp(tail + 4, tail_magic, 8))
+        return NULL;
+    memcpy(size, tail, 4);
+    if (*size > (uint32_t)end || !(buf = malloc(*size))) return NULL;
+    if (fseek(f, end - (long)*size, SEEK_SET) || fread(buf, 1, *size, f) != *size || memcmp(buf, magic, 4)) {
+        free(buf);
+        return NULL;
+    }
+    return buf;
+}
+
 static int read_overlay(const wchar_t *exe)
 {
     FILE *f = _wfopen(exe, L"rb");
-    uint8_t tail[12];
-    uint32_t size;
+    long end;
+    uint32_t size, xsize;
     const uint8_t *p;
 
     if (!f) return 0;
-    if (fseek(f, -12, SEEK_END) || fread(tail, 1, 12, f) != 12 || memcmp(tail + 4, "PRPKEND!", 8)) { fclose(f); return 0; }
-    memcpy(&size, tail, 4);
-    overlay = malloc(size);
-    if (!overlay || fseek(f, -(long)size, SEEK_END) || fread(overlay, 1, size, f) != size || memcmp(overlay, "PRPK", 4)) {
-        fclose(f);
-        free(overlay);
-        overlay = NULL;
-        return 0;
+    fseek(f, 0, SEEK_END);
+    end = ftell(f);
+    xoverlay = read_tail(f, end, "PRPXEND!", "PRPX", &xsize);
+    if (xoverlay) {
+        end -= (long)xsize;
+        p = xoverlay + 4 + 4;                  /* magic, version */
+        memcpy(xid, p, 16); p += 16;
+        xid[15] = 0;
+        memcpy(&xntables, p, 4); p += 4;
+        memcpy(&xnranges, p, 4); p += 4;
+        memcpy(&xtotal, p, 8); p += 8;
+        memcpy(&xcheck, p, 8); p += 8;
+        xranges = (const struct Range *)p;
+        parse_tables(p + (size_t)xnranges * sizeof(struct Range), xntables, xtables);
     }
+    overlay = read_tail(f, end, "PRPKEND!", "PRPK", &size);
     fclose(f);
+    if (!overlay) return 0;
     p = overlay + 4 + 4;                       /* magic, version */
     memcpy(&ntables, p, 4); p += 4;
     memcpy(&nranges, p, 4); p += 4;
     memcpy(&total, p, 8); p += 8;
     memcpy(&check, p, 8); p += 8;
     ranges = (const struct Range *)p;
-    p += (size_t)nranges * sizeof(struct Range);
-    for (uint32_t t = 0; t < ntables && t < 4; t++) {
-        memcpy(tables[t].sha1, p, 20); p += 20;
-        memcpy(&tables[t].romsize, p, 4); p += 4;
-        memcpy(&tables[t].count, p, 4); p += 4;
-        tables[t].pieces = (const struct Piece *)p;
-        p += (size_t)tables[t].count * sizeof(struct Piece);
-    }
+    parse_tables(p + (size_t)nranges * sizeof(struct Range), ntables, tables);
     return 1;
 }
 
 /* ---- the pack ------------------------------------------------------------------------------ */
 
-static uint8_t *load_pack(const wchar_t *path)
+static uint8_t *load_layer_pack(const wchar_t *path, const char *magic, uint64_t ltotal, uint64_t lcheck)
 {
     size_t size;
     uint8_t *buf = read_whole(path, &size);
     uint64_t t, c;
+
     if (!buf) return NULL;
-    if (size != 24 + total || memcmp(buf, PACK_MAGIC, 8)) { free(buf); return NULL; }
+    if (size != 24 + ltotal || memcmp(buf, magic, 8)) { free(buf); return NULL; }
     memcpy(&t, buf + 8, 8);
     memcpy(&c, buf + 16, 8);
-    if (t != total || c != check || fnv64(0xCBF29CE484222325ull, buf + 24, total) != check) { free(buf); return NULL; }
+    if (t != ltotal || c != lcheck || fnv64(0xCBF29CE484222325ull, buf + 24, ltotal) != lcheck) { free(buf); return NULL; }
     return buf;
+}
+
+static uint8_t *load_pack(const wchar_t *path)
+{
+    return load_layer_pack(path, PACK_MAGIC, total, check);
 }
 
 static void (*sProgress)(int percent, void *ctx);
@@ -169,8 +218,9 @@ static void progress(int percent)
     if (sProgress) sProgress(percent, sProgressCtx);
 }
 
-/* A ROM -> pack bytes (NULL if it isn't one we know). */
-static uint8_t *unpack_rom(const uint8_t *rom, size_t size)
+/* A ROM -> a layer's pack bytes (NULL if it isn't one the layer knows). */
+static uint8_t *unpack_layer(const uint8_t *rom, size_t size, const char *magic, const struct Table *ltables,
+                             uint32_t lntables, uint64_t total, uint64_t check)
 {
     uint8_t h[20], *pack, *out;
     const struct Table *tab = NULL;
@@ -178,12 +228,12 @@ static uint8_t *unpack_rom(const uint8_t *rom, size_t size)
     progress(45);
     sha1(rom, size, h);
     progress(60);
-    for (uint32_t t = 0; t < ntables && t < 4; t++)
-        if (!memcmp(h, tables[t].sha1, 20) && size == tables[t].romsize)
-            tab = &tables[t];
+    for (uint32_t t = 0; t < lntables && t < 4; t++)
+        if (!memcmp(h, ltables[t].sha1, 20) && size == ltables[t].romsize)
+            tab = &ltables[t];
     if (!tab || !(pack = malloc(24 + total)))
         return NULL;
-    memcpy(pack, PACK_MAGIC, 8);
+    memcpy(pack, magic, 8);
     memcpy(pack + 8, &total, 8);
     memcpy(pack + 16, &check, 8);
     out = pack + 24;
@@ -196,6 +246,11 @@ static uint8_t *unpack_rom(const uint8_t *rom, size_t size)
     }
     if (out != pack + 24 + total || fnv64(0xCBF29CE484222325ull, pack + 24, total) != check) { free(pack); return NULL; }
     return pack;
+}
+
+static uint8_t *unpack_rom(const uint8_t *rom, size_t size)
+{
+    return unpack_layer(rom, size, PACK_MAGIC, tables, ntables, total, check);
 }
 
 static uint8_t *try_rom(const wchar_t *path)
@@ -272,11 +327,12 @@ static int open_table(void)
     return GetModuleFileNameW(game_module(), path, MAX_PATH) && read_overlay(path);
 }
 
-static int write_pack(const wchar_t *path, const uint8_t *pack)
+static int write_layer_pack(const wchar_t *path, const uint8_t *pack, uint64_t total)
 {
     wchar_t tmp[MAX_PATH];
     FILE *f;
     int ok;
+
     _snwprintf(tmp, MAX_PATH, L"%ls.tmp", path);
     if ((f = _wfopen(tmp, L"wb")) == NULL) return 0;
     ok = fwrite(pack, 1, 24 + total, f) == 24 + total;
@@ -286,9 +342,15 @@ static int write_pack(const wchar_t *path, const uint8_t *pack)
     return 0;
 }
 
-static void apply(const uint8_t *bytes)
+static int write_pack(const wchar_t *path, const uint8_t *pack)
+{
+    return write_layer_pack(path, pack, total);
+}
+
+static void apply_layer(const uint8_t *bytes, const struct Range *ranges, uint32_t nranges)
 {
     uint8_t *base = (uint8_t *)game_module();
+
     for (uint32_t i = 0; i < nranges; i++) {
         DWORD old;
         uint8_t *dst = base + ranges[i].rva;
@@ -299,7 +361,80 @@ static void apply(const uint8_t *bytes)
     }
 }
 
+static void apply(const uint8_t *bytes)
+{
+    apply_layer(bytes, ranges, nranges);
+}
+
 const wchar_t *PcRomPackName(void) { return PACK_NAME; }
+
+int PcRomPackForeignReady(void) { return foreign_ready; }
+
+/* <game>_<region>.pkmn next to the runner: "firered_hoenn.pkmn" */
+static void foreign_pack_path(wchar_t *out)
+{
+    wchar_t dir[MAX_PATH], base[64], *slash, *dot;
+    GetModuleFileNameW(NULL, dir, MAX_PATH);
+    if ((slash = wcsrchr(dir, L'\\')) != NULL) *slash = 0;
+    wcsncpy(base, PACK_NAME, 63);
+    base[63] = 0;
+    if ((dot = wcsrchr(base, L'.')) != NULL) *dot = 0;
+    _snwprintf(out, MAX_PATH, L"%ls\\%ls_%hs.pkmn", dir, base, xid);
+}
+
+/* The foreign layer from the other game's ROM. PC_ROMPACK_WRONG_ROM if it
+ * isn't one (the runner offers every imported ROM to every game). */
+int PcRomPackExtractForeign(const wchar_t *rom, const wchar_t *out)
+{
+    wchar_t path[MAX_PATH];
+    size_t size;
+    uint8_t *data, *pack;
+
+    if (!open_table()) return PC_ROMPACK_NO_TABLE;
+    if (!xoverlay) return PC_ROMPACK_NO_TABLE;
+    if (!(data = read_whole(rom, &size))) return PC_ROMPACK_CANT_READ;
+    pack = size <= 32u << 20 ? unpack_layer(data, size, XPACK_MAGIC, xtables, xntables, xtotal, xcheck) : NULL;
+    free(data);
+    if (!pack) return PC_ROMPACK_WRONG_ROM;
+    if (!out) {
+        foreign_pack_path(path);
+        out = path;
+    }
+    if (!write_layer_pack(out, pack, xtotal)) { free(pack); return PC_ROMPACK_CANT_WRITE; }
+    free(pack);
+    return PC_ROMPACK_OK;
+}
+
+/* The foreign layer at boot: from its pack, else from that game's ROM if
+ * one is next to the runner. */
+static void load_foreign(const wchar_t *dir)
+{
+    wchar_t path[MAX_PATH], pattern[MAX_PATH];
+    WIN32_FIND_DATAW fd;
+    HANDLE h;
+    uint8_t *pack;
+
+    if (!xoverlay) return;
+    foreign_ready = 0;
+    foreign_pack_path(path);
+    pack = load_layer_pack(path, XPACK_MAGIC, xtotal, xcheck);
+    if (!pack) {
+        _snwprintf(pattern, MAX_PATH, L"%ls\\*.gba", dir);
+        if ((h = FindFirstFileW(pattern, &fd)) != INVALID_HANDLE_VALUE) {
+            do {
+                wchar_t rom[MAX_PATH];
+                _snwprintf(rom, MAX_PATH, L"%ls\\%ls", dir, fd.cFileName);
+                if (PcRomPackExtractForeign(rom, NULL) == PC_ROMPACK_OK)
+                    pack = load_layer_pack(path, XPACK_MAGIC, xtotal, xcheck);
+            } while (!pack && FindNextFileW(h, &fd));
+            FindClose(h);
+        }
+    }
+    if (!pack) return;
+    apply_layer(pack + 24, xranges, xnranges);
+    free(pack);
+    foreign_ready = 1;
+}
 
 int PcRomPackExtractProgress(const wchar_t *rom, const wchar_t *out, void (*cb)(int percent, void *ctx), void *ctx)
 {
@@ -377,7 +512,10 @@ int PcRomPackLoad(int argc, char **argv)
     }
     apply(pack + 24);
     free(pack);
+    load_foreign(dir);
     free(overlay);
     overlay = NULL;
+    free(xoverlay);
+    xoverlay = NULL;
     return 1;
 }

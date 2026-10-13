@@ -60,4 +60,12 @@ int PcTravelDepart(int serverIndex);/* leave for another region's world: saves a
 int PcTravelVisitor(void);          /* this trainer is visiting: their PC_NET_GAME_* (home), else -1 */
 const char *PcTravelTakeJoin(void); /* the world to join on arrival, once; NULL if none */
 
+/* A visitor looks like their own region's hero (include/pc_travel_game.h):
+ * their sprite in every state, battle back pic, trainer card and link version. */
+int PcTravelPlayerGfx(int gender, int gfx);              /* the player's field sprite */
+const void *PcTravelGraphicsInfo(int gfx, const void *info);  /* the visitor sprites' full anim set */
+const void *PcTravelBaseAnims(const void *anims);        /* ...and the walk-step table they use */
+int PcTravelBackPic(int gender, int pic);                /* the player's battle back pic */
+int PcTravelGameVersion(int version);                    /* VERSION_* on their card and the link */
+
 #endif

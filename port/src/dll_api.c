@@ -51,6 +51,15 @@ PR_API int PokeRecomp_ExtractProgress(const wchar_t *rom, const wchar_t *pkmn,
     return PcRomPackExtractProgress(rom, pkmn, progress, ctx);
 }
 
+/* Another game's ROM: if it's the one this game takes visitors' sprites from
+ * (Emerald for FireRed/LeafGreen, FireRed or LeafGreen for Emerald), unpack
+ * them into `pkmn` (NULL: <game>_<region>.pkmn next to the runner).
+ * PC_ROMPACK_WRONG_ROM if it isn't. */
+PR_API int PokeRecomp_ExtractForeign(const wchar_t *rom, const wchar_t *pkmn)
+{
+    return PcRomPackExtractForeign(rom, pkmn);
+}
+
 /* Run the game (the same arguments the game always took: --pkmn, --data-dir,
  * --save-file, --launcher-parent, --headless, ...). Returns the exit code.
  * One run per process. */

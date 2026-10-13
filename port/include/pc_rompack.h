@@ -22,6 +22,12 @@ int PcRomPackLoad(int argc, char **argv);
 int PcRomPackExtract(const wchar_t *rom, const wchar_t *out);
 int PcRomPackExtractProgress(const wchar_t *rom, const wchar_t *out, void (*cb)(int percent, void *ctx), void *ctx);
 
+/* The other region's player sprites for visitors (the foreign layer): unpack
+ * them from that game's ROM into <game>_<region>.pkmn (out NULL: next to the
+ * runner), and whether they're in place this run. */
+int PcRomPackExtractForeign(const wchar_t *rom, const wchar_t *out);
+int PcRomPackForeignReady(void);
+
 /* "firered.pkmn" etc. */
 const wchar_t *PcRomPackName(void);
 

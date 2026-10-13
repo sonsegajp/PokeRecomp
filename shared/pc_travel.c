@@ -30,10 +30,16 @@
 #include "constants/flags.h"
 #include "constants/maps.h"
 #include "constants/vars.h"
+#include "constants/event_objects.h"
+#include "constants/event_object_movement.h"
+#include "constants/trainers.h"
+#include "event_object_movement.h"
 #include "pc_net.h"
 #include "pc_port.h"
 #include "pc_launcher.h"
 #include "pc_travel.h"
+#include "pc_rompack.h"
+#include "../xgfx/pc_visitor_gfx.h"
 
 
 STATIC_ASSERT(sizeof(struct Pokemon) == 100, PokemonIs100Bytes);
@@ -269,6 +275,162 @@ void PcTravelOnSave(void)
     memcpy(sTravel.party, gPlayerParty, sizeof(struct Pokemon) * PARTY_SIZE);
     sTravel.partyCount = gPlayerPartyCount;
     PcTravelWrite(&sTravel);
+}
+
+// ---- a visitor's look -------------------------------------------------------------
+
+// A visitor is drawn with their own game's player sprites in every state:
+// Emerald's Brendan and May in FireRed/LeafGreen, FireRed's Red and Leaf in
+// Emerald (xgfx/, from the player's copy of that game). They take the
+// player's own sprite ids, so everything that shows the player shows them.
+// Each game's animation numbers are asked for by this game's code; any the
+// other game's table doesn't have become the nearest walking one.
+#define VISITOR_ANIMS 48   // past every animation the player's states use
+#define OBJ_EVENT_PAL_TAG_NONE 0x11FF   // as in event_object_movement.c
+
+static const u8 sPlayerGfxStates[][3] = {   // this game's player ids: gender, PC_VISITOR_*
+#ifdef EMERALD
+    {OBJ_EVENT_GFX_BRENDAN_NORMAL,     MALE,   PC_VISITOR_NORMAL},
+    {OBJ_EVENT_GFX_BRENDAN_MACH_BIKE,  MALE,   PC_VISITOR_BIKE},
+    {OBJ_EVENT_GFX_BRENDAN_ACRO_BIKE,  MALE,   PC_VISITOR_BIKE},
+    {OBJ_EVENT_GFX_BRENDAN_SURFING,    MALE,   PC_VISITOR_SURF},
+    {OBJ_EVENT_GFX_BRENDAN_UNDERWATER, MALE,   PC_VISITOR_SURF},
+    {OBJ_EVENT_GFX_BRENDAN_FIELD_MOVE, MALE,   PC_VISITOR_FIELD_MOVE},
+    {OBJ_EVENT_GFX_BRENDAN_FISHING,    MALE,   PC_VISITOR_FISH},
+    {OBJ_EVENT_GFX_BRENDAN_WATERING,   MALE,   PC_VISITOR_NORMAL},
+    {OBJ_EVENT_GFX_BRENDAN_DECORATING, MALE,   PC_VISITOR_NORMAL},
+    {OBJ_EVENT_GFX_MAY_NORMAL,         FEMALE, PC_VISITOR_NORMAL},
+    {OBJ_EVENT_GFX_MAY_MACH_BIKE,      FEMALE, PC_VISITOR_BIKE},
+    {OBJ_EVENT_GFX_MAY_ACRO_BIKE,      FEMALE, PC_VISITOR_BIKE},
+    {OBJ_EVENT_GFX_MAY_SURFING,        FEMALE, PC_VISITOR_SURF},
+    {OBJ_EVENT_GFX_MAY_UNDERWATER,     FEMALE, PC_VISITOR_SURF},
+    {OBJ_EVENT_GFX_MAY_FIELD_MOVE,     FEMALE, PC_VISITOR_FIELD_MOVE},
+    {OBJ_EVENT_GFX_MAY_FISHING,        FEMALE, PC_VISITOR_FISH},
+    {OBJ_EVENT_GFX_MAY_WATERING,       FEMALE, PC_VISITOR_NORMAL},
+    {OBJ_EVENT_GFX_MAY_DECORATING,     FEMALE, PC_VISITOR_NORMAL},
+#else
+    {OBJ_EVENT_GFX_RED_NORMAL,         MALE,   PC_VISITOR_NORMAL},
+    {OBJ_EVENT_GFX_RED_BIKE,           MALE,   PC_VISITOR_BIKE},
+    {OBJ_EVENT_GFX_RED_SURF,           MALE,   PC_VISITOR_SURF},
+    {OBJ_EVENT_GFX_RED_FIELD_MOVE,     MALE,   PC_VISITOR_FIELD_MOVE},
+    {OBJ_EVENT_GFX_RED_FISH,           MALE,   PC_VISITOR_FISH},
+    {OBJ_EVENT_GFX_RED_VS_SEEKER,      MALE,   PC_VISITOR_FIELD_MOVE},
+    {OBJ_EVENT_GFX_RED_VS_SEEKER_BIKE, MALE,   PC_VISITOR_BIKE},
+    {OBJ_EVENT_GFX_GREEN_NORMAL,       FEMALE, PC_VISITOR_NORMAL},
+    {OBJ_EVENT_GFX_GREEN_BIKE,         FEMALE, PC_VISITOR_BIKE},
+    {OBJ_EVENT_GFX_GREEN_SURF,         FEMALE, PC_VISITOR_SURF},
+    {OBJ_EVENT_GFX_GREEN_FIELD_MOVE,   FEMALE, PC_VISITOR_FIELD_MOVE},
+    {OBJ_EVENT_GFX_GREEN_FISH,         FEMALE, PC_VISITOR_FISH},
+    {OBJ_EVENT_GFX_GREEN_VS_SEEKER,    FEMALE, PC_VISITOR_FIELD_MOVE},
+    {OBJ_EVENT_GFX_GREEN_VS_SEEKER_BIKE, FEMALE, PC_VISITOR_BIKE},
+#endif
+};
+
+#ifdef EMERALD
+#define HOST_NORMAL_GFX OBJ_EVENT_GFX_BRENDAN_NORMAL      // its 16x32 player sprite
+#define HOST_BIG_GFX    OBJ_EVENT_GFX_BRENDAN_MACH_BIKE   // its 32x32 one
+#define VISITOR_BACK_PIC TRAINER_BACK_PIC_RED
+#else
+#define HOST_NORMAL_GFX OBJ_EVENT_GFX_RED_NORMAL
+#define HOST_BIG_GFX    OBJ_EVENT_GFX_RED_BIKE
+#define VISITOR_BACK_PIC TRAINER_BACK_PIC_RUBY_SAPPHIRE_BRENDAN
+#endif
+
+extern const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[];
+
+static struct ObjectEventGraphicsInfo sVisitorInfo[2][PC_VISITOR_STATE_COUNT];
+static const union AnimCmd *sVisitorAnims[2][PC_VISITOR_STATE_COUNT][VISITOR_ANIMS];
+static const union AnimCmd *const *sVisitorStepAnims[2][PC_VISITOR_STATE_COUNT];
+static bool8 sVisitorReady[2][PC_VISITOR_STATE_COUNT];
+
+int PcTravelPlayerGfx(int gender, int gfx)
+{
+    return gfx;   // the same ids: they're drawn as the visitor (PcTravelGraphicsInfo)
+}
+
+static void BuildVisitorInfo(int gender, int state, const struct ObjectEventGraphicsInfo *own)
+{
+    const struct PcVisitorState *v = &gPcVisitorStates[gender][state];
+    const struct ObjectEventGraphicsInfo *shape = gObjectEventGraphicsInfoPointers[v->width == 16 ? HOST_NORMAL_GFX : HOST_BIG_GFX];
+    struct ObjectEventGraphicsInfo *info = &sVisitorInfo[gender][state];
+    const union AnimCmd **anims = sVisitorAnims[gender][state];
+    int i;
+
+    *info = *own;                       // how this game treats the state (reflections, tracks, ...)
+    info->size = v->size;
+    info->width = v->width;
+    info->height = v->height;
+    info->oam = shape->oam;             // sprite shapes for that size
+    info->subspriteTables = shape->subspriteTables;
+    info->images = v->images;
+    info->paletteTag = PC_VISITOR_PAL_TAG(gender);
+    if (info->reflectionPaletteTag != OBJ_EVENT_PAL_TAG_NONE)
+        info->reflectionPaletteTag = PC_VISITOR_REFLECTION_PAL_TAG(gender);
+    for (i = 0; i < VISITOR_ANIMS; i++)
+    {
+        int dir = (i - ANIM_STD_COUNT) % 4;   // the extra animations come in S, N, W, E sets
+        // the bike sheets use the plain table: nothing past the standard set
+        bool8 has = i < v->animCount && v->anims[i] != NULL && (state != PC_VISITOR_BIKE || i < ANIM_STD_COUNT);
+        if (has)
+            anims[i] = v->anims[i];
+        else if (i < ANIM_STD_COUNT)
+            anims[i] = v->anims[ANIM_STD_FACE_SOUTH + (i & 3)];
+        else if (i < ANIM_STD_COUNT + 4)
+            anims[i] = v->anims[ANIM_STD_GO_FAST_SOUTH + dir];
+        else
+            anims[i] = v->anims[ANIM_STD_FACE_SOUTH + dir];
+    }
+    info->anims = anims;
+    sVisitorStepAnims[gender][state] = shape->anims;   // walk-step positions are the same in every set
+    sVisitorReady[gender][state] = TRUE;
+}
+
+const void *PcTravelGraphicsInfo(int gfx, const void *info)
+{
+    int i;
+
+    if (sRole != ROLE_VISITOR || !PcRomPackForeignReady())
+        return info;
+    for (i = 0; i < (int)ARRAY_COUNT(sPlayerGfxStates); i++)
+    {
+        if (sPlayerGfxStates[i][0] == gfx)
+        {
+            int gender = sPlayerGfxStates[i][1], state = sPlayerGfxStates[i][2];
+            if (!sVisitorReady[gender][state])
+                BuildVisitorInfo(gender, state, info);
+            return &sVisitorInfo[gender][state];
+        }
+    }
+    return info;
+}
+
+const void *PcTravelBaseAnims(const void *anims)
+{
+    int g, s;
+    for (g = 0; g < 2; g++)
+        for (s = 0; s < PC_VISITOR_STATE_COUNT; s++)
+            if (sVisitorReady[g][s] && anims == (const void *)sVisitorAnims[g][s])
+                return sVisitorStepAnims[g][s];
+    return anims;
+}
+
+int PcTravelBackPic(int gender, int pic)
+{
+    return sRole == ROLE_VISITOR ? VISITOR_BACK_PIC + gender : pic;
+}
+
+int PcTravelGameVersion(int version)
+{
+    static const u8 versions[] = {
+        [PC_NET_GAME_FIRERED] = VERSION_FIRE_RED,
+        [PC_NET_GAME_LEAFGREEN] = VERSION_LEAF_GREEN,
+        [PC_NET_GAME_EMERALD] = VERSION_EMERALD,
+        [PC_NET_GAME_RUBY] = VERSION_RUBY,
+        [PC_NET_GAME_SAPPHIRE] = VERSION_SAPPHIRE,
+    };
+    if (sRole != ROLE_VISITOR || sTravel.homeGame >= ARRAY_COUNT(versions))
+        return version;
+    return versions[sTravel.homeGame];
 }
 
 // ---- leaving --------------------------------------------------------------------

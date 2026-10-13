@@ -36,6 +36,7 @@ typedef const struct PokeRecompGameInfo *(*InfoFn)(void);
 typedef int (*ExtractFn)(const wchar_t *rom, const wchar_t *pkmn);
 typedef int (*ExtractProgressFn)(const wchar_t *rom, const wchar_t *pkmn, void (*progress)(int, void *), void *ctx);
 typedef int (*RunFn)(int argc, char **argv);
+typedef int (*ExtractForeignFn)(const wchar_t *rom, const wchar_t *pkmn);
 
 static wchar_t sDir[MAX_PATH];
 static wchar_t sStartDir[MAX_PATH];   /* the games change directory to their data dir */
@@ -146,6 +147,16 @@ static int extract_one(const wchar_t *id, HMODULE m, void *ctx)
     return 0;
 }
 
+/* Every game that takes visitors' sprites from this ROM unpacks them too
+ * (<game>_<region>.pkmn next to this program). */
+static int extract_foreign(const wchar_t *id, HMODULE m, void *ctx)
+{
+    ExtractForeignFn fn = (ExtractForeignFn)GetProcAddress(m, "PokeRecomp_ExtractForeign");
+    (void)id;
+    if (fn) fn((const wchar_t *)ctx, NULL);
+    return 0;
+}
+
 /* Append one argument to a command line, quoted for CommandLineToArgvW. */
 static void append_arg(wchar_t *cmd, size_t size, const wchar_t *arg)
 {
@@ -235,6 +246,7 @@ int main(void)
             else if (!wcscmp(wargv[i], L"--game")) job.only = wargv[++i];
         }
         for_each_game(extract_one, &job);
+        for_each_game(extract_foreign, (void *)job.rom);   /* visitors' sprites for the other games */
         if (job.code != 0)
             printf("{\"error\":%d}\n", job.code);   /* 1: no installed game knows this ROM */
         return job.code;

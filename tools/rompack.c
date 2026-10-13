@@ -14,6 +14,11 @@
  * --allow limits it to the game's own data sections (tools/game_ranges.py),
  * so nothing the C runtime needs before main() is ever taken out.
  *
+ * --foreign ID --foreign-allow RANGES --foreign-sha1 HEX...: a second layer,
+ * the other region's player sprites built in for visitors (xgfx/), taken
+ * out against that game's ROM. It goes in an overlay of its own (PRPX) and
+ * comes back from the player's copy of that game (<game>_<id>.pkmn).
+ *
  * ROMs are found by SHA-1 in the given directories. With several known ROMs
  * (e.g. revision 1.0 and 1.1) only bytes every one of them can supply are
  * taken out, and each gets its own table. With none found, OUT is IN.
@@ -225,37 +230,24 @@ static void match_section(const Index *ix, const uint8_t *data, uint32_t rva0, u
     }
 }
 
-/* ---- main ----------------------------------------------------------------------------- */
+/* ---- ROMs ------------------------------------------------------------------------------ */
 
-int main(int argc, char **argv)
+typedef struct {
+    uint8_t *data[MAX_ROMS];
+    size_t size[MAX_ROMS];
+    uint8_t sha[MAX_ROMS][20];
+    int n;
+} Roms;
+
+/* The .gba files in `dirs` whose SHA-1 is one of `want`. */
+static void find_roms(Roms *out, const char **dirs, int ndirs, uint8_t (*want)[20], int nwant)
 {
-    const char *in = NULL, *outp = NULL, *dirs[8], *allow_path = NULL;
-    uint8_t want[8][20];
-    int ndirs = 0, nwant = 0;
-
-    for (int i = 1; i < argc; i++) {
-        if (!strcmp(argv[i], "--sha1") && i + 1 < argc && nwant < 8) { if (!hex_to_sha1(argv[++i], want[nwant])) return 2; nwant++; }
-        else if (!strcmp(argv[i], "--dir") && i + 1 < argc && ndirs < 8) dirs[ndirs++] = argv[++i];
-        else if (!strcmp(argv[i], "--allow") && i + 1 < argc) allow_path = argv[++i];
-        else if (!in) in = argv[i];
-        else if (!outp) outp = argv[i];
-    }
-    if (!in || !outp) { fprintf(stderr, "usage: rompack IN.exe OUT.exe --sha1 HEX... --dir DIR...\n"); return 2; }
-
-    size_t exesize;
-    uint8_t *exe = read_file(in, &exesize);
-    if (!exe) { fprintf(stderr, "rompack: can't read %s\n", in); return 1; }
-
-    /* the ROMs we know, by hash */
-    uint8_t *roms[MAX_ROMS];
-    size_t romsize[MAX_ROMS];
-    uint8_t romsha[MAX_ROMS][20];
-    int nroms = 0;
+    out->n = 0;
     for (int d = 0; d < ndirs; d++) {
         DIR *dir = opendir(dirs[d]);
         struct dirent *e;
         if (!dir) continue;
-        while ((e = readdir(dir)) && nroms < MAX_ROMS) {
+        while ((e = readdir(dir)) && out->n < MAX_ROMS) {
             size_t l = strlen(e->d_name), size;
             char path[1024];
             uint8_t h[20], *data;
@@ -265,49 +257,48 @@ int main(int argc, char **argv)
             sha1(data, size, h);
             int known = 0, dup = 0;
             for (int w = 0; w < nwant; w++) known |= !memcmp(h, want[w], 20);
-            for (int r = 0; r < nroms; r++) dup |= !memcmp(h, romsha[r], 20);
+            for (int r = 0; r < out->n; r++) dup |= !memcmp(h, out->sha[r], 20);
             if (known && !dup) {
-                roms[nroms] = data;
-                romsize[nroms] = size;
-                memcpy(romsha[nroms], h, 20);
+                out->data[out->n] = data;
+                out->size[out->n] = size;
+                memcpy(out->sha[out->n], h, 20);
                 printf("rompack: ROM %s\n", path);
-                nroms++;
+                out->n++;
             } else free(data);
         }
         closedir(dir);
     }
-    FILE *f = fopen(outp, "wb");
-    if (!f) { fprintf(stderr, "rompack: can't write %s\n", outp); return 1; }
-    if (nroms == 0) {
-        printf("rompack: no ROM found - %s keeps its game data\n", outp);
-        fwrite(exe, 1, exesize, f);
-        fclose(f);
-        return 0;
-    }
+}
 
-    Section secs[32];
-    int nsec = pe_sections(exe, exesize, secs, 32);
-    if (nsec < 0) { fprintf(stderr, "rompack: not a PE file\n"); return 1; }
+/* ---- one layer: the bytes a set of ROMs can supply -------------------------------------- */
 
-    int nrel;
-    uint32_t *rel = pe_relocs(exe, exesize, secs, nsec, &nrel);
-    printf("rompack: %d relocated words kept in\n", nrel);
+typedef struct {
+    Piece *ranges;          /* .rom = file offset in the exe */
+    int nranges;
+    Piece *tables[MAX_ROMS];
+    int ntable[MAX_ROMS];
+    uint64_t taken, scanned, check;
+} Layer;
 
+/* Of the data sections' bytes listed in allow_path (every byte if NULL),
+ * those every ROM in `roms` holds: the layer's ranges, and per ROM where
+ * each comes from. Returns 0 if a ROM can't supply a range. */
+static int build_layer(Layer *L, const uint8_t *exe, const Section *secs, int nsec, const uint32_t *rel, int nrel,
+                       const Roms *roms, const char *allow_path)
+{
     Index ix[MAX_ROMS];
     Runs runs[MAX_ROMS] = {{0}};
-    for (int r = 0; r < nroms; r++) index_build(&ix[r], roms[r], romsize[r]);
 
-    /* canonical ranges: bytes every ROM can supply */
-    Piece *ranges = malloc(sizeof(Piece) * 400000);
-    int nranges = 0;
-    uint64_t taken = 0, scanned = 0;
+    memset(L, 0, sizeof *L);
+    for (int r = 0; r < roms->n; r++) index_build(&ix[r], roms->data[r], roms->size[r]);
+    L->ranges = malloc(sizeof(Piece) * 400000);
     for (int s = 0; s < nsec; s++) {
         if (strcmp(secs[s].name, ".data") && strcmp(secs[s].name, ".rdata")) continue;
         uint32_t len = secs[s].vsize < secs[s].rawsize ? secs[s].vsize : secs[s].rawsize;
         const uint8_t *data = exe + secs[s].raw;
         uint8_t *all = malloc(len), *one = malloc(len);
         memset(all, allow_path ? 0 : 1, len);
-        if (allow_path) {       /* only the game's own sections (tools/game_ranges.py) */
+        if (allow_path) {       /* only the sections listed (tools/game_ranges.py) */
             FILE *af = fopen(allow_path, "r");
             unsigned rva, sz;
             uint32_t pe = *(const uint32_t *)(exe + 0x3C), base = *(const uint32_t *)(exe + pe + 24 + 28);   /* ImageBase */
@@ -316,7 +307,7 @@ int main(int argc, char **argv)
                     if (b >= secs[s].rva && b < secs[s].rva + len) all[b - secs[s].rva] = 1;
             if (af) fclose(af);
         }
-        for (int r = 0; r < nroms; r++) {
+        for (int r = 0; r < roms->n; r++) {
             memset(one, 0, len);
             match_section(&ix[r], data, secs[s].rva, len, one, &runs[r]);
             for (uint32_t i = 0; i < len; i++) all[i] &= one[i];
@@ -329,25 +320,20 @@ int main(int argc, char **argv)
             uint32_t j = i;
             while (j < len && all[j]) j++;
             if (j - i >= MIN_RUN) {
-                ranges[nranges++] = (Piece){secs[s].rva + i, j - i, secs[s].raw + i};   /* .rom = file offset here */
-                taken += j - i;
+                L->ranges[L->nranges++] = (Piece){secs[s].rva + i, j - i, secs[s].raw + i};
+                L->taken += j - i;
             }
             i = j;
         }
-        scanned += len;
-        printf("rompack: %-8s %8u bytes\n", secs[s].name, len);
+        L->scanned += len;
         free(all);
         free(one);
     }
-
-    /* per-ROM tables: each canonical range as pieces of that ROM */
-    Piece *tables[MAX_ROMS];
-    int ntable[MAX_ROMS];
-    for (int r = 0; r < nroms; r++) {          /* clip that ROM's runs to the ranges */
+    for (int r = 0; r < roms->n; r++) {        /* clip that ROM's runs to the ranges */
         Runs out = {0};
         int j = 0;
-        for (int k = 0; k < nranges; k++) {
-            uint32_t a = ranges[k].rva, b = a + ranges[k].len, got = 0;
+        for (int k = 0; k < L->nranges; k++) {
+            uint32_t a = L->ranges[k].rva, b = a + L->ranges[k].len, got = 0;
             while (j < runs[r].n && runs[r].v[j].rva + runs[r].v[j].len <= a) j++;
             for (int q = j; q < runs[r].n && runs[r].v[q].rva < b; q++) {
                 const Piece *run = &runs[r].v[q];
@@ -357,43 +343,134 @@ int main(int argc, char **argv)
                     got += hi - lo;
                 }
             }
-            if (got != ranges[k].len) { fprintf(stderr, "rompack: ROM %d can't supply rva %08x\n", r, a); return 1; }
+            if (got != L->ranges[k].len) { fprintf(stderr, "rompack: ROM %d can't supply rva %08x\n", r, a); return 0; }
         }
-        tables[r] = out.v;
-        ntable[r] = out.n;
+        L->tables[r] = out.v;
+        L->ntable[r] = out.n;
     }
+    for (int r = 0; r < roms->n; r++) free(ix[r].slot);
+    L->check = 0xCBF29CE484222325ull;
+    for (int k = 0; k < L->nranges; k++)
+        L->check = fnv64(L->check, exe + L->ranges[k].rom, L->ranges[k].len);
+    return 1;
+}
 
-    /* checksum of what comes out, then take it out */
-    uint64_t check = 0xCBF29CE484222325ull;
-    for (int k = 0; k < nranges; k++) {
-        check = fnv64(check, exe + ranges[k].rom, ranges[k].len);
-        memset(exe + ranges[k].rom, 0, ranges[k].len);
-    }
+static void take_out(uint8_t *exe, const Layer *L)
+{
+    for (int k = 0; k < L->nranges; k++)
+        memset(exe + L->ranges[k].rom, 0, L->ranges[k].len);
+}
 
-    /* overlay: "PRPK" u32 version u32 ntables u32 nranges u64 total u64 check,
-     *          nranges x (u32 rva, u32 len),
-     *          per table: sha1[20] u32 romsize u32 npieces, npieces x (u32 rva, u32 len, u32 rom)
-     *          then u32 overlay size, "PRPKEND!" */
-    long start = (long)exesize;
-    fwrite(exe, 1, exesize, f);
-    uint32_t hdr[3] = {1, (uint32_t)nroms, (uint32_t)nranges};
-    fwrite("PRPK", 1, 4, f);
-    fwrite(hdr, 4, 3, f);
-    fwrite(&taken, 8, 1, f);
-    fwrite(&check, 8, 1, f);
-    for (int k = 0; k < nranges; k++) { fwrite(&ranges[k].rva, 4, 1, f); fwrite(&ranges[k].len, 4, 1, f); }
-    for (int r = 0; r < nroms; r++) {
-        uint32_t rs = (uint32_t)romsize[r], np = (uint32_t)ntable[r];
-        fwrite(romsha[r], 1, 20, f);
+/* nranges x (u32 rva, u32 len), then per ROM:
+ * sha1[20] u32 romsize u32 npieces, npieces x (u32 rva, u32 len, u32 rom) */
+static void write_layer(FILE *f, const Layer *L, const Roms *roms)
+{
+    for (int k = 0; k < L->nranges; k++) { fwrite(&L->ranges[k].rva, 4, 1, f); fwrite(&L->ranges[k].len, 4, 1, f); }
+    for (int r = 0; r < roms->n; r++) {
+        uint32_t rs = (uint32_t)roms->size[r], np = (uint32_t)L->ntable[r];
+        fwrite(roms->sha[r], 1, 20, f);
         fwrite(&rs, 4, 1, f);
         fwrite(&np, 4, 1, f);
-        fwrite(tables[r], sizeof(Piece), ntable[r], f);
+        fwrite(L->tables[r], sizeof(Piece), L->ntable[r], f);
     }
+}
+
+/* ---- main ----------------------------------------------------------------------------- */
+
+int main(int argc, char **argv)
+{
+    const char *in = NULL, *outp = NULL, *dirs[8], *allow_path = NULL;
+    const char *foreign_id = NULL, *foreign_allow = NULL;
+    uint8_t want[8][20], fwant[8][20];
+    int ndirs = 0, nwant = 0, nfwant = 0;
+
+    for (int i = 1; i < argc; i++) {
+        if (!strcmp(argv[i], "--sha1") && i + 1 < argc && nwant < 8) { if (!hex_to_sha1(argv[++i], want[nwant])) return 2; nwant++; }
+        else if (!strcmp(argv[i], "--dir") && i + 1 < argc && ndirs < 8) dirs[ndirs++] = argv[++i];
+        else if (!strcmp(argv[i], "--allow") && i + 1 < argc) allow_path = argv[++i];
+        else if (!strcmp(argv[i], "--foreign") && i + 1 < argc) foreign_id = argv[++i];
+        else if (!strcmp(argv[i], "--foreign-allow") && i + 1 < argc) foreign_allow = argv[++i];
+        else if (!strcmp(argv[i], "--foreign-sha1") && i + 1 < argc && nfwant < 8) { if (!hex_to_sha1(argv[++i], fwant[nfwant])) return 2; nfwant++; }
+        else if (!in) in = argv[i];
+        else if (!outp) outp = argv[i];
+    }
+    if (!in || !outp) {
+        fprintf(stderr, "usage: rompack IN.exe OUT.exe --sha1 HEX... --dir DIR... [--allow RANGES]"
+                        " [--foreign ID --foreign-allow RANGES --foreign-sha1 HEX...]\n");
+        return 2;
+    }
+
+    size_t exesize;
+    uint8_t *exe = read_file(in, &exesize);
+    if (!exe) { fprintf(stderr, "rompack: can't read %s\n", in); return 1; }
+
+    Roms roms, froms;
+    find_roms(&roms, dirs, ndirs, want, nwant);
+    froms.n = 0;
+    if (foreign_id && foreign_allow) find_roms(&froms, dirs, ndirs, fwant, nfwant);
+
+    FILE *f = fopen(outp, "wb");
+    if (!f) { fprintf(stderr, "rompack: can't write %s\n", outp); return 1; }
+    if (roms.n == 0) {
+        printf("rompack: no ROM found - %s keeps its game data\n", outp);
+        fwrite(exe, 1, exesize, f);
+        fclose(f);
+        return 0;
+    }
+
+    Section secs[32];
+    int nsec = pe_sections(exe, exesize, secs, 32);
+    if (nsec < 0) { fprintf(stderr, "rompack: not a PE file\n"); return 1; }
+    int nrel;
+    uint32_t *rel = pe_relocs(exe, exesize, secs, nsec, &nrel);
+    printf("rompack: %d relocated words kept in\n", nrel);
+
+    /* the game's own content, from its own ROM(s) */
+    Layer L, X;
+    if (!build_layer(&L, exe, secs, nsec, rel, nrel, &roms, allow_path)) return 1;
+    /* the other region's player sprites (xgfx/), from that game's ROM(s) */
+    int foreign = foreign_id && foreign_allow && froms.n > 0;
+    if (foreign && !build_layer(&X, exe, secs, nsec, rel, nrel, &froms, foreign_allow)) return 1;
+    if (foreign_id && !foreign)
+        printf("rompack: no %s ROM found - the visitor sprites stay in\n", foreign_id);
+    take_out(exe, &L);
+    if (foreign) take_out(exe, &X);
+
+    /* overlay: "PRPK" u32 version u32 ntables u32 nranges u64 total u64 check, layer,
+     *          then u32 overlay size, "PRPKEND!";
+     * the foreign one after it: "PRPX" u32 version char id[16] u32 ntables u32 nranges
+     *          u64 total u64 check, layer, u32 size, "PRPXEND!" */
+    long start = (long)exesize;
+    fwrite(exe, 1, exesize, f);
+    uint32_t hdr[3] = {1, (uint32_t)roms.n, (uint32_t)L.nranges};
+    fwrite("PRPK", 1, 4, f);
+    fwrite(hdr, 4, 3, f);
+    fwrite(&L.taken, 8, 1, f);
+    fwrite(&L.check, 8, 1, f);
+    write_layer(f, &L, &roms);
     uint32_t overlay = (uint32_t)(ftell(f) - start) + 12;
     fwrite(&overlay, 4, 1, f);
     fwrite("PRPKEND!", 1, 8, f);
-    fclose(f);
     printf("rompack: took out %llu of %llu data bytes (%.1f%%) in %d runs; %d ROM table(s)\n",
-           (unsigned long long)taken, (unsigned long long)scanned, 100.0 * taken / scanned, nranges, nroms);
+           (unsigned long long)L.taken, (unsigned long long)L.scanned, 100.0 * L.taken / L.scanned, L.nranges, roms.n);
+    if (foreign) {
+        char id[16] = {0};
+        uint32_t version = 1, counts[2] = {(uint32_t)froms.n, (uint32_t)X.nranges};
+        start = ftell(f);
+        strncpy(id, foreign_id, 15);
+        fwrite("PRPX", 1, 4, f);
+        fwrite(&version, 4, 1, f);
+        fwrite(id, 1, 16, f);
+        fwrite(counts, 4, 2, f);
+        fwrite(&X.taken, 8, 1, f);
+        fwrite(&X.check, 8, 1, f);
+        write_layer(f, &X, &froms);
+        overlay = (uint32_t)(ftell(f) - start) + 12;
+        fwrite(&overlay, 4, 1, f);
+        fwrite("PRPXEND!", 1, 8, f);
+        printf("rompack: %s: took out %llu bytes in %d runs; %d ROM table(s)\n",
+               foreign_id, (unsigned long long)X.taken, X.nranges, froms.n);
+    }
+    fclose(f);
     return 0;
 }
