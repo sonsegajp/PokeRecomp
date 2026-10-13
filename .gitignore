@@ -13,3 +13,6 @@ dist/
 *.gba
 *.pak
 EmeraldPC.exe
+*.pkmn
+games/
+PokeRecompGame.exe

@@ -8,7 +8,6 @@ bytes, which are used before main() can put anything back.
 import re
 import sys
 
-IMAGE_BASE = 0x400000
 LINE = re.compile(r'^ (\.r?data\S*)\s+0x([0-9a-f]+)\s+0x([0-9a-f]+)\s+(\S.*)$')
 NAME_ONLY = re.compile(r'^ (\.r?data\S*)\s*$')
 REST = re.compile(r'^\s+0x([0-9a-f]+)\s+0x([0-9a-f]+)\s+(\S.*)$')
@@ -31,8 +30,8 @@ for line in open(map_path, encoding='utf-8', errors='replace'):
     pending = None
     addr, size = int(addr, 16), int(size, 16)
     obj = obj.replace('\\', '/')
-    if size and addr >= IMAGE_BASE and any(obj.startswith(d) for d in dirs):
-        ranges.append((addr - IMAGE_BASE, size))
+    if size and any(obj.startswith(d) for d in dirs):
+        ranges.append((addr, size))   # linker addresses; rompack takes the image base off
 
 ranges.sort()
 with open(out_path, 'w') as f:

@@ -1,8 +1,10 @@
-# FireRed PC — build (run from an MSYS2 MINGW32 shell, or via build.sh).
+# PokeRecomp — build (run from an MSYS2 MINGW32 shell, or via build.sh).
 #
-#   make            build FireRedPC.exe
-#   make VERSION=LEAFGREEN   build LeafGreenPC.exe (needs `make leafgreen_modern` in game/ first)
-#   make VERSION=EMERALD     build EmeraldPC.exe from emerald/ (pret pokeemerald; `make modern` there first)
+# Every game is a DLL the launcher / PokeRecompGame.exe loads at runtime
+# (docs/GAME_DLL.md):
+#   make                     games/firered.dll   + PokeRecompGame.exe
+#   make VERSION=LEAFGREEN   games/leafgreen.dll (needs `make leafgreen_modern` in game/ first)
+#   make VERSION=EMERALD     games/emerald.dll   (pret pokeemerald in emerald/; `make modern` there first)
 #   make assets     (re)build pret's assets + reference ROM (needs devkitARM)
 #
 # Game C:   cpp -> pret preproc (INCBIN, charmap strings) -> i686 gcc
@@ -15,20 +17,20 @@ ifeq ($(VERSION),EMERALD)
 GAME   := emerald
 BUILD  := build/pc_em
 ARMOBJ := $(GAME)/build/modern
-EXE    := EmeraldPC.exe
+GAME_ID := emerald
 VERSION_DEF := -D EMERALD=1
 SHA1S  := emerald/rom.sha1
 PREPROC_ARGS := -g build/assets
 else ifeq ($(VERSION),LEAFGREEN)
 BUILD  := build/pc_lg
 ARMOBJ := $(GAME)/build/leafgreen_modern
-EXE    := LeafGreenPC.exe
+GAME_ID := leafgreen
 VERSION_DEF := -D LEAFGREEN=1
 SHA1S  := game/leafgreen.sha1 game/leafgreen_rev1.sha1
 else
 BUILD  := build/pc
 ARMOBJ := $(GAME)/build/firered_modern
-EXE    := FireRedPC.exe
+GAME_ID := firered
 VERSION_DEF := -D FIRERED=1
 SHA1S  := game/firered.sha1 game/firered_rev1.sha1
 endif
@@ -45,10 +47,11 @@ GAME_CPPFLAGS := -iquote include -I ../port/include -Wno-trigraphs $(GAME_DEFS)
 # Struct layouts must match the ARM build the data was assembled for.
 GAME_CFLAGS := -pipe -m32 -O2 -g -std=gnu17 -fshort-enums -mno-ms-bitfields -fno-strict-aliasing -fwrapv \
                -fno-builtin-memcpy -fno-toplevel-reorder -w
+# The game is a DLL: no SDL2main, and main() is PcGameMain (port/src/dll_api.c).
 PORT_CFLAGS := -pipe -m32 -O2 -g -std=gnu17 -Wall -Wno-unused-function -I port/include -iquote $(GAME)/include \
-               $(GAME_DEFS) $(shell sdl2-config --cflags)
+               $(GAME_DEFS) $(filter-out -Dmain=SDL_main,$(shell sdl2-config --cflags)) -DSDL_MAIN_HANDLED -Dmain=PcGameMain
 LDFLAGS := -m32 -g
-LIBS := $(shell sdl2-config --libs) -lopengl32 -lwinmm -lws2_32 -lcomdlg32 -Wl,--defsym,_gNumMusicPlayers=4,--defsym,_gMaxLines=0
+LIBS := $(filter-out -lmingw32 -mwindows -lSDL2main,$(shell sdl2-config --libs)) -lopengl32 -lwinmm -lws2_32 -lcomdlg32 -Wl,--defsym,_gNumMusicPlayers=4,--defsym,_gMaxLines=0
 
 # Game sources that are replaced or have no PC equivalent.
 # (Emerald: libisagbprn.c is debug print; its clock chip, siirtc.c, is port/src/rtc.c)
@@ -70,24 +73,32 @@ $(shell mkdir -p build/tmp)
 export TMP := $(shell cygpath -m $(CURDIR)/build/tmp)
 export TEMP := $(TMP)
 
-all: $(EXE)
+DLL    := games/$(GAME_ID).dll
+RUNNER := PokeRecompGame.exe
+
+all: $(DLL) $(RUNNER)
 
 # The ROM's content is taken out of the exe (tools/rompack.c) when a retail ROM
 # is found in ROM_DIRS; players' copies unpack it from their own cartridge.
 ROM_DIRS ?= .
 ROMPACK := build/rompack.exe
 
-$(EXE): $(BUILD)/game.exe $(ROMPACK) tools/game_ranges.py
+$(DLL): $(BUILD)/game.dll $(ROMPACK) tools/game_ranges.py
+	@mkdir -p games
 	$(PY) tools/game_ranges.py $(BUILD)/FireRedPC.map $(BUILD)/game_ranges.txt $(BUILD)/game/ $(BUILD)/shared/ $(BUILD)/data/
-	$(ROMPACK) $(BUILD)/game.exe $@ --allow $(BUILD)/game_ranges.txt $(foreach f,$(SHA1S),--sha1 $(firstword $(shell cat $(f)))) $(foreach d,$(ROM_DIRS),--dir $(d))
+	$(ROMPACK) $(BUILD)/game.dll $@ --allow $(BUILD)/game_ranges.txt $(foreach f,$(SHA1S),--sha1 $(firstword $(shell cat $(f)))) $(foreach d,$(ROM_DIRS),--dir $(d))
 
 $(ROMPACK): tools/rompack.c
 	/c/msys64/mingw64/bin/gcc -O2 -o $@ $<
 
-$(BUILD)/game.exe: $(GAME_OBJS) $(SHARED_OBJS) $(DATA_OBJS) $(PORT_OBJS)
+$(BUILD)/game.dll: $(GAME_OBJS) $(SHARED_OBJS) $(DATA_OBJS) $(PORT_OBJS)
 	@echo "LD $@"
 	@printf '%s\n' $^ > $(BUILD)/objs.rsp
-	@$(CC) $(LDFLAGS) -o $@ @$(BUILD)/objs.rsp $(LIBS) -Wl,-Map=$(BUILD)/FireRedPC.map
+	@$(CC) $(LDFLAGS) -shared -o $@ @$(BUILD)/objs.rsp $(LIBS) -Wl,-Map=$(BUILD)/FireRedPC.map
+
+# The runner: loads a game DLL at runtime (runner/runner.c).
+$(RUNNER): runner/runner.c
+	$(CC) -m32 -O2 -mwindows -o $@ $< -lshell32
 
 # preproc resolves INCBIN paths relative to the game directory.
 $(BUILD)/game/%.o: $(GAME)/src/%.c
@@ -117,7 +128,7 @@ assets:
 	cd $(GAME) && PATH=/c/devkitPro/devkitARM/bin:$$PATH $(MAKE) modern -j8
 
 clean:
-	rm -rf $(BUILD) $(EXE)
+	rm -rf $(BUILD) $(DLL)
 
 -include $(GAME_OBJS:.o=.o.d) $(SHARED_OBJS:.o=.o.d) $(PORT_OBJS:.o=.d)
 .PHONY: all assets clean

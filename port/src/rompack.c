@@ -1,14 +1,14 @@
 /* rompack.c — the game's content comes from the player's own cartridge.
  *
- * A released exe has the ROM's content (graphics, maps, scripts, text,
+ * A released game DLL has the ROM's content (graphics, maps, scripts, text,
  * music) taken out by tools/rompack.c, which appends a table saying where in
- * a retail ROM each removed run of bytes lives. On first launch we read the
- * player's ROM (chosen in a file dialog, given with --rom, or found next to
- * the exe), check its SHA-1, and unpack those bytes into <game>.pak beside
- * the exe — like Ship of Harkinian's oot.otr. Every launch then fills them
- * back in from the pack before any game code runs; a checksum proves the
- * result is exactly what was taken out. A development build without the
- * table runs as is.
+ * a retail ROM each removed run of bytes lives. Importing the player's ROM
+ * (PokeRecomp_Extract, or on first run: --rom, a ROM next to the runner, or a
+ * file dialog) checks its SHA-1 and unpacks those bytes into <game>.pkmn —
+ * like Ship of Harkinian's oot.otr. Every launch then fills them back in
+ * from the .pkmn before any game code runs; a checksum proves the result is
+ * exactly what was taken out. A development build without the table runs
+ * as is.
  */
 #include <stdint.h>
 #include <stdio.h>
@@ -22,15 +22,15 @@
 
 #if defined(EMERALD)
 #define GAME_NAME L"Pokémon Emerald"
-#define PACK_NAME L"emerald.pak"
+#define PACK_NAME L"emerald.pkmn"
 #elif defined(LEAFGREEN)
 #define GAME_NAME L"Pokémon LeafGreen"
-#define PACK_NAME L"leafgreen.pak"
+#define PACK_NAME L"leafgreen.pkmn"
 #else
 #define GAME_NAME L"Pokémon FireRed"
-#define PACK_NAME L"firered.pak"
+#define PACK_NAME L"firered.pkmn"
 #endif
-#define PACK_MAGIC "PRPAK1\0\0"
+#define PACK_MAGIC "PKMN\0\0\0\1"
 
 struct Range { uint32_t rva, len; };
 struct Piece { uint32_t rva, len, rom; };
@@ -197,7 +197,7 @@ static uint8_t *try_rom(const wchar_t *path)
     return pack;
 }
 
-/* Any .gba next to the exe that is the right ROM. */
+/* Any .gba in `dir` that is the right ROM. */
 static uint8_t *find_rom(const wchar_t *dir)
 {
     wchar_t pattern[MAX_PATH], path[MAX_PATH];
@@ -225,8 +225,7 @@ static uint8_t *ask_for_rom(void)
     MessageBoxW(NULL,
                 L"PokeRecomp runs on your own " GAME_NAME L" (USA) cartridge.\n\n"
                 L"Choose your ROM file. It is read once, to unpack the game's graphics, "
-                L"maps, music and text into " PACK_NAME L" next to PokeRecomp; after that "
-                L"the ROM isn't needed.",
+                L"maps, music and text into " PACK_NAME L"; after that the ROM isn't needed.",
                 L"PokeRecomp", MB_OK | MB_ICONINFORMATION);
     for (;;) {
         ofn.lStructSize = sizeof ofn;
@@ -245,9 +244,40 @@ static uint8_t *ask_for_rom(void)
     }
 }
 
+/* The game is a DLL (games/<id>.dll) run by PokeRecompGame.exe; the table and
+ * the data it fills in belong to the DLL, not to the process. */
+static HMODULE game_module(void)
+{
+    HMODULE m = NULL;
+    GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                       (LPCWSTR)(void *)game_module, &m);
+    return m;
+}
+
+static int open_table(void)
+{
+    wchar_t path[MAX_PATH];
+    if (overlay) return 1;
+    return GetModuleFileNameW(game_module(), path, MAX_PATH) && read_overlay(path);
+}
+
+static int write_pack(const wchar_t *path, const uint8_t *pack)
+{
+    wchar_t tmp[MAX_PATH];
+    FILE *f;
+    int ok;
+    _snwprintf(tmp, MAX_PATH, L"%ls.tmp", path);
+    if ((f = _wfopen(tmp, L"wb")) == NULL) return 0;
+    ok = fwrite(pack, 1, 24 + total, f) == 24 + total;
+    ok &= fclose(f) == 0;
+    if (ok && MoveFileExW(tmp, path, MOVEFILE_REPLACE_EXISTING)) return 1;
+    DeleteFileW(tmp);
+    return 0;
+}
+
 static void apply(const uint8_t *bytes)
 {
-    uint8_t *base = (uint8_t *)GetModuleHandleW(NULL);
+    uint8_t *base = (uint8_t *)game_module();
     for (uint32_t i = 0; i < nranges; i++) {
         DWORD old;
         uint8_t *dst = base + ranges[i].rva;
@@ -258,22 +288,41 @@ static void apply(const uint8_t *bytes)
     }
 }
 
+const wchar_t *PcRomPackName(void) { return PACK_NAME; }
+
+int PcRomPackExtract(const wchar_t *rom, const wchar_t *out)
+{
+    uint8_t *pack;
+    FILE *f;
+
+    if (!open_table()) return PC_ROMPACK_NO_TABLE;
+    if ((f = _wfopen(rom, L"rb")) == NULL) return PC_ROMPACK_CANT_READ;
+    fclose(f);
+    if ((pack = try_rom(rom)) == NULL) return PC_ROMPACK_WRONG_ROM;
+    if (!write_pack(out, pack)) { free(pack); return PC_ROMPACK_CANT_WRITE; }
+    free(pack);
+    return PC_ROMPACK_OK;
+}
+
 int PcRomPackLoad(int argc, char **argv)
 {
-    wchar_t exe[MAX_PATH], dir[MAX_PATH], pack_path[MAX_PATH], *slash;
-    const char *rom_arg = NULL;
+    wchar_t dir[MAX_PATH], pack_path[MAX_PATH], *slash;
+    const char *rom_arg = NULL, *pack_arg = NULL;
     uint8_t *pack;
 
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "--headless")) headless = 1;
         else if (!strcmp(argv[i], "--rom") && i + 1 < argc) rom_arg = argv[++i];
+        else if (!strcmp(argv[i], "--pkmn") && i + 1 < argc) pack_arg = argv[++i];
     }
-    if (!GetModuleFileNameW(NULL, exe, MAX_PATH) || !read_overlay(exe))
+    if (!open_table())
         return 1;                           /* a build with its data still inside */
 
-    wcscpy(dir, exe);
+    /* the pack: --pkmn, else next to the program that runs the game */
+    GetModuleFileNameW(NULL, dir, MAX_PATH);
     if ((slash = wcsrchr(dir, L'\\')) != NULL) *slash = 0;
-    _snwprintf(pack_path, MAX_PATH, L"%ls\\%ls", dir, PACK_NAME);
+    if (pack_arg) MultiByteToWideChar(CP_UTF8, 0, pack_arg, -1, pack_path, MAX_PATH);
+    else _snwprintf(pack_path, MAX_PATH, L"%ls\\%ls", dir, PACK_NAME);
 
     pack = load_pack(pack_path);
     if (!pack) {
@@ -285,21 +334,11 @@ int PcRomPackLoad(int argc, char **argv)
         if (!pack) pack = find_rom(dir);
         if (!pack && !headless) pack = ask_for_rom();
         if (!pack) {
-            complain(L"PokeRecomp needs your own " GAME_NAME L" (USA) ROM to run "
-                     L"(pass it with --rom, or put it next to PokeRecomp).");
+            complain(L"PokeRecomp needs " PACK_NAME L", made from your own " GAME_NAME
+                     L" (USA) ROM (import it in the launcher, or pass --rom).");
             return 0;
         }
-        {
-            wchar_t tmp[MAX_PATH];
-            FILE *f;
-            _snwprintf(tmp, MAX_PATH, L"%ls.tmp", pack_path);
-            if ((f = _wfopen(tmp, L"wb")) != NULL) {
-                int ok = fwrite(pack, 1, 24 + total, f) == 24 + total;
-                ok &= fclose(f) == 0;
-                if (ok) MoveFileExW(tmp, pack_path, MOVEFILE_REPLACE_EXISTING);
-                else DeleteFileW(tmp);
-            }
-        }
+        write_pack(pack_path, pack);
     }
     apply(pack + 24);
     free(pack);

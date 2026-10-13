@@ -310,7 +310,8 @@ int main(int argc, char **argv)
         if (allow_path) {       /* only the game's own sections (tools/game_ranges.py) */
             FILE *af = fopen(allow_path, "r");
             unsigned rva, sz;
-            while (af && fscanf(af, "%x %x", &rva, &sz) == 2)
+            uint32_t pe = *(const uint32_t *)(exe + 0x3C), base = *(const uint32_t *)(exe + pe + 24 + 28);   /* ImageBase */
+            while (af && fscanf(af, "%x %x", &rva, &sz) == 2 && (rva -= base, 1))   /* linker address -> RVA */
                 for (uint32_t b = rva; b < rva + sz; b++)
                     if (b >= secs[s].rva && b < secs[s].rva + len) all[b - secs[s].rva] = 1;
             if (af) fclose(af);
