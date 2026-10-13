@@ -337,7 +337,7 @@ internal sealed class LauncherWindow : Form
                 // IsWindowVisible(child) is false while its parent panel is hidden.
                 gamePanel.Visible = true;
                 bool needsFocus = changed || gameWindow == IntPtr.Zero;
-                if (changed || gameWindow == IntPtr.Zero || !IsWindow(gameWindow)) gameWindow = FindGameWindow(pid);
+                if (changed || gameWindow == IntPtr.Zero || !IsWindow(gameWindow)) gameWindow = FindGameOrLegWindow(pid);
                 if (gameWindow != IntPtr.Zero)
                 {
                     if (GetParent(gameWindow) != gamePanel.Handle) EmbedGameWindow();
@@ -372,6 +372,24 @@ internal sealed class LauncherWindow : Form
             Log("Launcher input restored after game exit");
         }
         catch (Exception error) { Log("Launcher return: " + error.Message); }
+    }
+
+    // The game's window, or on a trip between regions the current leg's: that
+    // game runs in a child process of the one we started (runner travel_leg)
+    // and puts its window in our game panel itself.
+    private IntPtr FindGameOrLegWindow(int pid)
+    {
+        IntPtr found = FindGameWindow(pid);
+        if (found != IntPtr.Zero) return found;
+        EnumWindowProc callback = delegate(IntPtr window, IntPtr parameter)
+        {
+            Rect bounds;
+            if (GetParent(window) == gamePanel.Handle && IsWindowVisible(window) && GetWindowRect(window, out bounds)
+             && bounds.Right - bounds.Left > 64 && bounds.Bottom - bounds.Top > 64) { found = window; return false; }
+            return true;
+        };
+        EnumChildWindows(gamePanel.Handle, callback, IntPtr.Zero);
+        return found;
     }
 
     private IntPtr FindGameWindow(int pid)
@@ -505,7 +523,7 @@ internal sealed class LauncherWindow : Form
             : gameMode == "gifts" ? "Close Mystery Gift and return to the launcher? Any unsaved changes will be lost."
             : "Discard unsaved PC Box changes and return? To save instead, choose No here, then press Z / B in the game and choose NO at Continue Box Operations.";
         if (MessageBox.Show(this, message, closeLauncher ? "Close Pokémon Recompiled?" : "Return to launcher?", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) != DialogResult.Yes) { FocusGameWindow(); return false; }
-        if (gameWindow == IntPtr.Zero || !IsWindow(gameWindow)) gameWindow = FindGameWindow(gamePid);
+        if (gameWindow == IntPtr.Zero || !IsWindow(gameWindow)) gameWindow = FindGameOrLegWindow(gamePid);
         if (gameWindow == IntPtr.Zero) { MessageBox.Show(this, "Close the game's window before closing the launcher.", "Game is still running"); return false; }
         PostMessage(gameWindow, 0x0010, IntPtr.Zero, IntPtr.Zero);
         for (int attempt = 0; attempt < 50 && GameIsAlive(); attempt++) await Task.Delay(100);
@@ -538,7 +556,7 @@ internal sealed class LauncherWindow : Form
                     {
                         object external;
                         int pid = Convert.ToInt32(running["pid"]);
-                        IntPtr candidate = FindGameWindow(pid);
+                        IntPtr candidate = FindGameOrLegWindow(pid);
                         bool owned = !running.TryGetValue("external", out external) || !Convert.ToBoolean(external)
                             || (candidate != IntPtr.Zero && GetParent(candidate) == gamePanel.Handle);
                         if (owned) { gamePid = pid; gameMode = Convert.ToString(running["mode"]); gameWindow = candidate; }
