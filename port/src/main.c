@@ -93,7 +93,7 @@ void PcFatal(const char *fmt, ...)
     vsnprintf(msg, sizeof msg, fmt, ap);
     va_end(ap);
     fprintf(stderr, "fatal: %s\n", msg);
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "FireRed PC", msg, NULL);
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "PokeRecomp", msg, NULL);
     exit(1);
 }
 
@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
     PcSettingsLoad();
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS) != 0)
         PcFatal("SDL_Init: %s", SDL_GetError());
-    if (!headless && PcVideoInit("FireRed PC") != 0)
+    if (!headless && PcVideoInit("PokeRecomp") != 0)
         PcFatal("could not open the game window");
     /* headless runs are silent (use --wav to capture) */
     PcAudioInit(headless || muted);
