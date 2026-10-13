@@ -409,6 +409,17 @@ static const struct MenuAction sMultichoiceList_OnlinePlayer[] = {
     { sText_OnlineCancel }
 };
 
+static const u8 sText_OnlineWonderTrade[] = _("WONDER TRADE");
+static const u8 sText_OnlineGts[] = _("GTS");
+static const u8 sText_OnlineMailbox[] = _("MAILBOX");
+static const u8 sText_OnlineExit[] = _("EXIT");
+static const struct MenuAction sMultichoiceList_GlobalTrade[] = {
+    { sText_OnlineWonderTrade },
+    { sText_OnlineGts },
+    { sText_OnlineMailbox },
+    { sText_OnlineExit }
+};
+
 static const struct MenuAction sMultichoiceList_PokejumpDodrio[] = {
     { gText_PokemonJump },
     { gText_DodrioBerryPicking },
@@ -564,6 +575,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] = {
     [MULTICHOICE_POKEJUMP_DODRIO]                            = MULTICHOICE(sMultichoiceList_PokejumpDodrio),
     [MULTICHOICE_TRADE_COLOSSEUM_2]                          = MULTICHOICE(sMultichoiceList_TradeColosseum_2),
     [MULTICHOICE_ONLINE_PLAYER]                              = MULTICHOICE(sMultichoiceList_OnlinePlayer),
+    [MULTICHOICE_GLOBAL_TRADE]                               = MULTICHOICE(sMultichoiceList_GlobalTrade),
     [MULTICHOICE_MUSHROOMS]                                  = MULTICHOICE(sMultichoiceList_Mushrooms),
     [MULTICHOICE_TRADE_COLOSSEUM_BLANK_CRUSH]                = MULTICHOICE(sMultichoiceList_TradeColosseumBlankCrush),
     [MULTICHOICE_TRADE_COLOSSEUM_BLANK]                      = MULTICHOICE(sMultichoiceList_TradeColosseumBlank),

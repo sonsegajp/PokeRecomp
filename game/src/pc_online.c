@@ -39,6 +39,10 @@
 #include "constants/cable_club.h"
 #include "constants/trainers.h"
 #include "naming_screen.h"
+#include "pokedex.h"
+#include "data.h"
+#include "pokemon_storage_system.h"
+#include "save.h"
 #include "pc_net.h"
 #include "pc_chat.h"
 #include "pc_online.h"
@@ -1145,6 +1149,137 @@ void Online_SessionKind(void)
     gSpecialVar_Result = PcNetLinkKind();
 }
 
+// ---- global trade: Wonder Trade + mailbox (GTS screen: Online_OpenGts) ----------
+
+enum { MSG_WONDER = 0x08, MSG_MAIL_COLLECT = 0x09 };
+enum { ERR_ILLEGAL_MON = 6 };
+u8 PcGiveTradedMon(struct Pokemon *mon);   // pokemon.c
+
+STATIC_ASSERT(sizeof(struct Pokemon) == 100, PokemonIs100BytesOnTheWire);
+
+static void RegisterReceivedMon(struct Pokemon *mon)
+{
+    u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    u16 dexNum = SpeciesToNationalPokedexNum(species);
+    GetSetPokedexFlag(dexNum, FLAG_SET_SEEN);
+    GetSetPokedexFlag(dexNum, FLAG_SET_CAUGHT);
+    StringCopy(gStringVar1, gSpeciesNames[species]);
+}
+
+static bool8 HasRoomForMon(void)
+{
+    int box, pos;
+    if (CalculatePlayerPartyCount() < PARTY_SIZE)
+        return TRUE;
+    for (box = 0; box < TOTAL_BOXES_COUNT; box++)
+        for (pos = 0; pos < IN_BOX_COUNT; pos++)
+            if (GetBoxMonDataAt(box, pos, MON_DATA_SPECIES) == SPECIES_NONE)
+                return TRUE;
+    return FALSE;
+}
+
+void Online_HasAccount(void)
+{
+    gSpecialVar_Result = PcNetHasAccount();
+}
+
+// VAR_RESULT: 0 failed, 1 traded (STR_VAR_1 = received), 2 deposit waiting, 3 not legal.
+// The game is saved right after any change, so a reload can't duplicate a Pokémon.
+static void Task_WonderTrade(u8 taskId)
+{
+    u8 slot = gTasks[taskId].data[0];
+    int status = PcNetOpStatus();
+    u8 type;
+    const u8 *reply;
+
+    if (status == PC_NET_OP_PENDING)
+        return;
+    if (status == PC_NET_OP_OK && PcNetMasterReply(&type, &reply) >= 1 + (int)sizeof(struct Pokemon))
+    {
+        if (reply[0] == 1)
+        {
+            memcpy(&gPlayerParty[slot], reply + 1, sizeof(struct Pokemon));
+            RegisterReceivedMon(&gPlayerParty[slot]);
+            gSpecialVar_Result = 1;
+        }
+        else
+        {
+            ZeroMonData(&gPlayerParty[slot]);
+            CompactPartySlots();
+            CalculatePlayerPartyCount();
+            gSpecialVar_Result = 2;
+        }
+        TrySavingData(SAVE_NORMAL);
+    }
+    else
+    {
+        gSpecialVar_Result = PcNetMasterError() == ERR_ILLEGAL_MON ? 3 : 0;
+    }
+    DestroyTask(taskId);
+    ScriptContext_Enable();
+}
+
+// special Online_WonderTrade (VAR_0x8004 = party slot; then waitstate)
+void Online_WonderTrade(void)
+{
+    u8 taskId = CreateTask(Task_WonderTrade, 80);
+    gTasks[taskId].data[0] = gSpecialVar_0x8004;
+    PcNetMasterRequest(MSG_WONDER, &gPlayerParty[gSpecialVar_0x8004], sizeof(struct Pokemon));
+}
+
+// VAR_RESULT: 0 failed, 1 received (STR_VAR_1; VAR_0x8005 = 1 if it went to the PC),
+// 2 nothing waiting, 4 no room.
+static void Task_CollectMail(u8 taskId)
+{
+    int status = PcNetOpStatus();
+    u8 type;
+    const u8 *reply;
+
+    if (status == PC_NET_OP_PENDING)
+        return;
+    gSpecialVar_0x8005 = 0;
+    if (status == PC_NET_OP_OK && PcNetMasterReply(&type, &reply) >= 3 + (int)sizeof(struct Pokemon))
+    {
+        if (reply[1])
+        {
+            struct Pokemon mon;
+            memcpy(&mon, reply + 3, sizeof(mon));
+            gSpecialVar_0x8005 = PcGiveTradedMon(&mon) == MON_GIVEN_TO_PC;
+            RegisterReceivedMon(&mon);
+            TrySavingData(SAVE_NORMAL);
+            gSpecialVar_Result = 1;
+        }
+        else
+        {
+            gSpecialVar_Result = 2;
+        }
+    }
+    else
+    {
+        gSpecialVar_Result = 0;
+    }
+    DestroyTask(taskId);
+    ScriptContext_Enable();
+}
+
+// special Online_CollectMail (then waitstate): one Pokémon per call.
+void Online_CollectMail(void)
+{
+    if (!HasRoomForMon())
+    {
+        gSpecialVar_Result = 4;   // checked before asking, so nothing is taken from the server
+        return;
+    }
+    CreateTask(Task_CollectMail, 80);
+    PcNetMasterRequest(MSG_MAIL_COLLECT, NULL, 0);
+}
+
+// special Online_OpenGts (after fadescreen; then waitstate) -- the GTS screen.
+void Online_OpenGts(void)
+{
+    SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
+}
+
 #else
 // The ARM (GBA) build has no network; the scripts are never reached there.
 void Online_OpenScreen(void) {}
@@ -1157,4 +1292,8 @@ void Online_DeclineRequest(void) {}
 void Online_SessionKind(void) {}
 void Online_StartBattle(void) {}
 void Online_StartTrade(void) {}
+void Online_HasAccount(void) {}
+void Online_WonderTrade(void) {}
+void Online_CollectMail(void) {}
+void Online_OpenGts(void) {}
 #endif

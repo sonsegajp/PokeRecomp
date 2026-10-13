@@ -463,5 +463,9 @@ gSpecials::
 	def_special Online_SessionKind
 	def_special Online_StartBattle
 	def_special Online_StartTrade
+	def_special Online_HasAccount
+	def_special Online_WonderTrade
+	def_special Online_CollectMail
+	def_special Online_OpenGts
 gSpecialsEnd::
 

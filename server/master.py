@@ -21,6 +21,7 @@ import struct
 import time
 
 from protocol import *  # noqa: F401,F403
+from trades import Trades
 
 TOKEN_TTL = 24 * 3600
 SERVER_TIMEOUT = 30
@@ -46,6 +47,7 @@ class Master:
         self.tokens = {}       # token -> (account_id, expiry)
         self.servers = {}      # writer -> dict(name, host, port, max, players, seen)
         self.online = {}       # account_id -> server name
+        self.trades = Trades(self.db)
 
     # ---- accounts ----------------------------------------------------------
 
@@ -164,6 +166,11 @@ class Master:
                 return frame(M_ERROR, bytes([ERR_FULL]))
             print("master: account", account_id, "renamed, tag", tag)
             return frame(M_RENAMED, name + struct.pack("<H", tag))
+        if account_id and M_WONDER <= t <= M_GTS_WITHDRAW:
+            names = lambda acc: (self.account(acc) or (b"", 0))[0]
+            reply = self.trades.dispatch(account_id, t, p, names)
+            if reply:
+                return reply
         if t == M_LIST_SERVERS:
             return frame(M_SERVER_LIST, self.server_list())
         if t == M_FRIEND_ADD and account_id and len(p) >= NAME_LEN + 2:

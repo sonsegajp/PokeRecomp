@@ -200,3 +200,190 @@ Online_Text_Connecting::
 
 Online_Text_LinkFailed::
 	.string "The connection was lost.$"
+
+@ ---- GLOBAL TRADE desk (the middle 2F desk): Wonder Trade, GTS, mailbox ----
+
+Online_EventScript_GlobalTrade::
+	goto_if_questlog EventScript_ReleaseEnd
+	special QuestLog_CutRecording
+	lock
+	faceplayer
+	special Online_HasAccount
+	goto_if_eq VAR_RESULT, FALSE, Online_EventScript_GlobalNeedAccount
+	message Online_Text_GlobalWelcome
+	waitmessage
+	multichoice 17, 0, MULTICHOICE_GLOBAL_TRADE, FALSE
+	switch VAR_RESULT
+	case 0, Online_EventScript_Wonder
+	case 1, Online_EventScript_Gts
+	case 2, Online_EventScript_Mailbox
+	goto Online_EventScript_GlobalBye
+
+Online_EventScript_GlobalNeedAccount::
+	msgbox Online_Text_GlobalNeedAccount
+	release
+	end
+
+Online_EventScript_GlobalBye::
+	msgbox Online_Text_ComeAgain
+	release
+	end
+
+Online_EventScript_Wonder::
+	msgbox Online_Text_WonderChoose
+	special ChoosePartyMon
+	waitstate
+	goto_if_ge VAR_0x8004, PARTY_SIZE, Online_EventScript_GlobalBye
+	specialvar VAR_RESULT, GetPartyMonSpecies
+	goto_if_eq VAR_RESULT, SPECIES_EGG, Online_EventScript_WonderEgg
+	specialvar VAR_RESULT, CountPartyAliveNonEggMons_IgnoreVar0x8004Slot
+	goto_if_eq VAR_RESULT, 0, Online_EventScript_WonderLast
+	special BufferMonNickname
+	msgbox Online_Text_WonderConfirm, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Online_EventScript_GlobalBye
+	call EventScript_AskSaveGame
+	goto_if_eq VAR_RESULT, 0, Online_EventScript_GlobalBye
+	message Online_Text_Connecting
+	waitmessage
+	special Online_WonderTrade
+	waitstate
+	switch VAR_RESULT
+	case 1, Online_EventScript_WonderGot
+	case 2, Online_EventScript_WonderWaiting
+	case 3, Online_EventScript_GlobalIllegal
+	goto Online_EventScript_GlobalFailed
+
+Online_EventScript_WonderGot::
+	playfanfare MUS_OBTAIN_ITEM
+	msgbox Online_Text_WonderGot
+	waitfanfare
+	release
+	end
+
+Online_EventScript_WonderWaiting::
+	msgbox Online_Text_WonderWaiting
+	release
+	end
+
+Online_EventScript_WonderEgg::
+	msgbox Online_Text_WonderEgg
+	release
+	end
+
+Online_EventScript_WonderLast::
+	msgbox Online_Text_WonderLast
+	release
+	end
+
+Online_EventScript_GlobalIllegal::
+	msgbox Online_Text_GlobalIllegal
+	release
+	end
+
+Online_EventScript_GlobalFailed::
+	msgbox Online_Text_GlobalFailed
+	release
+	end
+
+Online_EventScript_Mailbox::
+	setvar VAR_0x8007, 0
+Online_EventScript_MailboxNext::
+	message Online_Text_Checking
+	waitmessage
+	special Online_CollectMail
+	waitstate
+	switch VAR_RESULT
+	case 1, Online_EventScript_MailboxGot
+	case 2, Online_EventScript_MailboxEmpty
+	case 4, Online_EventScript_MailboxNoRoom
+	goto Online_EventScript_GlobalFailed
+
+Online_EventScript_MailboxGot::
+	addvar VAR_0x8007, 1
+	playfanfare MUS_OBTAIN_ITEM
+	msgbox Online_Text_MailboxGot
+	waitfanfare
+	goto_if_eq VAR_0x8005, 0, Online_EventScript_MailboxNext
+	msgbox Online_Text_MailboxToPC
+	goto Online_EventScript_MailboxNext
+
+Online_EventScript_MailboxEmpty::
+	goto_if_ne VAR_0x8007, 0, Online_EventScript_MailboxDone
+	msgbox Online_Text_MailboxEmpty
+	release
+	end
+
+Online_EventScript_MailboxDone::
+	msgbox Online_Text_MailboxDone
+	release
+	end
+
+Online_EventScript_MailboxNoRoom::
+	msgbox Online_Text_MailboxNoRoom
+	release
+	end
+
+Online_EventScript_Gts::
+	fadescreen FADE_TO_BLACK
+	special Online_OpenGts
+	waitstate
+	release
+	end
+
+Online_Text_GlobalWelcome::
+	.string "Welcome to the GLOBAL TRADE desk!\n"
+	.string "How may I help you?$"
+
+Online_Text_GlobalNeedAccount::
+	.string "Please register at the ONLINE CLUB\n"
+	.string "desk on the left first.$"
+
+Online_Text_WonderChoose::
+	.string "Which POKéMON will you send? It will\n"
+	.string "be traded with a random trainer.$"
+
+Online_Text_WonderConfirm::
+	.string "Send {STR_VAR_1} on a WONDER TRADE?$"
+
+Online_Text_WonderGot::
+	.string "{PLAYER} received {STR_VAR_1}!$"
+
+Online_Text_WonderWaiting::
+	.string "Your POKéMON is waiting for a\n"
+	.string "partner.\p"
+	.string "Check the MAILBOX later to collect\n"
+	.string "the POKéMON you get in return.$"
+
+Online_Text_WonderEgg::
+	.string "Eggs can't be sent on a WONDER\n"
+	.string "TRADE.$"
+
+Online_Text_WonderLast::
+	.string "You can't send your last POKéMON!$"
+
+Online_Text_GlobalIllegal::
+	.string "That POKéMON can't be traded.\n"
+	.string "It didn't pass the check.$"
+
+Online_Text_GlobalFailed::
+	.string "The connection failed.\n"
+	.string "Please try again later.$"
+
+Online_Text_Checking::
+	.string "Checking the MAILBOX…$"
+
+Online_Text_MailboxGot::
+	.string "{PLAYER} received {STR_VAR_1}!$"
+
+Online_Text_MailboxToPC::
+	.string "It was sent to the PC.$"
+
+Online_Text_MailboxEmpty::
+	.string "No POKéMON are waiting for you.$"
+
+Online_Text_MailboxDone::
+	.string "That's everything!$"
+
+Online_Text_MailboxNoRoom::
+	.string "There's no room for more POKéMON.\n"
+	.string "Make space in your PC, then come back.$"

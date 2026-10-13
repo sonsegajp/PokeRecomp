@@ -54,10 +54,14 @@ static uint16_t my_tag;
 static uint8_t token[TOKEN_LEN];
 
 /* operation in progress */
-enum { OP_NONE, OP_REGISTER, OP_LOGIN, OP_JOIN, OP_RENAME };
+enum { OP_NONE, OP_REGISTER, OP_LOGIN, OP_JOIN, OP_RENAME, OP_REQUEST };
 static int op, op_status = PC_NET_OP_IDLE;
 static int master_logged_in;
 static uint8_t rename_to[PC_NET_NAME_LEN];
+static uint8_t request_type, request_data[256];
+static int request_len;
+static uint8_t reply_type, reply_data[4096];
+static int reply_len, master_error;
 static uint8_t join_gender;
 
 /* servers */
@@ -316,6 +320,32 @@ void PcNetBeginRename(const uint8_t *name)
     send_login();
 }
 
+void PcNetMasterRequest(uint8_t type, const void *payload, int len)
+{
+    if (len > (int)sizeof request_data) len = sizeof request_data;
+    request_type = type;
+    memcpy(request_data, payload, len);
+    request_len = len;
+    master_error = 0;
+    op = OP_REQUEST;
+    op_status = PC_NET_OP_PENDING;
+    if (master.s != INVALID_SOCKET && master_logged_in) {
+        conn_send(&master, request_type, request_data, request_len);
+        return;
+    }
+    if (!PcNetHasAccount() || !open_master()) { finish_op(PC_NET_OP_FAILED); return; }
+    send_login();
+}
+
+int PcNetMasterReply(uint8_t *type, const uint8_t **payload)
+{
+    *type = reply_type;
+    *payload = reply_data;
+    return reply_len;
+}
+
+int PcNetMasterError(void) { return master_error; }
+
 int PcNetOpStatus(void) { return op_status; }
 const uint8_t *PcNetMyName(void) { return my_name; }
 uint16_t PcNetMyTag(void) { return my_tag; }
@@ -493,6 +523,8 @@ static void handle_master(uint8_t type, const uint8_t *p, int len)
         master_logged_in = 1;
         if (op == OP_RENAME)
             conn_send(&master, M_RENAME, rename_to, PC_NET_NAME_LEN);
+        else if (op == OP_REQUEST)
+            conn_send(&master, request_type, request_data, request_len);
         else
             conn_send(&master, M_LIST_SERVERS, NULL, 0);
         break;
@@ -519,8 +551,17 @@ static void handle_master(uint8_t type, const uint8_t *p, int len)
         if (op == OP_REGISTER || op == OP_LOGIN || op == OP_RENAME) finish_op(PC_NET_OP_OK);
         break;
     }
+    case 0x86: case 0x87: case 0x88: case 0x89: case 0x8A:   /* M_WONDER_RESULT .. M_GTS_RESULT */
+        if (op == OP_REQUEST) {
+            reply_type = type;
+            reply_len = len > (int)sizeof reply_data ? (int)sizeof reply_data : len;
+            memcpy(reply_data, p, reply_len);
+            finish_op(PC_NET_OP_OK);
+        }
+        break;
     case M_ERROR:
-        if (op == OP_REGISTER || op == OP_LOGIN || op == OP_RENAME) finish_op(PC_NET_OP_FAILED);
+        if (op == OP_REQUEST) master_error = len ? p[0] : 0;
+        if (op == OP_REGISTER || op == OP_LOGIN || op == OP_RENAME || op == OP_REQUEST) finish_op(PC_NET_OP_FAILED);
         break;
     }
 }
@@ -622,7 +663,7 @@ void PcNetPump(void)
         if (!conn_io(&master)) {
             conn_close(&master);
             master_logged_in = 0;
-            if (op == OP_REGISTER || op == OP_LOGIN || op == OP_RENAME) finish_op(PC_NET_OP_FAILED);
+            if (op == OP_REGISTER || op == OP_LOGIN || op == OP_RENAME || op == OP_REQUEST) finish_op(PC_NET_OP_FAILED);
         }
         while ((n = conn_next(&master, &type, &p, &len)) > 0) {
             handle_master(type, p, len);

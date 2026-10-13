@@ -33,6 +33,13 @@ int PcNetHasAccount(void);
 void PcNetBeginRegister(const uint8_t *name);   /* registers, then logs in */
 void PcNetBeginLogin(void);                     /* logs in + fetches the server list */
 void PcNetBeginRename(const uint8_t *name);     /* new online name (new tag), then the server list */
+
+/* Global trade (Wonder Trade / GTS / mailbox) requests to the master: send
+ * one request, then read the reply once PcNetOpStatus() is OK (or the error
+ * code once it FAILED). Types/layouts: server/protocol.py M_WONDER..M_GTS_*. */
+void PcNetMasterRequest(uint8_t type, const void *payload, int len);
+int PcNetMasterReply(uint8_t *type, const uint8_t **payload);  /* returns payload length */
+int PcNetMasterError(void);
 int PcNetOpStatus(void);
 const uint8_t *PcNetMyName(void);
 uint16_t PcNetMyTag(void);

@@ -1234,7 +1234,7 @@ EventScript_VsSeekerChargingDone::
 
 @ PC port: the 2F desks are online now (data/scripts/pc_online.inc).
 Common_EventScript_UnionRoomAttendant::
-	goto Online_EventScript_LocalClosed
+	goto Online_EventScript_GlobalTrade
 	end
 
 Common_EventScript_WirelessClubAttendant::
