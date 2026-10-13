@@ -238,6 +238,12 @@ int main(int argc, char *argv[])
             gPcDebugWarp.y = atoi(argv[++i]);
             gPcDebugWarp.pending = 1;
         }
+        else if (!strcmp(argv[i], "--dump-legality") && i + 1 < argc) {
+            /* the game's own Pokemon rules as JSON, for the servers' legality checks */
+            void PcDumpLegality(const char *path);
+            PcDumpLegality(argv[i + 1]);
+            return 0;
+        }
         else if (!strcmp(argv[i], "--net-autojoin")) gPcDebugNet.autojoin = 1;
         else if (!strcmp(argv[i], "--net-accept")) gPcDebugNet.accept = 1;
         else if (!strcmp(argv[i], "--net-chat") && i + 1 < argc) snprintf(gPcDebugNet.chat, sizeof gPcDebugNet.chat, "%s", argv[++i]);

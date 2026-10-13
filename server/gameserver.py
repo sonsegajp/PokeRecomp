@@ -19,9 +19,11 @@ them — so both games see identical data in identical order, as on a cable.
 import argparse
 import asyncio
 import collections
+import os
 import struct
 
 from protocol import *  # noqa: F401,F403
+import legality
 
 TICK = 1 / 60
 MAX_QUEUE = 600          # commands a client may have waiting (10 s) before it is cut off
@@ -40,6 +42,7 @@ class Player:
         self.session = None
         self.pending_to = None              # (target id, kind) we asked
         self.link_queue = collections.deque()
+        self.block = None                   # link block being sent: [size, bytearray]
 
     def info(self):
         return frame(S_PLAYER, struct.pack("<H", self.id) + self.name + struct.pack("<HB", self.tag, self.gender)
@@ -209,6 +212,8 @@ class GameServer:
         elif t == S_LINK_CMD and player.session and len(p) >= CMD_LENGTH * 2:
             if not player.session.all_open():
                 pass                                  # cable not connected: dropped, as on hardware
+            elif self.inspect(player, bytes(p[:CMD_LENGTH * 2])):
+                return                                # session ended: illegal Pokémon
             elif len(player.link_queue) >= MAX_QUEUE:
                 self.end_session(player, 3)
             else:
@@ -227,6 +232,38 @@ class GameServer:
                 for m in s.members:
                     m.link_queue.clear()
                     m.send(frame(S_LINK_STATE, bytes([s.all_open()])))
+
+    # ---- legality -------------------------------------------------------------------------
+
+    def inspect(self, player, cmd):
+        """Rebuild the player's link blocks (link.c: INIT_BLOCK 0xBBBB size, then
+        CONT_BLOCK 0x8888 + 14 bytes) and check every Pokémon party block.
+        Returns True if the session was ended for an illegal Pokémon."""
+        word0, size = struct.unpack_from("<HH", cmd)
+        if word0 == 0xBBBB:
+            player.block = [size, bytearray()]
+        elif word0 == 0x8888 and player.block:
+            player.block[1] += cmd[2:16]
+            if len(player.block[1]) >= player.block[0]:
+                data = bytes(player.block[1][:player.block[0]])
+                player.block = None
+                why = legality.check_block(data)
+                if len(data) == 200:
+                    print(f"game: checked party block from player {player.id}: {why or 'legal'}")
+                    if not why and not os.path.exists("sample_party_block.bin"):
+                        open("sample_party_block.bin", "wb").write(data)   # for legality tests
+                if why:
+                    print(f"game: player {player.id} sent an illegal Pokemon ({why}); ending the session")
+                    self.end_session_all(player, 4)
+                    return True
+        return False
+
+    def end_session_all(self, player, reason):
+        s = player.session
+        if not s:
+            return
+        self.end_session(player, reason)
+        player.send(frame(S_SESSION_END, bytes([reason])))
 
     # ---- link sessions -----------------------------------------------------------------
 

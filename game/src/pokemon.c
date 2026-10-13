@@ -6451,3 +6451,13 @@ u8 *MonSpritesGfxManager_GetSpritePtr(u8 spriteNum)
         return sMonSpritesGfxManager->spritePointers[spriteNum];
     }
 }
+
+#ifdef PLATFORM_PC
+// For the online legality data dump (pc_legality.c).
+u32 PcSpeciesCanLearnTMHM(u16 species, u8 tm)
+{
+    if (tm < 32)
+        return sTMHMLearnsets[species][0] & (1u << tm);
+    return sTMHMLearnsets[species][1] & (1u << (tm - 32));
+}
+#endif

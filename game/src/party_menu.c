@@ -6340,3 +6340,16 @@ static void Task_PartyMenuWaitForFade(u8 taskId)
         ScriptContext_Enable();
     }
 }
+
+#ifdef PLATFORM_PC
+// For the online legality data dump (pc_legality.c).
+bool8 PcSpeciesCanLearnTutor(u16 species, u8 tutor)
+{
+    return CanLearnTutorMove(species, tutor);
+}
+
+u16 PcTutorMove(u8 tutor)
+{
+    return GetTutorMove(tutor);
+}
+#endif
