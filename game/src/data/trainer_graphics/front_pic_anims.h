@@ -888,4 +888,8 @@ const union AnimCmd *const *const gTrainerFrontAnimsPtrTable[] =
     [TRAINER_PIC_RUIN_MANIAC]           = sAnims_RuinManiac,
     [TRAINER_PIC_LADY]                  = sAnims_Lady,
     [TRAINER_PIC_PAINTER]               = sAnims_Painter,
+#ifdef PLATFORM_PC
+    [TRAINER_PIC_PC_VISITOR(MALE)]      = sAnims_RSBrendan1,
+    [TRAINER_PIC_PC_VISITOR(FEMALE)]    = sAnims_RSMay1,
+#endif
 };

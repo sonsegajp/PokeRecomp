@@ -67,5 +67,6 @@ const void *PcTravelGraphicsInfo(int gfx, const void *info);  /* the visitor spr
 const void *PcTravelBaseAnims(const void *anims);        /* ...and the walk-step table they use */
 int PcTravelBackPic(int gender, int pic);                /* the player's battle back pic */
 int PcTravelGameVersion(int version);                    /* VERSION_* on their card and the link */
+int PcTravelCardPic(int gender, int pic);                /* the picture on their trainer card */
 
 #endif

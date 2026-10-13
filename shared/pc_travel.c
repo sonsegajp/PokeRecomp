@@ -40,6 +40,7 @@
 #include "pc_travel.h"
 #include "pc_rompack.h"
 #include "../xgfx/pc_visitor_gfx.h"
+#include "pc_travel_game.h"
 
 
 STATIC_ASSERT(sizeof(struct Pokemon) == 100, PokemonIs100Bytes);
@@ -219,6 +220,8 @@ static void TakeParty(void)
 
     memcpy(gPlayerParty, sTravel.party, sizeof(struct Pokemon) * PARTY_SIZE);
     CalculatePlayerPartyCount();
+    if (gPlayerPartyCount > 0)
+        FlagSet(FLAG_SYS_POKEMON_GET);   // they came with Pokemon: the menu has POKEMON
     for (i = 0; i < gPlayerPartyCount; i++)
     {
         u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, NULL);
@@ -329,11 +332,9 @@ static const u8 sPlayerGfxStates[][3] = {   // this game's player ids: gender, P
 #ifdef EMERALD
 #define HOST_NORMAL_GFX OBJ_EVENT_GFX_BRENDAN_NORMAL      // its 16x32 player sprite
 #define HOST_BIG_GFX    OBJ_EVENT_GFX_BRENDAN_MACH_BIKE   // its 32x32 one
-#define VISITOR_BACK_PIC TRAINER_BACK_PIC_RED
 #else
 #define HOST_NORMAL_GFX OBJ_EVENT_GFX_RED_NORMAL
 #define HOST_BIG_GFX    OBJ_EVENT_GFX_RED_BIKE
-#define VISITOR_BACK_PIC TRAINER_BACK_PIC_RUBY_SAPPHIRE_BRENDAN
 #endif
 
 extern const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[];
@@ -385,11 +386,29 @@ static void BuildVisitorInfo(int gender, int state, const struct ObjectEventGrap
     sVisitorReady[gender][state] = TRUE;
 }
 
+// Other online trainers from the other region, walking around: the same sprites.
+#ifdef EMERALD
+#define REMOTE_GFX_MALE   OBJ_EVENT_GFX_RED
+#define REMOTE_GFX_FEMALE OBJ_EVENT_GFX_LEAF
+#else
+#define REMOTE_GFX_MALE   OBJ_EVENT_GFX_PC_HOENN_BRENDAN
+#define REMOTE_GFX_FEMALE OBJ_EVENT_GFX_PC_HOENN_MAY
+#endif
+
 const void *PcTravelGraphicsInfo(int gfx, const void *info)
 {
     int i;
 
-    if (sRole != ROLE_VISITOR || !PcRomPackForeignReady())
+    if (!PcRomPackForeignReady())
+        return info;
+    if (gfx == REMOTE_GFX_MALE || gfx == REMOTE_GFX_FEMALE)
+    {
+        int gender = gfx == REMOTE_GFX_MALE ? MALE : FEMALE;
+        if (!sVisitorReady[gender][PC_VISITOR_NORMAL])
+            BuildVisitorInfo(gender, PC_VISITOR_NORMAL, gObjectEventGraphicsInfoPointers[HOST_NORMAL_GFX]);
+        return &sVisitorInfo[gender][PC_VISITOR_NORMAL];
+    }
+    if (sRole != ROLE_VISITOR)
         return info;
     for (i = 0; i < (int)ARRAY_COUNT(sPlayerGfxStates); i++)
     {
@@ -416,7 +435,24 @@ const void *PcTravelBaseAnims(const void *anims)
 
 int PcTravelBackPic(int gender, int pic)
 {
-    return sRole == ROLE_VISITOR ? VISITOR_BACK_PIC + gender : pic;
+    if (sRole != ROLE_VISITOR)
+        return pic;
+#ifdef EMERALD
+    return TRAINER_BACK_PIC_RED + gender;              // Emerald carries FireRed's
+#else
+    if (PcRomPackForeignReady())
+        return TRAINER_BACK_PIC_PC_VISITOR(gender);    // Emerald's Brendan / May (xgfx)
+    return TRAINER_BACK_PIC_RUBY_SAPPHIRE_BRENDAN + gender;
+#endif
+}
+
+int PcTravelCardPic(int gender, int pic)
+{
+#ifndef EMERALD
+    if (sRole == ROLE_VISITOR && PcRomPackForeignReady())
+        return TRAINER_PIC_PC_VISITOR(gender);
+#endif
+    return pic;
 }
 
 int PcTravelGameVersion(int version)

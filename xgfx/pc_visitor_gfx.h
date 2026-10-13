@@ -31,4 +31,15 @@ extern const u16 gPcVisitorPal[4][16];   // [gender * 2]: the sprites', [gender 
 #define PC_VISITOR_PAL_TAG(gender)            (0x11F0 + (gender) * 2)
 #define PC_VISITOR_REFLECTION_PAL_TAG(gender) (0x11F1 + (gender) * 2)
 
+#ifndef EMERALD
+// FireRed / LeafGreen: Emerald's Brendan and May in battle (back pics) and on
+// the trainer card (front pics), beside the game's own pics
+extern const u8 gPcVisitorBackPic_M[], gPcVisitorBackPic_F[];
+extern const u32 gPcVisitorFrontPic_M[], gPcVisitorFrontPic_F[];
+extern const u32 gPcVisitorTrainerPalette_M[], gPcVisitorTrainerPalette_F[];
+extern const struct SpriteFrameImage gPcVisitorBackPicFrames[2][4];
+#define TRAINER_BACK_PIC_PC_VISITOR(gender) (TRAINER_BACK_PIC_OLD_MAN + 1 + (gender))
+#define TRAINER_PIC_PC_VISITOR(gender)      (TRAINER_PIC_PAINTER + 1 + (gender))
+#endif
+
 #endif // GUARD_PC_VISITOR_GFX_H

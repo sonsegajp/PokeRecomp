@@ -69,6 +69,7 @@
 #include "pc_online.h"
 #include "pc_game.h"
 #include "pc_travel.h"
+#include "pc_travel_game.h"
 #include "item.h"
 #include "money.h"
 #include "constants/items.h"
@@ -2862,19 +2863,19 @@ static EWRAM_DATA u8 sIncomingKind = 0;
 static EWRAM_DATA u16 sIncomingWait = 0;
 
 // Every trainer looks like their own game's hero: Kanto players as Red/Leaf,
-// Hoenn players as Brendan/May (both engines carry the other's sprites for
-// link play).
+// Hoenn players as Brendan/May, with that game's own sprites (ported between
+// the games, xgfx/; see pc_travel.c PcTravelGraphicsInfo).
 static u16 AvatarGfx(const struct PcNetPlayer *p)
 {
     bool8 hoenn = p->game == PC_NET_GAME_EMERALD || p->game == PC_NET_GAME_RUBY || p->game == PC_NET_GAME_SAPPHIRE;
 #ifdef EMERALD
     if (!hoenn)
         return p->gender ? OBJ_EVENT_GFX_LEAF : OBJ_EVENT_GFX_RED;
-    return p->gender ? OBJ_EVENT_GFX_MAY_NORMAL : OBJ_EVENT_GFX_BRENDAN_NORMAL;
+    return p->gender ? OBJ_EVENT_GFX_LINK_MAY : OBJ_EVENT_GFX_LINK_BRENDAN;   // Emerald's own, not the player's ids
 #else
     if (hoenn)
-        return p->gender ? OBJ_EVENT_GFX_RS_MAY : OBJ_EVENT_GFX_RS_BRENDAN;
-    return p->gender ? OBJ_EVENT_GFX_GREEN_NORMAL : OBJ_EVENT_GFX_RED_NORMAL;
+        return p->gender ? OBJ_EVENT_GFX_PC_HOENN_MAY : OBJ_EVENT_GFX_PC_HOENN_BRENDAN;
+    return p->gender ? OBJ_EVENT_GFX_PC_KANTO_GREEN : OBJ_EVENT_GFX_PC_KANTO_RED;   // not the player's ids
 #endif
 }
 

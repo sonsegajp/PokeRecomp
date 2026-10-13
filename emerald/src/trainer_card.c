@@ -1,4 +1,7 @@
 #include "global.h"
+#ifdef PLATFORM_PC
+#include "pc_travel_game.h"
+#endif
 #include "scanline_effect.h"
 #include "palette.h"
 #include "task.h"
@@ -760,7 +763,7 @@ static void SetPlayerCardData(struct TrainerCard *trainerCard, u8 cardType)
 static void TrainerCard_GenerateCardForPlayer(struct TrainerCard *trainerCard)
 {
     memset(trainerCard, 0, sizeof(struct TrainerCard));
-    trainerCard->version = GAME_VERSION;
+    trainerCard->version = PC_GAME_VERSION(GAME_VERSION);
     SetPlayerCardData(trainerCard, CARD_TYPE_EMERALD);
     trainerCard->hasAllFrontierSymbols = HasAllFrontierSymbols();
     trainerCard->frontierBP = gSaveBlock2Ptr->frontier.cardBattlePoints;
@@ -776,7 +779,7 @@ static void TrainerCard_GenerateCardForPlayer(struct TrainerCard *trainerCard)
 void TrainerCard_GenerateCardForLinkPlayer(struct TrainerCard *trainerCard)
 {
     memset(trainerCard, 0, 0x60);
-    trainerCard->version = GAME_VERSION;
+    trainerCard->version = PC_GAME_VERSION(GAME_VERSION);
     SetPlayerCardData(trainerCard, CARD_TYPE_EMERALD);
     trainerCard->linkHasAllFrontierSymbols = HasAllFrontierSymbols();
     *((u16 *)&trainerCard->linkPoints.frontier) = gSaveBlock2Ptr->frontier.cardBattlePoints;

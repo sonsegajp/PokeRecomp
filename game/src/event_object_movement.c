@@ -2081,6 +2081,10 @@ const struct ObjectEventGraphicsInfo *GetObjectEventGraphicsInfo(u8 graphicsId)
     if (graphicsId == OBJ_EVENT_GFX_PC_KANTO_RED || graphicsId == OBJ_EVENT_GFX_PC_KANTO_GREEN)
         return gObjectEventGraphicsInfoPointers[graphicsId == OBJ_EVENT_GFX_PC_KANTO_RED
                                                 ? OBJ_EVENT_GFX_RED_NORMAL : OBJ_EVENT_GFX_GREEN_NORMAL];
+    // other online Hoenn trainers: Emerald's Brendan / May
+    if (graphicsId == OBJ_EVENT_GFX_PC_HOENN_BRENDAN || graphicsId == OBJ_EVENT_GFX_PC_HOENN_MAY)
+        return PC_GFX_INFO(graphicsId, gObjectEventGraphicsInfoPointers[graphicsId == OBJ_EVENT_GFX_PC_HOENN_BRENDAN
+                                                                        ? OBJ_EVENT_GFX_RS_BRENDAN : OBJ_EVENT_GFX_RS_MAY]);
 #endif
     if (graphicsId >= NUM_OBJ_EVENT_GFX)
         graphicsId = OBJ_EVENT_GFX_LITTLE_BOY;

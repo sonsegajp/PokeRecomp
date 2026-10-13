@@ -11,12 +11,14 @@
 #define PC_STEP_ANIMS(anims)              ((const union AnimCmd *const *)PcTravelBaseAnims(anims))
 #define PC_PLAYER_BACK_PIC(gender, pic)   PcTravelBackPic(gender, pic)
 #define PC_GAME_VERSION(version)          PcTravelGameVersion(version)
+#define PC_CARD_PIC(gender, pic)          PcTravelCardPic(gender, pic)
 #else
 #define PC_PLAYER_GFX(gender, gfx)        (gfx)
 #define PC_GFX_INFO(gfx, info)            (info)
 #define PC_STEP_ANIMS(anims)              (anims)
 #define PC_PLAYER_BACK_PIC(gender, pic)   (pic)
 #define PC_GAME_VERSION(version)          (version)
+#define PC_CARD_PIC(gender, pic)          (pic)
 #endif
 
 #endif // GUARD_PC_TRAVEL_GAME_H

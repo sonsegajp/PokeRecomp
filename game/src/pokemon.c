@@ -1,6 +1,9 @@
 #define IS_POKEMON_C
 
 #include "global.h"
+#ifdef PLATFORM_PC
+#include "../../xgfx/pc_visitor_gfx.h"
+#endif
 #include "gflib.h"
 #include "random.h"
 #include "text.h"
@@ -1575,6 +1578,27 @@ static const struct SpriteTemplate sTrainerBackSpriteTemplates[] =
         .affineAnims = gAffineAnims_BattleSpritePlayerSide,
         .callback = SpriteCB_AllyMon,
     },
+#ifdef PLATFORM_PC
+    // a visitor from Hoenn: Emerald's Brendan and May (pc_visitor_gfx.h)
+    [TRAINER_BACK_PIC_PC_VISITOR(MALE)] = {
+        .tileTag = TAG_NONE,
+        .paletteTag = 0,
+        .oam = &gOamData_BattlerPlayer,
+        .anims = NULL,
+        .images = gPcVisitorBackPicFrames[MALE],
+        .affineAnims = gAffineAnims_BattleSpritePlayerSide,
+        .callback = SpriteCB_AllyMon,
+    },
+    [TRAINER_BACK_PIC_PC_VISITOR(FEMALE)] = {
+        .tileTag = TAG_NONE,
+        .paletteTag = 0,
+        .oam = &gOamData_BattlerPlayer,
+        .anims = NULL,
+        .images = gPcVisitorBackPicFrames[FEMALE],
+        .affineAnims = gAffineAnims_BattleSpritePlayerSide,
+        .callback = SpriteCB_AllyMon,
+    },
+#endif
 };
 
 // Classes dummied out

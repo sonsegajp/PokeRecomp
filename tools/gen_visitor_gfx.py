@@ -44,6 +44,14 @@ GAMES = {
         ],
         palettes=[('gObjectEventPal_Brendan', 'gObjectEventPal_BrendanReflection'),
                   ('gObjectEventPal_May', 'gObjectEventPal_MayReflection')],
+        # battle back pics (4 frames), trainer card front pics and their palette:
+        # FireRed only has Ruby/Sapphire's Brendan and May
+        trainers=[('graphics/trainers/back_pics/brendan.png.4bpp', 4,
+                   'graphics/trainers/front_pics/brendan.png.4bpp.lz',
+                   'graphics/trainers/palettes/brendan.pal.gbapal.lz'),
+                  ('graphics/trainers/back_pics/may.png.4bpp', 4,
+                   'graphics/trainers/front_pics/may.png.4bpp.lz',
+                   'graphics/trainers/palettes/may.pal.gbapal.lz')],
     ),
     'firered': dict(
         dir='game',
@@ -142,6 +150,18 @@ def gen(key):
             bits, path = asset(game, gfx_lines[n])
             out.append('    INCBIN_U16("%s"),' % path)
     out.append('};')
+    if game.get('trainers'):
+        out.append('')
+        out.append('// battle back pics, trainer card pics and their palettes')
+        for g, (back, frames, front, pal) in zip(('M', 'F'), game['trainers']):
+            root = '../%s/build/assets/' % game['dir']
+            out.append('const u8 gPcVisitorBackPic_%s[] = INCBIN_U8("%s%s");' % (g, root, back))
+            out.append('const u32 gPcVisitorFrontPic_%s[] = INCBIN_U32("%s%s");' % (g, root, front))
+            out.append('const u32 gPcVisitorTrainerPalette_%s[] = INCBIN_U32("%s%s");' % (g, root, pal))
+        out.append('const struct SpriteFrameImage gPcVisitorBackPicFrames[2][4] = {')
+        for g, (back, frames, front, pal) in zip(('M', 'F'), game['trainers']):
+            out.append('    {' + ', '.join('{gPcVisitorBackPic_%s + 0x800 * %d, 0x800}' % (g, i) for i in range(frames)) + '},')
+        out.append('};')
     path = os.path.join(ROOT, game['out'])
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w', encoding='utf-8', newline='\n') as f:

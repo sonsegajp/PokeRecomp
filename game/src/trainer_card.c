@@ -1,4 +1,7 @@
 #include "global.h"
+#ifdef PLATFORM_PC
+#include "pc_travel_game.h"
+#endif
 #include "gflib.h"
 #include "scanline_effect.h"
 #include "task.h"
@@ -859,7 +862,7 @@ void TrainerCard_GenerateCardForLinkPlayer(struct TrainerCard *trainerCard)
 {
     u8 id = 0;
 
-    trainerCard->version = GAME_VERSION;
+    trainerCard->version = PC_GAME_VERSION(GAME_VERSION);
     SetPlayerCardData(trainerCard, CARD_TYPE_RSE);
     if (GetCardType() != CARD_TYPE_FRLG)
         return;
@@ -1922,7 +1925,7 @@ static void CreateTrainerCardTrainerPic(void)
     {
         if (sTrainerCardDataPtr->cardType != CARD_TYPE_FRLG)
         {
-            CreateTrainerCardTrainerPicSprite(FacilityClassToPicIndex(facilityClass), TRUE, sTrainerPicOffsets[sTrainerCardDataPtr->cardType][sTrainerCardDataPtr->trainerCard.rse.gender][0],
+            CreateTrainerCardTrainerPicSprite(PC_CARD_PIC(sTrainerCardDataPtr->trainerCard.rse.gender, FacilityClassToPicIndex(facilityClass)), TRUE, sTrainerPicOffsets[sTrainerCardDataPtr->cardType][sTrainerCardDataPtr->trainerCard.rse.gender][0],
                     sTrainerPicOffsets[sTrainerCardDataPtr->cardType][sTrainerCardDataPtr->trainerCard.rse.gender][1], 8, 2);
         }
         else

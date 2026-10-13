@@ -1,5 +1,8 @@
 #include "global.h"
 #ifdef PLATFORM_PC
+#include "pc_travel_game.h"
+#endif
+#ifdef PLATFORM_PC
 #include "pc_net.h"
 #endif
 #include "gflib.h"
@@ -350,7 +353,7 @@ static void InitLocalLinkPlayer(void)
     gLocalLinkPlayer.gender = gSaveBlock2Ptr->playerGender;
     gLocalLinkPlayer.linkType = gLinkType;
     gLocalLinkPlayer.language = gGameLanguage;
-    gLocalLinkPlayer.version = gGameVersion + 0x4000;
+    gLocalLinkPlayer.version = PC_GAME_VERSION(gGameVersion) + 0x4000;
     gLocalLinkPlayer.lp_field_2 = 0x8000;
     gLocalLinkPlayer.progressFlags = IsNationalPokedexEnabled();
     if (FlagGet(FLAG_SYS_CAN_LINK_WITH_RS))

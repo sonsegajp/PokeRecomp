@@ -526,3 +526,15 @@ const u16 gPcVisitorPal[4][16] = {
     INCBIN_U16("../emerald/build/assets/graphics/object_events/palettes/may.pal.gbapal"),
     INCBIN_U16("../emerald/build/assets/graphics/object_events/palettes/may_reflection.pal.gbapal"),
 };
+
+// battle back pics, trainer card pics and their palettes
+const u8 gPcVisitorBackPic_M[] = INCBIN_U8("../emerald/build/assets/graphics/trainers/back_pics/brendan.png.4bpp");
+const u32 gPcVisitorFrontPic_M[] = INCBIN_U32("../emerald/build/assets/graphics/trainers/front_pics/brendan.png.4bpp.lz");
+const u32 gPcVisitorTrainerPalette_M[] = INCBIN_U32("../emerald/build/assets/graphics/trainers/palettes/brendan.pal.gbapal.lz");
+const u8 gPcVisitorBackPic_F[] = INCBIN_U8("../emerald/build/assets/graphics/trainers/back_pics/may.png.4bpp");
+const u32 gPcVisitorFrontPic_F[] = INCBIN_U32("../emerald/build/assets/graphics/trainers/front_pics/may.png.4bpp.lz");
+const u32 gPcVisitorTrainerPalette_F[] = INCBIN_U32("../emerald/build/assets/graphics/trainers/palettes/may.pal.gbapal.lz");
+const struct SpriteFrameImage gPcVisitorBackPicFrames[2][4] = {
+    {{gPcVisitorBackPic_M + 0x800 * 0, 0x800}, {gPcVisitorBackPic_M + 0x800 * 1, 0x800}, {gPcVisitorBackPic_M + 0x800 * 2, 0x800}, {gPcVisitorBackPic_M + 0x800 * 3, 0x800}},
+    {{gPcVisitorBackPic_F + 0x800 * 0, 0x800}, {gPcVisitorBackPic_F + 0x800 * 1, 0x800}, {gPcVisitorBackPic_F + 0x800 * 2, 0x800}, {gPcVisitorBackPic_F + 0x800 * 3, 0x800}},
+};

@@ -291,6 +291,9 @@ const union AnimCmd *const gAnims_MonPic[] =
 #include "data/pokemon_graphics/palette_table.h"
 #include "data/pokemon_graphics/shiny_palette_table.h"
 
+#ifdef PLATFORM_PC
+#include "../../xgfx/pc_visitor_gfx.h"
+#endif
 #include "data/trainer_graphics/front_pic_anims.h"
 #include "data/trainer_graphics/front_pic_tables.h"
 #include "data/trainer_graphics/back_pic_anims.h"

@@ -86,5 +86,9 @@ const union AnimCmd *const *const gTrainerBackAnimsPtrTable[] = {
     sBackAnims_RSBrendan,
     sBackAnims_RSMay,
     sBackAnims_Pokedude,
-    sBackAnims_OldMan
+    sBackAnims_OldMan,
+#ifdef PLATFORM_PC
+    sBackAnims_RSBrendan,   // a visitor from Hoenn: Emerald's Brendan and May throw the same way
+    sBackAnims_RSMay,
+#endif
 };
