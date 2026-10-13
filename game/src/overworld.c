@@ -42,6 +42,7 @@
 #include "scanline_effect.h"
 #include "script.h"
 #include "script_pokemon_util.h"
+#include "item.h"
 #include "start_menu.h"
 #include "tileset_anims.h"
 #include "trainer_pokemon_sprites.h"
@@ -1483,6 +1484,11 @@ void CB1_Overworld(void)
     {
         ScriptGiveMon(gPcDebugGiveMon.species, gPcDebugGiveMon.level, 0, 0, 0, 0); // no held item
         gPcDebugGiveMon.species = 0;
+    }
+    if (gPcDebugGiveItem.item && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
+    {
+        AddBagItem(gPcDebugGiveItem.item, gPcDebugGiveItem.count);
+        gPcDebugGiveItem.item = 0;
     }
     if (gPcDebugWarp.pending && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
     {

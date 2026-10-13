@@ -52,5 +52,8 @@ extern struct PcDebugWarp gPcDebugWarp;
 /* Test hook (--give-mon SPECIES LEVEL): added to the party the same way. */
 struct PcDebugGiveMon { int species, level; };
 extern struct PcDebugGiveMon gPcDebugGiveMon;
+/* Test hook (--give-item ITEM COUNT): added to the bag the same way. */
+struct PcDebugGiveItem { int item, count; };
+extern struct PcDebugGiveItem gPcDebugGiveItem;
 
 #endif
