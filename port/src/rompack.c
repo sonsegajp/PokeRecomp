@@ -161,13 +161,23 @@ static uint8_t *load_pack(const wchar_t *path)
     return buf;
 }
 
+static void (*sProgress)(int percent, void *ctx);
+static void *sProgressCtx;
+
+static void progress(int percent)
+{
+    if (sProgress) sProgress(percent, sProgressCtx);
+}
+
 /* A ROM -> pack bytes (NULL if it isn't one we know). */
 static uint8_t *unpack_rom(const uint8_t *rom, size_t size)
 {
     uint8_t h[20], *pack, *out;
     const struct Table *tab = NULL;
 
+    progress(45);
     sha1(rom, size, h);
+    progress(60);
     for (uint32_t t = 0; t < ntables && t < 4; t++)
         if (!memcmp(h, tables[t].sha1, 20) && size == tables[t].romsize)
             tab = &tables[t];
@@ -182,6 +192,7 @@ static uint8_t *unpack_rom(const uint8_t *rom, size_t size)
         if ((uint64_t)pc->rom + pc->len > size || out + pc->len > pack + 24 + total) { free(pack); return NULL; }
         memcpy(out, rom + pc->rom, pc->len);
         out += pc->len;
+        if ((i & 2047) == 0) progress(60 + (int)(30ull * i / tab->count));
     }
     if (out != pack + 24 + total || fnv64(0xCBF29CE484222325ull, pack + 24, total) != check) { free(pack); return NULL; }
     return pack;
@@ -290,18 +301,42 @@ static void apply(const uint8_t *bytes)
 
 const wchar_t *PcRomPackName(void) { return PACK_NAME; }
 
-int PcRomPackExtract(const wchar_t *rom, const wchar_t *out)
+int PcRomPackExtractProgress(const wchar_t *rom, const wchar_t *out, void (*cb)(int percent, void *ctx), void *ctx)
 {
-    uint8_t *pack;
+    uint8_t *data, *pack;
+    long size, done = 0;
     FILE *f;
 
+    sProgress = cb;
+    sProgressCtx = ctx;
+    progress(0);
     if (!open_table()) return PC_ROMPACK_NO_TABLE;
     if ((f = _wfopen(rom, L"rb")) == NULL) return PC_ROMPACK_CANT_READ;
+    fseek(f, 0, SEEK_END);
+    size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    if (size <= 0 || size > 32l << 20 || (data = malloc((size_t)size)) == NULL) { fclose(f); return PC_ROMPACK_WRONG_ROM; }
+    while (done < size) {                       /* reading the cartridge: 0-40% */
+        size_t n = fread(data + done, 1, (size_t)(size - done < (1 << 20) ? size - done : 1 << 20), f);
+        if (n == 0) { fclose(f); free(data); return PC_ROMPACK_CANT_READ; }
+        done += (long)n;
+        progress((int)(40ll * done / size));
+    }
     fclose(f);
-    if ((pack = try_rom(rom)) == NULL) return PC_ROMPACK_WRONG_ROM;
-    if (!write_pack(out, pack)) { free(pack); return PC_ROMPACK_CANT_WRITE; }
+    pack = unpack_rom(data, (size_t)size);      /* checking it, unpacking: 45-90% */
+    free(data);
+    if (pack == NULL) { sProgress = NULL; return PC_ROMPACK_WRONG_ROM; }
+    progress(92);
+    if (!write_pack(out, pack)) { free(pack); sProgress = NULL; return PC_ROMPACK_CANT_WRITE; }
     free(pack);
+    progress(100);
+    sProgress = NULL;
     return PC_ROMPACK_OK;
+}
+
+int PcRomPackExtract(const wchar_t *rom, const wchar_t *out)
+{
+    return PcRomPackExtractProgress(rom, out, NULL, NULL);
 }
 
 int PcRomPackLoad(int argc, char **argv)

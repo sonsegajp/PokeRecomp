@@ -44,6 +44,13 @@ PR_API int PokeRecomp_Extract(const wchar_t *rom, const wchar_t *pkmn)
     return PcRomPackExtract(rom, pkmn);
 }
 
+/* The same, reporting progress (0-100) as it goes: for the launcher's progress bar. */
+PR_API int PokeRecomp_ExtractProgress(const wchar_t *rom, const wchar_t *pkmn,
+                                      void (*progress)(int percent, void *ctx), void *ctx)
+{
+    return PcRomPackExtractProgress(rom, pkmn, progress, ctx);
+}
+
 /* Run the game (the same arguments the game always took: --pkmn, --data-dir,
  * --save-file, --launcher-parent, --headless, ...). Returns the exit code.
  * One run per process. */

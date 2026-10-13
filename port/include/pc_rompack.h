@@ -20,6 +20,7 @@ int PcRomPackLoad(int argc, char **argv);
 
 /* ROM import: check `rom` and unpack this game's content into `out` (.pkmn). */
 int PcRomPackExtract(const wchar_t *rom, const wchar_t *out);
+int PcRomPackExtractProgress(const wchar_t *rom, const wchar_t *out, void (*cb)(int percent, void *ctx), void *ctx);
 
 /* "firered.pkmn" etc. */
 const wchar_t *PcRomPackName(void);

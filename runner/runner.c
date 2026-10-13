@@ -7,7 +7,8 @@
  *       print the installed games as JSON (one per games/*.dll)
  *   PokeRecompGame.exe --extract ROM [--out FILE.pkmn] [--game ID]
  *       ROM import: find the game the ROM belongs to and unpack it into its
- *       .pkmn (default: next to this program). Prints JSON, exit 0 on success.
+ *       .pkmn (default: next to this program). Prints {"progress":N} lines
+ *       as it goes, then the game as JSON; exit 0 on success.
  *
  * Games are found by name and loaded with LoadLibrary; nothing links them.
  * See docs/GAME_DLL.md. */
@@ -26,6 +27,7 @@ struct PokeRecompGameInfo {
 };
 typedef const struct PokeRecompGameInfo *(*InfoFn)(void);
 typedef int (*ExtractFn)(const wchar_t *rom, const wchar_t *pkmn);
+typedef int (*ExtractProgressFn)(const wchar_t *rom, const wchar_t *pkmn, void (*progress)(int, void *), void *ctx);
 typedef int (*RunFn)(int argc, char **argv);
 
 static wchar_t sDir[MAX_PATH];
@@ -100,11 +102,24 @@ static int list_one(const wchar_t *id, HMODULE m, void *ctx)
 
 struct ExtractJob { const wchar_t *rom, *out, *only; int code; };
 
+/* {"progress":N} lines while a ROM is unpacked (the launcher's progress bar) */
+static void print_progress(int percent, void *ctx)
+{
+    static int last = -1;
+    if (percent == 0) last = -1;   /* a new attempt */
+    (void)ctx;
+    if (percent == last) return;
+    last = percent;
+    printf("{\"progress\":%d}\n", percent);
+    fflush(stdout);
+}
+
 static int extract_one(const wchar_t *id, HMODULE m, void *ctx)
 {
     struct ExtractJob *job = ctx;
     const struct PokeRecompGameInfo *info = ((InfoFn)GetProcAddress(m, "PokeRecomp_GameInfo"))();
     ExtractFn extract = (ExtractFn)GetProcAddress(m, "PokeRecomp_Extract");
+    ExtractProgressFn extract_progress = (ExtractProgressFn)GetProcAddress(m, "PokeRecomp_ExtractProgress");
     wchar_t out[MAX_PATH];
     int code;
 
@@ -112,7 +127,7 @@ static int extract_one(const wchar_t *id, HMODULE m, void *ctx)
         return 0;
     if (job->out) wcsncpy(out, job->out, MAX_PATH - 1), out[MAX_PATH - 1] = 0;
     else _snwprintf(out, MAX_PATH, L"%ls\\%ls", sDir, info->pkmn);
-    code = extract(job->rom, out);
+    code = extract_progress ? extract_progress(job->rom, out, print_progress, NULL) : extract(job->rom, out);
     if (code == 0) {
         print_game(info, out);
         putchar('\n');
