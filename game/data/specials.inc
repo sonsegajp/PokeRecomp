@@ -452,4 +452,16 @@ gSpecials::
 	def_special UpdateLoreleiDollCollection
 	def_special LoopWingFlapSound
 	def_special CreateEnemyEventMon
+@ PC port: online play (src/pc_online.c)
+	def_special Online_OpenScreen
+	def_special Online_IsConnected
+	def_special Online_BufferServerName
+	def_special Online_BufferTarget
+	def_special Online_SendRequest
+	def_special Online_AcceptRequest
+	def_special Online_DeclineRequest
+	def_special Online_SessionKind
+	def_special Online_StartBattle
+	def_special Online_StartTrade
 gSpecialsEnd::
+

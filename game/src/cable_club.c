@@ -1,4 +1,7 @@
 #include "global.h"
+#ifdef PLATFORM_PC
+#include "pc_net.h"
+#endif
 #include "gflib.h"
 #include "battle.h"
 #include "battle_records.h"
@@ -254,7 +257,12 @@ static void Task_LinkupAwaitConfirmation(u8 taskId)
         return;
 
     UpdateLinkPlayerCountDisplay(taskId, linkPlayerCount);
+#ifdef PLATFORM_PC
+    // online: both trainers already agreed, so the leader confirms itself
+    if ((JOY_NEW(A_BUTTON) || PcNetLinkActive()) && linkPlayerCount >= tMinPlayers)
+#else
     if (JOY_NEW(A_BUTTON) && linkPlayerCount >= tMinPlayers)
+#endif
     {
         SaveLinkPlayers(linkPlayerCount);
         ClearLinkPlayerCountWindow(tWindowId);
@@ -284,7 +292,11 @@ static void Task_LinkupTryConfirmation(u8 taskId)
             ShowFieldAutoScrollMessage(CableClub_Text_WhenAllPlayersReadyAConfirmBCancel);
             gTasks[taskId].func = Task_LinkupConfirmWhenReady;
         }
+#ifdef PLATFORM_PC
+        else if (JOY_HELD(A_BUTTON) || PcNetLinkActive())
+#else
         else if (JOY_HELD(A_BUTTON))
+#endif
         {
             PlaySE(SE_SELECT);
             CheckShouldAdvanceLinkState();

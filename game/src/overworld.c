@@ -43,6 +43,7 @@
 #include "script.h"
 #include "script_pokemon_util.h"
 #include "item.h"
+#include "pc_online.h"
 #include "start_menu.h"
 #include "tileset_anims.h"
 #include "trainer_pokemon_sprites.h"
@@ -1479,6 +1480,7 @@ static void DoCB1_Overworld_QuestLogPlayback(void)
 void CB1_Overworld(void)
 {
 #ifdef PLATFORM_PC
+    Online_OverworldUpdate();
     // Test hooks (--give-mon, --warp): run once the player can move.
     if (gPcDebugGiveMon[0].species && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
     {

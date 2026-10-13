@@ -69,6 +69,7 @@
 #define MULTICHOICE_62                                         62
 #define MULTICHOICE_JOIN_OR_LEAD                               63
 #define MULTICHOICE_TRAINER_TOWER_MODE                         64
+#define MULTICHOICE_ONLINE_PLAYER                              65  // PC port: BATTLE / TRADE / CANCEL
 
 #define MULTICHOICE_NONE                                      255
 

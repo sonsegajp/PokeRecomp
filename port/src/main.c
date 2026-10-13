@@ -15,6 +15,7 @@
 #include "pc_hw.h"
 #include "pc_port.h"
 #include "pc_settings.h"
+#include "pc_net.h"
 
 #define REG_DISPSTAT 0x04
 #define REG_VCOUNT   0x06
@@ -122,6 +123,7 @@ static int spin_count;
 struct PcDebugWarp gPcDebugWarp;
 struct PcDebugGiveMon gPcDebugGiveMon[6];
 struct PcDebugGiveItem gPcDebugGiveItem;
+struct PcDebugNet gPcDebugNet;
 
 void PcSpinWait(void)
 {
@@ -217,6 +219,7 @@ int main(int argc, char *argv[])
     const char *gl_dump = NULL;
     const char *shot_dir = NULL;
     int test_width = 0;
+    int paced = 0;
 
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "--headless")) headless = 1;
@@ -233,6 +236,15 @@ int main(int argc, char *argv[])
             gPcDebugWarp.x = atoi(argv[++i]);
             gPcDebugWarp.y = atoi(argv[++i]);
             gPcDebugWarp.pending = 1;
+        }
+        else if (!strcmp(argv[i], "--net-autojoin")) gPcDebugNet.autojoin = 1;
+        else if (!strcmp(argv[i], "--net-accept")) gPcDebugNet.accept = 1;
+        else if (!strcmp(argv[i], "--net-request") && i + 1 < argc) gPcDebugNet.request_kind = atoi(argv[++i]);
+        else if (!strcmp(argv[i], "--paced")) paced = 1; /* test: headless at real speed (online) */
+        else if (!strcmp(argv[i], "--data-dir") && i + 1 < argc) {
+            /* save, settings and online account live here (test: two clients) */
+            CreateDirectoryA(argv[i + 1], NULL);
+            SetCurrentDirectoryA(argv[++i]);
         }
         else if (!strcmp(argv[i], "--give-item") && i + 2 < argc) {
             gPcDebugGiveItem.item = atoi(argv[++i]);
@@ -294,6 +306,7 @@ int main(int argc, char *argv[])
         run_vblank();
         PcAudioFrame();
         PcSaveFlush();
+        PcNetPump();
 
         if (scripted)
             PcIoWrite16(REG_KEYINPUT, PcTestInput(frames + 1));
@@ -322,6 +335,10 @@ int main(int argc, char *argv[])
             } else {
                 next_frame = SDL_GetPerformanceCounter();
             }
+        } else if (paced) {
+            next_frame += (uint64_t)(FRAME_SECONDS * freq);
+            while (SDL_GetPerformanceCounter() < next_frame)
+                SDL_Delay(1);
             if (gl_dump && max_frames && frames == max_frames - 1)
                 PcVideoDumpScreen(gl_dump);
         }

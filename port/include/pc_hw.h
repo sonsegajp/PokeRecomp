@@ -56,5 +56,9 @@ extern struct PcDebugGiveMon gPcDebugGiveMon[6];
 /* Test hook (--give-item ITEM COUNT): added to the bag the same way. */
 struct PcDebugGiveItem { int item, count; };
 extern struct PcDebugGiveItem gPcDebugGiveItem;
+/* Online test hooks: --net-autojoin (register/login, join server 0),
+ * --net-request KIND (ask the first trainer on the map), --net-accept. */
+struct PcDebugNet { int autojoin, request_kind, accept; };
+extern struct PcDebugNet gPcDebugNet;
 
 #endif

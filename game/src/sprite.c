@@ -609,6 +609,10 @@ u8 CreateSpriteAndAnimate(const struct SpriteTemplate *template, s16 x, s16 y, u
 
 void DestroySprite(struct Sprite *sprite)
 {
+#ifdef PLATFORM_PC
+    if (sprite == NULL)   // some screens tear down sprites they never made
+        return;
+#endif
     if (sprite->inUse)
     {
         if (!sprite->usingSheet)
@@ -888,6 +892,10 @@ void FreeSpriteOamMatrix(struct Sprite *sprite)
 
 void DestroySpriteAndFreeResources(struct Sprite *sprite)
 {
+#ifdef PLATFORM_PC
+    if (sprite == NULL)
+        return;
+#endif
     FreeSpriteTiles(sprite);
     FreeSpritePalette(sprite);
     FreeSpriteOamMatrix(sprite);

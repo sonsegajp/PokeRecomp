@@ -3123,6 +3123,10 @@ static void VBlankCB_PokemonSummaryScreen(void)
     ProcessSpriteCopyRequests();
     TransferPlttBuffer();
 
+#ifdef PLATFORM_PC
+    if (sMonSummaryScreen == NULL)   // VBlank after the summary screen freed it
+        return;
+#endif
     if (sMonSummaryScreen->flippingPages == FALSE)
         return;
 

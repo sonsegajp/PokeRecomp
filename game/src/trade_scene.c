@@ -675,6 +675,10 @@ static void SetTradeGpuRegs(void)
 {
     u16 dispcnt;
 
+#ifdef PLATFORM_PC
+    if (sTradeAnim == NULL)   // VBlank after the trade scene freed it
+        return;
+#endif
     SetGpuReg(REG_OFFSET_BG1VOFS, sTradeAnim->bg1vofs);
     SetGpuReg(REG_OFFSET_BG1HOFS, sTradeAnim->bg1hofs);
 

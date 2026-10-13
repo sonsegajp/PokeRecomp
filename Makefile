@@ -26,7 +26,7 @@ GAME_CFLAGS := -pipe -m32 -O2 -g -std=gnu17 -fshort-enums -mno-ms-bitfields -fno
 PORT_CFLAGS := -pipe -m32 -O2 -g -std=gnu17 -Wall -Wno-unused-function -I port/include -iquote $(GAME)/include \
                $(GAME_DEFS) $(shell sdl2-config --cflags)
 LDFLAGS := -m32 -g
-LIBS := $(shell sdl2-config --libs) -lopengl32 -lwinmm -Wl,--defsym,_gNumMusicPlayers=4,--defsym,_gMaxLines=0
+LIBS := $(shell sdl2-config --libs) -lopengl32 -lwinmm -lws2_32 -Wl,--defsym,_gNumMusicPlayers=4,--defsym,_gMaxLines=0
 
 # Game sources that are replaced or have no PC equivalent.
 GAME_SKIP := isagbprn.c mini_printf.c librfu_intr.c multiboot.c agb_flash.c agb_flash_1m.c agb_flash_le.c agb_flash_mx.c

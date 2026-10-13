@@ -1232,16 +1232,17 @@ EventScript_VsSeekerChargingDone::
 	releaseall
 	end
 
+@ PC port: the 2F desks are online now (data/scripts/pc_online.inc).
 Common_EventScript_UnionRoomAttendant::
-	call CableClub_EventScript_UnionRoomAttendant
+	goto Online_EventScript_LocalClosed
 	end
 
 Common_EventScript_WirelessClubAttendant::
-	call CableClub_EventScript_WirelessClubAttendant
+	goto Online_EventScript_Attendant
 	end
 
 Common_EventScript_DirectCornerAttendant::
-	call CableClub_EventScript_DirectCornerAttendant
+	goto Online_EventScript_LocalClosed
 	end
 
 VermilionCity_PokemonCenter_1F_EventScript_VSSeekerWoman::
@@ -1339,6 +1340,7 @@ Text_TestMsg::
 	.include "data/scripts/trainer_card.inc"
 	.include "data/text/help_system.inc"
 	.include "data/scripts/cable_club.inc"
+	.include "data/scripts/pc_online.inc"
 	.include "data/scripts/field_moves.inc"
 	.include "data/scripts/item_ball_scripts.inc"
 	.include "data/scripts/mystery_event_club.inc"

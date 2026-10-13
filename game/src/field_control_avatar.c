@@ -1,4 +1,7 @@
 #include "global.h"
+#ifdef PLATFORM_PC
+#include "pc_online.h"
+#endif
 #include "gflib.h"
 #include "bike.h"
 #include "coord_event_weather.h"
@@ -453,6 +456,12 @@ static const u8 *GetInteractedObjectEventScript(struct MapPosition *position, u8
     gSpecialVar_LastTalked = gObjectEvents[objectEventId].localId;
     gSpecialVar_Facing = direction;
 
+#ifdef PLATFORM_PC
+    // another online trainer
+    script = Online_GetAvatarScript(gSpecialVar_LastTalked);
+    if (script != NULL)
+        return script;
+#endif
     script = GetObjectEventScriptPointerByObjectEventId(objectEventId);
 
     script = GetRamScript(gSpecialVar_LastTalked, script);
