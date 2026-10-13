@@ -10,3 +10,5 @@ game/*.elf
 game/*.map
 game/tools/*/*.exe
 dist/
+*.gba
+*.pak

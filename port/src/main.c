@@ -17,6 +17,7 @@
 #include "pc_settings.h"
 #include "pc_net.h"
 #include "pc_chat.h"
+#include "pc_rompack.h"
 
 #define REG_DISPSTAT 0x04
 #define REG_VCOUNT   0x06
@@ -221,6 +222,9 @@ int main(int argc, char *argv[])
     const char *shot_dir = NULL;
     int test_width = 0;
     int paced = 0;
+
+    if (!PcRomPackLoad(argc, argv))   /* the game's content, from the player's ROM */
+        return 1;
 
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "--headless")) headless = 1;

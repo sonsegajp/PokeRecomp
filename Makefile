@@ -14,11 +14,13 @@ BUILD  := build/pc_lg
 ARMOBJ := $(GAME)/build/leafgreen_modern
 EXE    := LeafGreenPC.exe
 VERSION_DEF := -D LEAFGREEN=1
+SHA1S  := game/leafgreen.sha1 game/leafgreen_rev1.sha1
 else
 BUILD  := build/pc
 ARMOBJ := $(GAME)/build/firered_modern
 EXE    := FireRedPC.exe
 VERSION_DEF := -D FIRERED=1
+SHA1S  := game/firered.sha1 game/firered_rev1.sha1
 endif
 
 CC     := gcc
@@ -36,7 +38,7 @@ GAME_CFLAGS := -pipe -m32 -O2 -g -std=gnu17 -fshort-enums -mno-ms-bitfields -fno
 PORT_CFLAGS := -pipe -m32 -O2 -g -std=gnu17 -Wall -Wno-unused-function -I port/include -iquote $(GAME)/include \
                $(GAME_DEFS) $(shell sdl2-config --cflags)
 LDFLAGS := -m32 -g
-LIBS := $(shell sdl2-config --libs) -lopengl32 -lwinmm -lws2_32 -Wl,--defsym,_gNumMusicPlayers=4,--defsym,_gMaxLines=0
+LIBS := $(shell sdl2-config --libs) -lopengl32 -lwinmm -lws2_32 -lcomdlg32 -Wl,--defsym,_gNumMusicPlayers=4,--defsym,_gMaxLines=0
 
 # Game sources that are replaced or have no PC equivalent.
 GAME_SKIP := isagbprn.c mini_printf.c librfu_intr.c multiboot.c agb_flash.c agb_flash_1m.c agb_flash_le.c agb_flash_mx.c
@@ -56,7 +58,19 @@ export TEMP := $(TMP)
 
 all: $(EXE)
 
-$(EXE): $(GAME_OBJS) $(DATA_OBJS) $(PORT_OBJS)
+# The ROM's content is taken out of the exe (tools/rompack.c) when a retail ROM
+# is found in ROM_DIRS; players' copies unpack it from their own cartridge.
+ROM_DIRS ?= .
+ROMPACK := build/rompack.exe
+
+$(EXE): $(BUILD)/game.exe $(ROMPACK) tools/game_ranges.py
+	$(PY) tools/game_ranges.py $(BUILD)/FireRedPC.map $(BUILD)/game_ranges.txt $(BUILD)/game/ $(BUILD)/data/
+	$(ROMPACK) $(BUILD)/game.exe $@ --allow $(BUILD)/game_ranges.txt $(foreach f,$(SHA1S),--sha1 $(firstword $(shell cat $(f)))) $(foreach d,$(ROM_DIRS),--dir $(d))
+
+$(ROMPACK): tools/rompack.c
+	/c/msys64/mingw64/bin/gcc -O2 -o $@ $<
+
+$(BUILD)/game.exe: $(GAME_OBJS) $(DATA_OBJS) $(PORT_OBJS)
 	@echo "LD $@"
 	@printf '%s\n' $^ > $(BUILD)/objs.rsp
 	@$(CC) $(LDFLAGS) -o $@ @$(BUILD)/objs.rsp $(LIBS) -Wl,-Map=$(BUILD)/FireRedPC.map
