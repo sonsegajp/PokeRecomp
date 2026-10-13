@@ -1021,7 +1021,12 @@ void BtlController_EmitChosenMonReturnValue(u8 bufferId, u8 partyId, u8 *battleP
     sBattleBuffersTransferData[0] = CONTROLLER_CHOSENMONRETURNVALUE;
     sBattleBuffersTransferData[1] = partyId;
     for (i = 0; i < (int)ARRAY_COUNT(gBattlePartyCurrentOrder); i++)
+#ifdef PLATFORM_PC
+        // AI/scripted controllers pass NULL (the order is only read for the player)
+        sBattleBuffersTransferData[2 + i] = battlePartyOrder ? battlePartyOrder[i] : 0;
+#else
         sBattleBuffersTransferData[2 + i] = battlePartyOrder[i];
+#endif
     PrepareBufferDataTransfer(bufferId, sBattleBuffersTransferData, 5);
 }
 
