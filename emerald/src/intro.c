@@ -1,4 +1,7 @@
 #include "global.h"
+#ifdef PLATFORM_PC
+#include "pc_travel.h"
+#endif
 #include "main.h"
 #include "palette.h"
 #include "scanline_effect.h"
@@ -1156,6 +1159,9 @@ void CB2_InitCopyrightScreenAfterBootup(void)
             Sav2_ClearSetDefault();
         SetPokemonCryStereo(gSaveBlock2Ptr->optionsSound);
         InitHeap(gHeap, HEAP_SIZE);
+#ifdef PLATFORM_PC
+        PcTravelBoot();   // arriving from another region: straight to the field
+#endif
     }
 }
 

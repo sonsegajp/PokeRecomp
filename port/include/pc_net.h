@@ -80,6 +80,7 @@ int PcNetServerPlayers(int i);
 int PcNetServerRegion(int i);           /* PC_NET_REGION_* */
 int PcNetOwnsRegion(int region);        /* this player can play there (owns that region's game) */
 void PcNetBeginJoin(int index, uint8_t gender);
+void PcNetSetGame(uint8_t game);        /* PC_NET_GAME_* others see us as (a visitor: their home game) */
 void PcNetDisconnect(void);
 int PcNetConnected(void);
 /* Where this account was the last time it left the joined server (the server

@@ -390,6 +390,10 @@ int PcNetLastPosition(uint8_t *group, uint8_t *num, int16_t *x, int16_t *y, uint
 }
 const char *PcNetConnectedServerName(void) { return connected_name; }
 
+/* how others see us: our own game, or a visitor's home game */
+static uint8_t net_game = PC_NET_GAME;
+void PcNetSetGame(uint8_t game) { net_game = game; }
+
 void PcNetBeginJoin(int index, uint8_t gender)
 {
     if (index < 0 || index >= server_count) { op_status = PC_NET_OP_FAILED; return; }
@@ -403,7 +407,7 @@ void PcNetBeginJoin(int index, uint8_t gender)
     memcpy(p, token, TOKEN_LEN);
     p[TOKEN_LEN] = gender;
     put16(p + TOKEN_LEN + 1, VERSION);
-    p[TOKEN_LEN + 3] = PC_NET_GAME;      /* how others see us: Red/Leaf or Brendan/May */
+    p[TOKEN_LEN + 3] = net_game;         /* how others see us: Red/Leaf or Brendan/May */
     conn_send(&game, S_JOIN, p, sizeof p);
 }
 

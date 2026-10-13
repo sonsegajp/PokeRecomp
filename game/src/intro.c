@@ -1,4 +1,7 @@
 #include "global.h"
+#ifdef PLATFORM_PC
+#include "pc_travel.h"
+#endif
 #include "gflib.h"
 #include "m4a.h"
 #include "task.h"
@@ -1007,6 +1010,9 @@ void CB2_InitCopyrightScreenAfterBootup(void)
         if (gSaveFileStatus == SAVE_STATUS_EMPTY || gSaveFileStatus == SAVE_STATUS_INVALID)
             Sav2_ClearSetDefault();
         SetPokemonCryStereo(gSaveBlock2Ptr->optionsSound);
+#ifdef PLATFORM_PC
+        PcTravelBoot();   // arriving from another region: straight to the field
+#endif
     }
 }
 

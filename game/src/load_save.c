@@ -1,4 +1,7 @@
 #include "global.h"
+#ifdef PLATFORM_PC
+#include "pc_travel.h"
+#endif
 #include "gflib.h"
 #include "gba/flash_internal.h"
 #include "load_save.h"
@@ -161,6 +164,9 @@ void SavePlayerParty(void)
 {
     int i;
 
+#ifdef PLATFORM_PC
+    PcTravelOnSave();
+#endif
     gSaveBlock1Ptr->playerPartyCount = gPlayerPartyCount;
 
     for (i = 0; i < PARTY_SIZE; i++)

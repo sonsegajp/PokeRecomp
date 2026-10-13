@@ -58,7 +58,7 @@ struct PcDebugGiveItem { int item, count; };
 extern struct PcDebugGiveItem gPcDebugGiveItem;
 /* Online test hooks: --net-autojoin (register/login, join server 0),
  * --net-request KIND (ask the first trainer on the map), --net-accept. */
-struct PcDebugNet { int autojoin, request_kind, accept; char chat[64]; };  /* --net-chat TEXT */
+struct PcDebugNet { int autojoin, request_kind, accept, travel; char chat[64]; };  /* --net-chat TEXT */
 extern struct PcDebugNet gPcDebugNet;
 
 #endif

@@ -97,8 +97,8 @@ $(BUILD)/game.dll: $(GAME_OBJS) $(SHARED_OBJS) $(DATA_OBJS) $(PORT_OBJS)
 	@$(CC) $(LDFLAGS) -shared -static-libgcc -o $@ @$(BUILD)/objs.rsp $(LIBS) -Wl,-Map=$(BUILD)/FireRedPC.map
 
 # The runner: loads a game DLL at runtime (runner/runner.c).
-$(RUNNER): runner/runner.c
-	$(CC) -m32 -O2 -mwindows -static-libgcc -o $@ $< -lshell32
+$(RUNNER): runner/runner.c port/include/pc_travel.h
+	$(CC) -m32 -O2 -mwindows -static-libgcc -I port/include -o $@ $< -lshell32
 
 # preproc resolves INCBIN paths relative to the game directory.
 $(BUILD)/game/%.o: $(GAME)/src/%.c

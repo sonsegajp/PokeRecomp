@@ -18,6 +18,7 @@
 #include "pc_net.h"
 #include "pc_chat.h"
 #include "pc_rompack.h"
+#include "pc_travel.h"
 
 #define REG_DISPSTAT 0x04
 #define REG_VCOUNT   0x06
@@ -45,6 +46,7 @@ static int frame_width = GBA_WIDTH;
  * is and append it to hang.log (exe-relative addresses; map with nm). Only
  * logs — a dragged window or a breakpoint can trip it harmlessly. */
 static volatile LONG frames_done;
+static volatile LONG game_over;   /* the game returned (the runner may start the next region's) */
 static HANDLE main_thread;
 
 static DWORD WINAPI watchdog(void *arg)
@@ -56,6 +58,7 @@ static DWORD WINAPI watchdog(void *arg)
     (void)arg;
     for (;;) {
         Sleep(1000);
+        if (game_over) return 0;
         if (frames_done != last) { last = frames_done; still = 0; continue; }
         if (++still != 5) continue;
         FILE *f = fopen("hang.log", "a");
@@ -248,7 +251,9 @@ int main(int argc, char *argv[])
             PcDumpLegality(argv[i + 1]);
             return 0;
         }
+        else if (!strcmp(argv[i], "--travel")) gPcTravelArrive = 1;   /* arriving from another region (runner) */
         else if (!strcmp(argv[i], "--net-autojoin")) gPcDebugNet.autojoin = 1;
+        else if (!strcmp(argv[i], "--net-travel")) gPcDebugNet.travel = 1;   /* test: travel to the other region */
         else if (!strcmp(argv[i], "--net-accept")) gPcDebugNet.accept = 1;
         else if (!strcmp(argv[i], "--net-chat") && i + 1 < argc) snprintf(gPcDebugNet.chat, sizeof gPcDebugNet.chat, "%s", argv[++i]);
         else if (!strcmp(argv[i], "--net-request") && i + 1 < argc) gPcDebugNet.request_kind = atoi(argv[++i]);
@@ -364,5 +369,6 @@ int main(int argc, char *argv[])
     PcSaveFlush();
     if (!headless) PcVideoShutdown();
     SDL_Quit();
+    game_over = 1;
     return 0;
 }

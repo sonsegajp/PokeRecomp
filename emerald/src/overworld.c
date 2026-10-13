@@ -72,6 +72,7 @@
 #include "script_pokemon_util.h"
 #include "constants/items.h"
 #include "pc_online.h"
+#include "pc_travel.h"
 #endif
 
 struct CableClubPlayer
@@ -1600,6 +1601,10 @@ void CB2_NewGame(void)
     UnlockPlayerFieldControls();
     gFieldCallback = ExecuteTruckSequence;
     gFieldCallback2 = NULL;
+#ifdef PLATFORM_PC
+    if (PcTravelNewGame())   // a visiting trainer: no truck, straight into Littleroot
+        gFieldCallback = FieldCB_WarpExitFadeFromBlack;
+#endif
     DoMapLoadLoop(&gMain.state);
     SetFieldVBlankCallback();
     SetMainCallback1(CB1_Overworld);

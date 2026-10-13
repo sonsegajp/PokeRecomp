@@ -44,6 +44,7 @@
 #include "script_pokemon_util.h"
 #include "item.h"
 #include "pc_online.h"
+#include "pc_travel.h"
 #include "start_menu.h"
 #include "tileset_anims.h"
 #include "trainer_pokemon_sprites.h"
@@ -1601,6 +1602,9 @@ void CB2_NewGame(void)
     UnlockPlayerFieldControls();
     gFieldCallback = FieldCB_WarpExitFadeFromBlack;
     gFieldCallback2 = NULL;
+#ifdef PLATFORM_PC
+    PcTravelNewGame();   // a visiting trainer: straight into Pallet Town
+#endif
     DoMapLoadLoop(&gMain.state);
     SetFieldVBlankCallback();
     SetMainCallback1(CB1_Overworld);

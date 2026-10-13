@@ -68,6 +68,7 @@
 #include "pc_chat.h"
 #include "pc_online.h"
 #include "pc_game.h"
+#include "pc_travel.h"
 #include "item.h"
 #include "money.h"
 #include "constants/items.h"
@@ -219,6 +220,7 @@ struct OnlineScreen
     u8 friendCount, friendSel;
     struct OnlineFriend friends[MAX_FRIENDS];
     u8 inGuild, memberCount, guildOp, confirmAction;
+    u8 travelServer;     // CONFIRM_TRAVEL: the other region's world
     u8 guildName[GUILD_NAME_LEN];
     struct OnlineMember members[MAX_MEMBERS];
 };
@@ -563,7 +565,7 @@ static void LeaveScreen(u8 taskId)
 enum { MSG_FRIEND_ADD = 0x05, MSG_FRIEND_LIST = 0x06, MSG_FRIEND_REMOVE = 0x0F,
        MSG_GUILD_INFO = 0x10, MSG_GUILD_CREATE = 0x11, MSG_GUILD_JOIN = 0x12, MSG_GUILD_LEAVE = 0x13 };
 enum { NET_ERR_NOT_FOUND = 4, NET_ERR_FULL = 5, NET_ERR_NO_MATCH = 7 };
-enum { CONFIRM_REMOVE_FRIEND, CONFIRM_LEAVE_GUILD, CONFIRM_TAKE_BACK };
+enum { CONFIRM_REMOVE_FRIEND, CONFIRM_LEAVE_GUILD, CONFIRM_TAKE_BACK, CONFIRM_TRAVEL };
 enum { FMENU_JOIN, FMENU_REMOVE, FMENU_BACK };
 
 static const u8 sText_Offline[] = _("OFFLINE");
@@ -580,6 +582,11 @@ static const u8 sText_JoinGuild[] = _("JOIN GUILD");
 static const u8 sText_LeaveGuild[] = _("LEAVE GUILD");
 static const u8 sText_HintGuild[] = _("/G: GUILD CHAT {A_BUTTON}OK {B_BUTTON}BACK");
 static const u8 sText_Yes[] = _("YES");
+static const u8 sText_TravelKanto[] = _("Travel to KANTO as yourself?");
+static const u8 sText_TravelHoenn[] = _("Travel to HOENN as yourself?");
+static const u8 sText_TravelNote[] = _("Your party comes too. (It saves.)");
+static const u8 sText_CantTravel1[] = _("That region's game isn't set up.");
+static const u8 sText_CantTravel2[] = _("Import its ROM in the launcher.");
 static const u8 sText_No[] = _("NO");
 static const u8 sText_RemoveAsk[] = _("Remove this trainer from FRIENDS?");
 static const u8 sText_LeaveAsk[] = _("Really leave the GUILD?");
@@ -849,8 +856,16 @@ static const u8 sText_TakeBackAsk[] = _("Take these items back?");
 static void DrawConfirm(void)
 {
     PrintHeader(sOnline->confirmAction == CONFIRM_LEAVE_GUILD ? sText_Guild
-              : sOnline->confirmAction == CONFIRM_TAKE_BACK ? ScreenTitle() : sText_Friends);
+              : sOnline->confirmAction == CONFIRM_TAKE_BACK ? ScreenTitle()
+              : sOnline->confirmAction == CONFIRM_TRAVEL ? sText_ServerBrowser : sText_Friends);
     FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
+    if (sOnline->confirmAction == CONFIRM_TRAVEL)
+    {
+        PrintLine(0, PcNetServerRegion(sOnline->travelServer) == PC_NET_REGION_HOENN ? sText_TravelHoenn : sText_TravelKanto,
+                  sTextColor);
+        PrintLine(1, sText_TravelNote, sTextColor);
+    }
+    else
     PrintLine(1, sOnline->confirmAction == CONFIRM_LEAVE_GUILD ? sText_LeaveAsk
                : sOnline->confirmAction == CONFIRM_TAKE_BACK ? sText_TakeBackAsk : sText_RemoveAsk, sTextColor);
     PrintLine(3, sText_Yes, sTextColor);
@@ -1040,6 +1055,8 @@ static void ConfirmInput(u8 taskId)
             ShowGuild();
         else if (sOnline->confirmAction == CONFIRM_TAKE_BACK)
             MarketReturn(MODE_MKT_MINE);
+        else if (sOnline->confirmAction == CONFIRM_TRAVEL)
+            ShowServers();
         else
             ShowFriendMenu();
     }
@@ -1055,6 +1072,12 @@ static void ConfirmInput(u8 taskId)
         else if (sOnline->confirmAction == CONFIRM_TAKE_BACK)
         {
             MarketTakeBack();
+        }
+        else if (sOnline->confirmAction == CONFIRM_TRAVEL)
+        {
+            // saves and hands over to the other region's game
+            if (!PcTravelDepart(sOnline->travelServer))
+                ShowMessage(sText_CantTravel1, sText_CantTravel2, NULL, FALSE, MODE_SERVERS);
         }
         else
         {
@@ -1174,6 +1197,12 @@ static void HandleServerInput(u8 taskId)
         switch (sOnline->rows[sOnline->cursor])
         {
         case ROW_SERVER:
+            if (PcNetServerRegion(sOnline->serverOf[sOnline->cursor]) != PC_NET_REGION)
+            {
+                sOnline->travelServer = sOnline->serverOf[sOnline->cursor];
+                ShowConfirm(CONFIRM_TRAVEL);
+                break;
+            }
             PcNetBeginJoin(sOnline->serverOf[sOnline->cursor], gSaveBlock2Ptr->playerGender);
             StartBusy(BUSY_JOIN);
             break;
@@ -3023,6 +3052,33 @@ static void DebugNetHooks(void)
     static u8 stage;
     int s;
 
+    if (gPcDebugNet.travel && !ArePlayerFieldControlsLocked() && !ScriptContext_IsEnabled())
+    {
+        // log in, then leave for the other region's first world (the ONLINE CLUB's YES)
+        switch (stage)
+        {
+        case 0:
+            if (PcNetHasAccount())
+                PcNetBeginLogin();
+            else
+                PcNetBeginRegister(gSaveBlock2Ptr->playerName);
+            stage = 1;
+            break;
+        case 1:
+            if (PcNetOpStatus() == PC_NET_OP_FAILED)
+                stage = 0;
+            if (PcNetOpStatus() != PC_NET_OP_OK)
+                break;
+            for (s = 0; s < PcNetServerCount(); s++)
+                if (PcNetServerRegion(s) != PC_NET_REGION)
+                    break;
+            gPcDebugNet.travel = 0;
+            if (s < PcNetServerCount())
+                PcTravelDepart(s);
+            break;
+        }
+        return;
+    }
     if (gPcDebugNet.autojoin && !PcNetConnected())
     {
         switch (stage)
@@ -3240,12 +3296,63 @@ void Online_GuideRemove(void)
         RemoveObjectEventByLocalIdAndMap(GUIDE_LOCALID, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup);
 }
 
+// Just arrived from another region: log in and join the world picked there
+// (no warp; the trainer is where their trip put them).
+static void TravelJoinHook(void)
+{
+    static const char *sWorld;
+    static u8 sStage;
+    int i;
+
+    switch (sStage)
+    {
+    case 0:
+        if ((sWorld = PcTravelTakeJoin()) == NULL)
+            return;
+        if (PcNetHasAccount())
+            PcNetBeginLogin();
+        else
+            PcNetBeginRegister(gSaveBlock2Ptr->playerName);
+        sStage = 1;
+        break;
+    case 1:
+        if (PcNetOpStatus() == PC_NET_OP_FAILED)
+            sStage = 3;
+        if (PcNetOpStatus() != PC_NET_OP_OK)
+            break;
+        for (i = 0; i < PcNetServerCount(); i++)
+            if (!strcmp(PcNetServerName(i), sWorld))
+                break;
+        if (i == PcNetServerCount())
+        {
+            sStage = 3;   // that world went away meanwhile
+            break;
+        }
+        PcNetBeginJoin(i, gSaveBlock2Ptr->playerGender);
+        sStage = 2;
+        break;
+    case 2:
+        if (PcNetOpStatus() == PC_NET_OP_OK)
+        {
+            sShowJoinedMessage = TRUE;
+            sStage = 3;
+        }
+        else if (PcNetOpStatus() == PC_NET_OP_FAILED)
+        {
+            sStage = 3;
+        }
+        break;
+    }
+}
+
 // Called every overworld frame (CB1_Overworld).
 void Online_OverworldUpdate(void)
 {
     u16 from;
     u8 kind;
 
+    PcTravelFieldUpdate();
+    TravelJoinHook();
     DebugNetHooks();
     if (PcFieldIsOnScreen())
         UpdateGuide();
