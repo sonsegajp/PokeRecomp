@@ -26,6 +26,19 @@ struct PcNetPlayer {
     uint8_t facing, flags;
 };
 
+/* the server's world state (S_WORLD): the day's shiny-boost type and a
+ * timed event such as a mass outbreak */
+enum { PC_NET_EVENT_NONE, PC_NET_EVENT_OUTBREAK };
+struct PcNetWorld {
+    uint8_t boostType;          /* TYPE_*, 0xFF = none */
+    uint16_t shinyOdds;         /* 1 in N for the boosted type */
+    uint8_t eventKind;
+    uint8_t mapGroup, mapNum;
+    uint16_t species;
+    uint8_t minLevel, maxLevel;
+    uint8_t percent;            /* share of wild encounters there */
+};
+
 void PcNetPump(void);
 
 /* account (credentials live in online.dat next to the save) */
@@ -57,6 +70,7 @@ const char *PcNetConnectedServerName(void);
 void PcNetSendPos(uint8_t group, uint8_t num, int16_t x, int16_t y, uint8_t facing, uint8_t flags);
 void PcNetSendChat(const uint8_t *text, int len);   /* game charset, 0xFF-terminated */
 const struct PcNetPlayer *PcNetGetPlayer(int slot);   /* slot 0..PC_NET_MAX_PLAYERS-1 */
+const struct PcNetWorld *PcNetWorldState(void);       /* NULL when not on a server */
 
 /* battle / trade requests */
 void PcNetRequest(uint16_t target, uint8_t kind);

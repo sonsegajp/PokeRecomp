@@ -28,7 +28,7 @@ enum {
     M_REGISTERED = 0x81, M_LOGIN_OK = 0x82, M_SERVER_LIST = 0x83, M_RENAMED = 0x85, M_ERROR = 0x8F,
     S_JOIN = 0x40, S_POS = 0x41, S_CHAT = 0x42, S_REQUEST = 0x43, S_RESPOND = 0x44, S_LINK_CMD = 0x45, S_LINK_END = 0x46,
     S_WELCOME = 0xC0, S_PLAYER = 0xC1, S_PLAYER_GONE = 0xC2, S_CHAT_FROM = 0xC3, S_REQUESTED = 0xC4, S_DECLINED = 0xC5,
-    S_SESSION = 0xC6, S_LINK_FRAME = 0xC7, S_SESSION_END = 0xC8, S_LINK_STATE = 0xC9, S_ERROR = 0xCF,
+    S_SESSION = 0xC6, S_LINK_FRAME = 0xC7, S_SESSION_END = 0xC8, S_LINK_STATE = 0xC9, S_WORLD = 0xCA, S_ERROR = 0xCF,
     S_LINK_OPEN = 0x47,
 };
 
@@ -566,12 +566,21 @@ static void handle_master(uint8_t type, const uint8_t *p, int len)
     }
 }
 
+static struct PcNetWorld world;
+static int have_world;
+
+const struct PcNetWorld *PcNetWorldState(void)
+{
+    return connected && have_world ? &world : NULL;
+}
+
 static void handle_game(uint8_t type, const uint8_t *p, int len)
 {
     struct PcNetPlayer *pl;
     switch (type) {
     case S_WELCOME:
         connected = 1;
+        have_world = 0;
         if (len >= 2) my_player_id = get16(p);
         if (op == OP_JOIN) finish_op(PC_NET_OP_OK);
         conn_close(&master);           /* the master is only needed until we're in */
@@ -597,7 +606,9 @@ static void handle_game(uint8_t type, const uint8_t *p, int len)
             uint16_t id = get16(p);
             memcpy(text, p + 2, n);
             text[n] = 0xFF;
-            if (id == my_player_id)
+            if (id == 0)                       /* the server itself: events etc. */
+                PcChatReceive(NULL, 0, text);
+            else if (id == my_player_id)
                 PcChatReceive(my_name, my_tag, text);
             else if ((pl = player_slot(id, 0)) != NULL)
                 PcChatReceive(pl->name, pl->tag, text);
@@ -625,6 +636,19 @@ static void handle_game(uint8_t type, const uint8_t *p, int len)
         link_count = 0;
         link_open = link_connected = 0;
         request_result = 1;
+        break;
+    case S_WORLD:
+        if (len < 15) break;
+        world.boostType = p[0];
+        world.shinyOdds = get16(p + 1);
+        world.eventKind = p[3];
+        world.mapGroup = p[4];
+        world.mapNum = p[5];
+        world.species = get16(p + 6);
+        world.minLevel = p[8];
+        world.maxLevel = p[9];
+        world.percent = p[10];
+        have_world = 1;
         break;
     case S_LINK_STATE:
         if (len >= 1 && link_active) {

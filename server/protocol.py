@@ -78,6 +78,8 @@ S_SESSION        = 0xC6  # u8 link_id, u8 players, u8 kind, u16 partner
 S_LINK_FRAME     = 0xC7  # u8 players, players * u16[8]
 S_SESSION_END    = 0xC8  # u8 reason
 S_LINK_STATE     = 0xC9  # u8 all_open (every member has its end open = "connected")
+S_WORLD          = 0xCA  # u8 boost_type, u16 shiny_odds, u8 event_kind, u8 group, u8 num, u16 species,
+                         #   u8 min, u8 max, u8 percent, u32 seconds_left (S_CHAT_FROM id 0 = the server)
 S_ERROR          = 0xCF  # u8 code
 
 KIND_SINGLE, KIND_DOUBLE, KIND_TRADE = 1, 2, 3
@@ -112,3 +114,5 @@ async def read_frame(reader):
     except (asyncio.IncompleteReadError, ConnectionError):
         return None
     return body[0], body[1:]
+
+EVENT_NONE, EVENT_OUTBREAK = 0, 1

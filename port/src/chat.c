@@ -26,10 +26,12 @@ const uint16_t *PcFontNormalGlyph(uint16_t glyphId, uint8_t *width);
 #define COL_TEXT   0xFFFFFFFFu
 #define COL_SHADOW 0xFF404040u
 #define COL_NAME   0xFFF8C878u   /* 0xAABBGGRR: sky blue */
+#define COL_SYSTEM 0xFF60D8F8u   /* gold: the server's announcements */
 #define COL_BOX    0x99000000u
 #define COL_INPUT  0xCC181818u
 
 struct Line {
+    uint8_t system;          /* from the server, not a player */
     uint8_t name[8];
     uint16_t tag;
     uint8_t text[MAX_INPUT + 1];
@@ -124,7 +126,8 @@ void PcChatReceive(const uint8_t *name, uint16_t tag, const uint8_t *text)
         log_count--;
     }
     l = &log_lines[log_count++];
-    memcpy(l->name, name, 8);
+    l->system = name == NULL;
+    if (name) memcpy(l->name, name, 8);
     l->tag = tag;
     for (i = 0; i < MAX_INPUT && text[i] != EOS; i++) l->text[i] = text[i];
     l->text[i] = EOS;
@@ -227,6 +230,13 @@ const uint32_t *PcChatOverlay(int w, int h)
         if (!input_open) {
             if (age >= SHOW_MS) break;
             if (age > SHOW_MS - FADE_MS) alpha = (unsigned)((SHOW_MS - age) * 255 / FADE_MS);
+        }
+        if (l->system) {
+            fill(MARGIN - 2, y - 1, text_width(l->text) + 4, LINE_H, fade(COL_BOX, alpha));
+            text(MARGIN, y, l->text, COL_SYSTEM, alpha);
+            y -= LINE_H;
+            shown = 1;
+            continue;
         }
         for (n = 0; n < 7 && l->name[n] != EOS; n++) name[n] = l->name[n];
         name[n] = EOS;

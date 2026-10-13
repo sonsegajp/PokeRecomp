@@ -46,6 +46,7 @@
 #include "pc_net.h"
 #include "pc_chat.h"
 #include "pc_online.h"
+#include "random.h"
 
 bool32 PcFieldIsOnScreen(void); // overworld.c
 
@@ -1253,6 +1254,38 @@ void Online_OpenScreen(void)
     SetMainCallback2(CB2_OnlineInit);
 }
 
+// ---- world events (the game server's S_WORLD) -------------------------------------------------
+
+// A mass outbreak on this map: some of the land encounters are its species.
+bool8 Online_OutbreakMon(u16 *species, u8 *level)
+{
+    const struct PcNetWorld *w = PcNetWorldState();
+
+    if (w == NULL || w->eventKind != PC_NET_EVENT_OUTBREAK
+     || w->mapGroup != gSaveBlock1Ptr->location.mapGroup || w->mapNum != gSaveBlock1Ptr->location.mapNum
+     || w->species == SPECIES_NONE || w->species >= NUM_SPECIES || w->species == SPECIES_UNOWN
+     || w->minLevel == 0 || w->maxLevel > MAX_LEVEL || w->minLevel > w->maxLevel)
+        return FALSE;
+    if (Random() % 100 >= w->percent)
+        return FALSE;
+    *species = w->species;
+    *level = w->minLevel + Random() % (w->maxLevel - w->minLevel + 1);
+    return TRUE;
+}
+
+// The day's boosted type: extra rolls for a shiny wild Pokemon (each roll is
+// the normal 1/8192), so the odds become about 1 in shinyOdds.
+u8 Online_ShinyRerolls(u16 species)
+{
+    const struct PcNetWorld *w = PcNetWorldState();
+
+    if (w == NULL || w->boostType >= NUMBER_OF_MON_TYPES || w->shinyOdds == 0 || species >= NUM_SPECIES)
+        return 0;
+    if (gSpeciesInfo[species].types[0] != w->boostType && gSpeciesInfo[species].types[1] != w->boostType)
+        return 0;
+    return min(8192 / w->shinyOdds, 64) - 1;
+}
+
 // ---- specials for the 2F and for other trainers -----------------------------------------------
 
 void Online_IsConnected(void)
@@ -1979,6 +2012,8 @@ void Online_HasAccount(void) {}
 void Online_WonderTrade(void) {}
 void Online_CollectMail(void) {}
 void Online_OpenGts(void) {}
+bool8 Online_OutbreakMon(u16 *species, u8 *level) { return FALSE; }
+u8 Online_ShinyRerolls(u16 species) { return 0; }
 void Online_GtsCheckOffer(void) {}
 void Online_GtsDeposit(void) {}
 void Online_GtsOffer(void) {}

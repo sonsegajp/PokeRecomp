@@ -14,7 +14,7 @@ void PcChatSubmit(void);
 void PcChatCancel(void);
 
 /* A message arrived (name/text in the game's charset, 0xFF-terminated). */
-void PcChatReceive(const uint8_t *name, uint16_t tag, const uint8_t *text);
+void PcChatReceive(const uint8_t *name, uint16_t tag, const uint8_t *text);   /* name NULL = the server */
 
 /* The overlay for this frame at (w, h) = 2x the game's logical size, RGBA;
  * NULL when there is nothing to show. */

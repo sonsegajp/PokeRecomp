@@ -8,7 +8,8 @@ and then relays:
   * presence — where every player is (the game draws them on the same map),
   * chat,
   * battle / trade requests, and
-  * the virtual link cable for accepted ones.
+  * the virtual link cable for accepted ones,
+and runs the world: the day's shiny-boost type and timed outbreaks (world.py).
 
 The link cable: the game's link.c exchanges one 8-word command per player per
 transfer cycle; every unit receives the same merged set. We do exactly that
@@ -24,6 +25,7 @@ import struct
 
 from protocol import *  # noqa: F401,F403
 import legality
+from world import World
 
 TICK = 1 / 60
 MAX_QUEUE = 600          # commands a client may have waiting (10 s) before it is cut off
@@ -74,6 +76,7 @@ class GameServer:
         self.master_writer = None
         self.verify_waits = {}
         self.next_req = 1
+        self.world = World(args)
 
     # ---- master link ---------------------------------------------------------
 
@@ -164,6 +167,9 @@ class GameServer:
             for other in self.players.values():
                 if other is not player:
                     player.send(other.info())
+            player.send(self.world.state_frame())
+            for line in self.world.announcements():
+                player.send(line)
             print(f"game: player {player.id} joined ({len(self.players)} online)")
             while True:
                 msg = await read_frame(reader)
@@ -308,6 +314,13 @@ class GameServer:
                             m.send(data)
 
 
+    async def world_loop(self):
+        while True:
+            for data in self.world.update():
+                self.broadcast(data)
+            await asyncio.sleep(5)
+
+
 async def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--name", default="Kanto")
@@ -316,12 +329,19 @@ async def main():
     ap.add_argument("--master", default="127.0.0.1:27100")
     ap.add_argument("--key-file", default="server_key.txt")
     ap.add_argument("--max", type=int, default=100)
+    ap.add_argument("--shiny-odds", type=int, default=512, help="1 in N for the day's boosted type (normally 8192)")
+    ap.add_argument("--event-every", type=float, default=60, help="minutes between outbreaks")
+    ap.add_argument("--event-length", type=float, default=20, help="minutes an outbreak lasts")
+    ap.add_argument("--first-event", type=float, default=1, help="minutes until the first outbreak")
+    ap.add_argument("--outbreak-percent", type=int, default=50, help="share of wild encounters there")
+    ap.add_argument("--outbreak", help='start with this outbreak: "GROUP.NUM:SPECIES" (e.g. 3.19:25)')
     args = ap.parse_args()
     gs = GameServer(args)
     srv = await asyncio.start_server(gs.handle, "0.0.0.0", args.port)
     print("game: listening on", args.port)
     asyncio.ensure_future(gs.master_loop())
     asyncio.ensure_future(gs.tick_loop())
+    asyncio.ensure_future(gs.world_loop())
     async with srv:
         await srv.serve_forever()
 

@@ -16,6 +16,9 @@
 #include "constants/maps.h"
 #include "constants/abilities.h"
 #include "constants/items.h"
+#ifdef PLATFORM_PC
+#include "pc_online.h"
+#endif
 
 #define MAX_ENCOUNTER_RATE 1600
 
@@ -230,7 +233,16 @@ static void GenerateWildMon(u16 species, u8 level, u8 slot)
     ZeroEnemyPartyMons();
     if (species != SPECIES_UNOWN)
     {
+#ifdef PLATFORM_PC
+        u8 nature = Random() % NUM_NATURES;
+        u8 rerolls = Online_ShinyRerolls(species);   // the day's boosted type, online
+
+        CreateMonWithNature(&gEnemyParty[0], species, level, USE_RANDOM_IVS, nature);
+        while (rerolls-- > 0 && !IsMonShiny(&gEnemyParty[0]))
+            CreateMonWithNature(&gEnemyParty[0], species, level, USE_RANDOM_IVS, nature);
+#else
         CreateMonWithNature(&gEnemyParty[0], species, level, USE_RANDOM_IVS, Random() % NUM_NATURES);
+#endif
     }
     else
     {
@@ -328,6 +340,19 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo * info, u8 area, u8
         break;
     }
     level = ChooseWildMonLevel(&info->wildPokemon[slot]);
+#ifdef PLATFORM_PC
+    {
+        u16 outbreakSpecies;   // an online mass outbreak on this map
+        u8 outbreakLevel;
+        if (area == WILD_AREA_LAND && Online_OutbreakMon(&outbreakSpecies, &outbreakLevel))
+        {
+            if (flags == WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(outbreakLevel))
+                return FALSE;
+            GenerateWildMon(outbreakSpecies, outbreakLevel, slot);
+            return TRUE;
+        }
+    }
+#endif
     if (flags == WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(level))
     {
         return FALSE;
