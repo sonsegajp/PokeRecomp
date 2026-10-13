@@ -23,7 +23,11 @@ void PcDmaOnVBlank(void);   /* run VBlank-timed channels */
 
 /* render.c — draw one frame from VRAM/OAM/palette/registers into `out`
  * (RGBA8888, `width` x 160). Calls `hblank` after each visible line. */
-void PcRenderFrame(uint32_t *out, int width, void (*hblank)(int line));
+/* Draw a frame `width` pixels wide (the GBA screen centered). Only the BGs in
+ * `wide_bgs` (bit per BG) extend past the GBA screen; the rest end at its edges. */
+void PcRenderFrame(uint32_t *out, int width, int wide_bgs, void (*hblank)(int line));
+/* Provided by the game (overworld.c): is the field (map) being shown? */
+int PcFieldIsOnScreen(void);
 
 /* video.c */
 int PcVideoInit(const char *title);

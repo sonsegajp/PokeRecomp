@@ -1341,9 +1341,20 @@ static void InitOverworldBgs(void)
     SetBgAttribute(1, BG_ATTR_MOSAIC, TRUE);
     SetBgAttribute(2, BG_ATTR_MOSAIC, TRUE);
     SetBgAttribute(3, BG_ATTR_MOSAIC, TRUE);
+#ifdef PLATFORM_PC
+    // The field BGs are 512x256 on PC so the camera can keep a ring 64 tiles
+    // wide drawn for widescreen (see field_camera.c). VRAM has no room for a
+    // second screenblock each, so the right halves go to the PC's extra
+    // "wide" VRAM (bg.c copies them, the renderer reads them).
+    gPcBgWide = (1 << 1) | (1 << 2) | (1 << 3);
+    gBGTilemapBuffers2 = AllocZeroed(BG_SCREEN_SIZE * 2);
+    gBGTilemapBuffers1 = AllocZeroed(BG_SCREEN_SIZE * 2);
+    gBGTilemapBuffers3 = AllocZeroed(BG_SCREEN_SIZE * 2);
+#else
     gBGTilemapBuffers2 = AllocZeroed(BG_SCREEN_SIZE);
     gBGTilemapBuffers1 = AllocZeroed(BG_SCREEN_SIZE);
     gBGTilemapBuffers3 = AllocZeroed(BG_SCREEN_SIZE);
+#endif
     SetBgTilemapBuffer(1, gBGTilemapBuffers2);
     SetBgTilemapBuffer(2, gBGTilemapBuffers1);
     SetBgTilemapBuffer(3, gBGTilemapBuffers3);
@@ -1359,9 +1370,20 @@ static void InitOverworldBgs_NoResetHeap(void)
     SetBgAttribute(1, BG_ATTR_MOSAIC, TRUE);
     SetBgAttribute(2, BG_ATTR_MOSAIC, TRUE);
     SetBgAttribute(3, BG_ATTR_MOSAIC, TRUE);
+#ifdef PLATFORM_PC
+    // The field BGs are 512x256 on PC so the camera can keep a ring 64 tiles
+    // wide drawn for widescreen (see field_camera.c). VRAM has no room for a
+    // second screenblock each, so the right halves go to the PC's extra
+    // "wide" VRAM (bg.c copies them, the renderer reads them).
+    gPcBgWide = (1 << 1) | (1 << 2) | (1 << 3);
+    gBGTilemapBuffers2 = AllocZeroed(BG_SCREEN_SIZE * 2);
+    gBGTilemapBuffers1 = AllocZeroed(BG_SCREEN_SIZE * 2);
+    gBGTilemapBuffers3 = AllocZeroed(BG_SCREEN_SIZE * 2);
+#else
     gBGTilemapBuffers2 = AllocZeroed(BG_SCREEN_SIZE);
     gBGTilemapBuffers1 = AllocZeroed(BG_SCREEN_SIZE);
     gBGTilemapBuffers3 = AllocZeroed(BG_SCREEN_SIZE);
+#endif
     SetBgTilemapBuffer(1, gBGTilemapBuffers2);
     SetBgTilemapBuffer(2, gBGTilemapBuffers1);
     SetBgTilemapBuffer(3, gBGTilemapBuffers3);
@@ -1486,6 +1508,14 @@ static void CB2_Overworld(void)
     if (fading)
         SetFieldVBlankCallback();
 }
+
+#ifdef PLATFORM_PC
+// Widescreen: the field is the only screen drawn wider than the GBA's.
+bool32 PcFieldIsOnScreen(void)
+{
+    return gMain.callback2 == CB2_Overworld || gMain.callback2 == CB2_OverworldBasic;
+}
+#endif
 
 void SetMainCallback1(MainCallback cb)
 {

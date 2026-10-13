@@ -71,6 +71,10 @@ void ResetBgControlStructs(void)
     struct BgConfig zeroedConfig = sZeroedBgControlStruct;
     int i;
 
+#ifdef PLATFORM_PC
+    gPcBgWide = 0;
+#endif
+
     for (i = 0; i < 4; i++)
     {
         bgConfigs[i] = zeroedConfig;
@@ -397,6 +401,9 @@ void InitBgFromTemplate(const struct BgTemplate *template)
 
     if (bg < 4)
     {
+#ifdef PLATFORM_PC
+        gPcBgWide &= ~(1 << bg);
+#endif
         SetBgControlAttributes(bg,
                                template->charBaseIndex,
                                template->mapBaseIndex,
@@ -863,6 +870,11 @@ void CopyBgTilemapBufferToVram(u8 bg)
                 break;
         }
         LoadBgVram(bg, sGpuBgConfigs2[bg].tilemap, sizeToLoad, 0, 2);
+#ifdef PLATFORM_PC
+        // 512-wide field BG: the right half goes to the PC's wide VRAM.
+        if ((gPcBgWide & (1 << bg)) && GetBgType(bg) == 0)
+            RequestDma3Copy((const u8 *)sGpuBgConfigs2[bg].tilemap + BG_SCREEN_SIZE, gPcVramWide[bg], BG_SCREEN_SIZE, DMA3_16BIT);
+#endif
     }
 }
 

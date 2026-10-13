@@ -16,6 +16,11 @@
 extern unsigned char gPcIo[PC_IO_SIZE];      /* 0x04000000 I/O registers */
 extern unsigned char gPcPltt[PC_PLTT_SIZE];  /* 0x05000000 palette RAM */
 extern unsigned char gPcVram[PC_VRAM_SIZE];  /* 0x06000000 VRAM */
+/* PC extension: text BGs with their bit set in gPcBgWide are 512 pixels wide;
+ * their right-hand screenblock lives in gPcVramWide[bg] (the GBA's 64 KB of BG
+ * VRAM has no room for it). Used by the widescreen field. */
+extern unsigned char gPcVramWide[4][0x800];
+extern unsigned char gPcBgWide;
 extern unsigned char gPcOam[PC_OAM_SIZE];    /* 0x07000000 OAM */
 extern unsigned char gPcFlash[PC_FLASH_SIZE];/* 0x0E000000 flash save chip */
 

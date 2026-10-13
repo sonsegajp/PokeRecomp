@@ -271,6 +271,10 @@ void RegisterRamReset(u32 flags)
         memset(gPcIo + 0xB0, 0, 0x60);  /* DMA, timers */
         memset(gPcIo + 0x200, 0, 0x10); /* IE, IF, WAITCNT, IME */
         gPcIo[0] = 0x80;                /* DISPCNT forced blank */
+        /* The BIOS leaves the affine BGs at identity scale (PA = PD = 1.0);
+         * screens like Oak's intro rely on it and never set them. */
+        gPcIo[0x21] = gPcIo[0x27] = 0x01; /* BG2PA, BG2PD = 0x0100 */
+        gPcIo[0x31] = gPcIo[0x37] = 0x01; /* BG3PA, BG3PD = 0x0100 */
     }
     if (flags & RESET_SOUND_REGS) memset(gPcIo + 0x60, 0, 0x50);
     if (flags & RESET_SIO_REGS) {

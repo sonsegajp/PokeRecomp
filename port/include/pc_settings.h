@@ -25,8 +25,13 @@ enum PcWidescreen {
     PC_WIDE_OFF,         /* 3:2, the GBA screen */
     PC_WIDE_16_10,
     PC_WIDE_16_9,
+    PC_WIDE_AUTO,        /* match the window / monitor shape: no side bars */
     PC_WIDE_COUNT
 };
+
+/* Widest field the camera keeps drawn (field_camera.c WIDE_COLS): ~2.7:1.
+ * Wider windows get thin side bars. */
+#define PC_WIDE_MAX_WIDTH 432
 
 struct PcSettings {
     int window_scale;    /* 2..8: window size as a multiple of the GBA screen */

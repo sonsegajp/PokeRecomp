@@ -243,7 +243,8 @@ static const u8 *const sColorLabels[] = {sText_ColorsPc, sText_ColorsGba};
 static const u8 sText_WideOff[] = _("OFF");
 static const u8 sText_Wide1610[] = _("16:10");
 static const u8 sText_Wide169[] = _("16:9");
-static const u8 *const sWideLabels[] = {sText_WideOff, sText_Wide1610, sText_Wide169};
+static const u8 sText_WideAuto[] = _("AUTO");
+static const u8 *const sWideLabels[] = {sText_WideOff, sText_Wide1610, sText_Wide169, sText_WideAuto};
 
 static const u8 sText_On[] = _("ON");
 static const u8 *const sOffOnLabels[] = {sText_WideOff, sText_On};

@@ -17,7 +17,7 @@ const char RomHeaderGameCode[4] = {'B', 'P', 'R', 'E'};
 const u8 RomHeaderSoftwareVersion = 0;
 
 /* The heap the linker script placed at the end of EWRAM. */
-u8 gHeap[0x1C000] __attribute__((aligned(4)));
+u8 gHeap[0x20000] __attribute__((aligned(4)));
 
 /* IntrMain is ARM code copied to IWRAM on the console; interrupts are
  * dispatched by the host here, so it only needs to exist. */

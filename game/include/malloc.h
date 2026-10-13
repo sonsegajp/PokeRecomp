@@ -3,7 +3,11 @@
 
 #include "global.h"
 
+#ifdef PLATFORM_PC
+#define HEAP_SIZE 0x20000 // room for the double-width field tilemaps
+#else
 #define HEAP_SIZE 0x1C000
+#endif
 #define malloc Alloc
 #define calloc(ct, sz) AllocZeroed((ct) * (sz))
 #define free Free

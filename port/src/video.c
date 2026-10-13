@@ -160,11 +160,31 @@ static GLuint compile(GLenum type, const char *src)
     return s;
 }
 
+/* AUTO: as many columns as the window's shape holds at the current scaling,
+ * so the field fills it edge to edge (even width, GBA_WIDTH..PC_WIDE_MAX_WIDTH). */
+static int auto_width(void)
+{
+    int ww, wh, w;
+
+    if (!window) return 284;
+    SDL_GL_GetDrawableSize(window, &ww, &wh);
+    if (ww <= 0 || wh <= 0) return 284;
+    if (gPcSettings.scaling == PC_SCALE_INTEGER && wh >= GBA_HEIGHT)
+        w = ww / (wh / GBA_HEIGHT);
+    else
+        w = (int)((double)ww * GBA_HEIGHT / wh + 0.5);
+    w &= ~1;
+    if (w < GBA_WIDTH) w = GBA_WIDTH;
+    if (w > PC_WIDE_MAX_WIDTH) w = PC_WIDE_MAX_WIDTH;
+    return w;
+}
+
 static int logical_width(void)
 {
     switch (gPcSettings.widescreen) {
     case PC_WIDE_16_10: return 256;
     case PC_WIDE_16_9: return 284;
+    case PC_WIDE_AUTO: return auto_width();
     default: return GBA_WIDTH;
     }
 }
@@ -176,6 +196,7 @@ void PcSettingsApplyVideo(void)
     if (!window) return;
     SDL_SetWindowFullscreen(window, gPcSettings.fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
     if (!gPcSettings.fullscreen) {
+        /* AUTO keeps the window's current shape (16:9 the first time). */
         SDL_SetWindowSize(window, logical_width() * gPcSettings.window_scale, GBA_HEIGHT * gPcSettings.window_scale);
         SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     }

@@ -12,7 +12,11 @@ EWRAM_DATA bool8 gBikeCameraAheadPanback = FALSE;
 // Static type declarations
 struct FieldCameraOffset
 {
+#ifdef PLATFORM_PC
+    u16 xPixelOffset; // wraps at 512: the PC field ring is 64 tiles wide
+#else
     u8 xPixelOffset;
+#endif
     u8 yPixelOffset;
     u8 xTileOffset;
     u8 yTileOffset;
@@ -41,6 +45,46 @@ COMMON_DATA struct CameraObject gFieldCamera = {0};
 COMMON_DATA u16 gTotalCameraPixelOffsetY = 0;
 COMMON_DATA u16 gTotalCameraPixelOffsetX = 0;
 
+#ifdef PLATFORM_PC
+// Widescreen: on PC the field BGs are 512x256 and the ring of drawn tiles is
+// 64 tiles (32 metatiles) wide instead of 32. Besides the 16 metatile columns
+// the GBA keeps drawn, WIDE_COLS more are kept up to date on each side, so a
+// wider view shows the real map. Map column pos.x still sits at ring column
+// xTileOffset; columns left of it wrap around the ring. With 8 the kept
+// columns (-8..23) fill the ring exactly: a scroll redraws the one column that
+// just left the far side. Enough for ~96px margins (PC_WIDE_MAX_WIDTH).
+#define RING_W    64
+#define WIDE_COLS 8
+
+// Buffer index of ring tile (x, y): a 512-wide BG is two 32x32 screenblocks.
+static s32 RingOffset(s32 x, s32 y)
+{
+    x &= RING_W - 1;
+    y &= 31;
+    return x < 32 ? y * 32 + x : 0x400 + y * 32 + (x - 32);
+}
+
+// Draw camera-relative metatile column `col` (all 16 rows).
+static void DrawRingColumn(struct FieldCameraOffset *cameraOffset, const struct MapLayout *mapLayout, s32 col)
+{
+    s32 row;
+
+    for (row = 0; row < 16; row++)
+        DrawMetatileAt(mapLayout, RingOffset(cameraOffset->xTileOffset + col * 2, cameraOffset->yTileOffset + row * 2),
+                       gSaveBlock1Ptr->pos.x + col, gSaveBlock1Ptr->pos.y + row);
+}
+
+// Draw camera-relative metatile row `row` across all kept columns.
+static void DrawRingRow(struct FieldCameraOffset *cameraOffset, const struct MapLayout *mapLayout, s32 row)
+{
+    s32 col;
+
+    for (col = -WIDE_COLS; col < 16 + WIDE_COLS; col++)
+        DrawMetatileAt(mapLayout, RingOffset(cameraOffset->xTileOffset + col * 2, cameraOffset->yTileOffset + row * 2),
+                       gSaveBlock1Ptr->pos.x + col, gSaveBlock1Ptr->pos.y + row);
+}
+#endif
+
 // text
 static void move_tilemap_camera_to_upper_left_corner_(struct FieldCameraOffset *cameraOffset)
 {
@@ -54,7 +98,11 @@ static void move_tilemap_camera_to_upper_left_corner_(struct FieldCameraOffset *
 static void tilemap_move_something(struct FieldCameraOffset *cameraOffset, u32 b, u32 c)
 {
     cameraOffset->xTileOffset += b;
+#ifdef PLATFORM_PC
+    cameraOffset->xTileOffset %= RING_W;
+#else
     cameraOffset->xTileOffset %= 32;
+#endif
     cameraOffset->yTileOffset += c;
     cameraOffset->yTileOffset %= 32;
 }
@@ -62,6 +110,9 @@ static void tilemap_move_something(struct FieldCameraOffset *cameraOffset, u32 b
 static void coords8_add(struct FieldCameraOffset *cameraOffset, u32 b, u32 c)
 {
     cameraOffset->xPixelOffset += b;
+#ifdef PLATFORM_PC
+    cameraOffset->xPixelOffset &= RING_W * 8 - 1;
+#endif
     cameraOffset->yPixelOffset += c;
 }
 
@@ -97,6 +148,14 @@ void DrawWholeMapView(void)
 }
 
 static void DrawWholeMapViewInternal(int x, int y, const struct MapLayout *mapLayout)
+#ifdef PLATFORM_PC
+{
+    s32 row;
+
+    for (row = 0; row < 16; row++)
+        DrawRingRow(&sFieldCameraOffset, mapLayout, row);
+}
+#else
 {
     u8 i;
     u8 j;
@@ -118,6 +177,7 @@ static void DrawWholeMapViewInternal(int x, int y, const struct MapLayout *mapLa
         }
     }
 }
+#endif
 
 static void RedrawMapSlicesForCameraUpdate(struct FieldCameraOffset *cameraOffset, int x, int y)
 {
@@ -135,6 +195,11 @@ static void RedrawMapSlicesForCameraUpdate(struct FieldCameraOffset *cameraOffse
 }
 
 static void RedrawMapSliceNorth(struct FieldCameraOffset *cameraOffset, const struct MapLayout *mapLayout)
+#ifdef PLATFORM_PC
+{
+    DrawRingRow(cameraOffset, mapLayout, 14);
+}
+#else
 {
     u8 i;
     u8 temp;
@@ -152,8 +217,14 @@ static void RedrawMapSliceNorth(struct FieldCameraOffset *cameraOffset, const st
         DrawMetatileAt(mapLayout, r7 + temp, gSaveBlock1Ptr->pos.x + i / 2, gSaveBlock1Ptr->pos.y + 14);
     }
 }
+#endif
 
 static void RedrawMapSliceSouth(struct FieldCameraOffset *cameraOffset, const struct MapLayout *mapLayout)
+#ifdef PLATFORM_PC
+{
+    DrawRingRow(cameraOffset, mapLayout, 0);
+}
+#else
 {
     u8 i;
     u8 temp;
@@ -167,8 +238,14 @@ static void RedrawMapSliceSouth(struct FieldCameraOffset *cameraOffset, const st
         DrawMetatileAt(mapLayout, r7 + temp, gSaveBlock1Ptr->pos.x + i / 2, gSaveBlock1Ptr->pos.y);
     }
 }
+#endif
 
 static void RedrawMapSliceEast(struct FieldCameraOffset *cameraOffset, const struct MapLayout *mapLayout)
+#ifdef PLATFORM_PC
+{
+    DrawRingColumn(cameraOffset, mapLayout, -WIDE_COLS);
+}
+#else
 {
     u8 i;
     u8 temp;
@@ -182,8 +259,15 @@ static void RedrawMapSliceEast(struct FieldCameraOffset *cameraOffset, const str
         DrawMetatileAt(mapLayout, temp * 32 + r6, gSaveBlock1Ptr->pos.x, gSaveBlock1Ptr->pos.y + i / 2);
     }
 }
+#endif
 
 static void RedrawMapSliceWest(struct FieldCameraOffset *cameraOffset, const struct MapLayout *mapLayout)
+#ifdef PLATFORM_PC
+{
+    DrawRingColumn(cameraOffset, mapLayout, 14 + WIDE_COLS);
+    DrawRingColumn(cameraOffset, mapLayout, 15 + WIDE_COLS);
+}
+#else
 {
     u8 i;
     u8 temp;
@@ -199,6 +283,7 @@ static void RedrawMapSliceWest(struct FieldCameraOffset *cameraOffset, const str
         DrawMetatileAt(mapLayout, temp * 32 + r5, gSaveBlock1Ptr->pos.x + 14, gSaveBlock1Ptr->pos.y + i / 2);
     }
 }
+#endif
 
 void CurrentMapDrawMetatileAt(int x, int y)
 {
@@ -307,6 +392,15 @@ static void DrawMetatile(s32 metatileLayerType, const u16 *tiles, u16 offset)
 }
 
 static s32 MapPosToBgTilemapOffset(struct FieldCameraOffset *cameraOffset, s32 x, s32 y)
+#ifdef PLATFORM_PC
+{
+    x -= gSaveBlock1Ptr->pos.x;
+    y -= gSaveBlock1Ptr->pos.y;
+    if (x < -WIDE_COLS || x >= 16 + WIDE_COLS || y < 0 || y >= 16)
+        return -1;
+    return RingOffset(cameraOffset->xTileOffset + x * 2, cameraOffset->yTileOffset + y * 2);
+}
+#else
 {
     x -= gSaveBlock1Ptr->pos.x;
     x *= 2;
@@ -325,6 +419,7 @@ static s32 MapPosToBgTilemapOffset(struct FieldCameraOffset *cameraOffset, s32 x
 
     return y * 32 + x;
 }
+#endif
 
 static void CameraUpdateCallback(struct CameraObject *fieldCamera)
 {

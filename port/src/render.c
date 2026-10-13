@@ -53,7 +53,8 @@ static void draw_text_bg(int bg, int line, int x_origin, int width)
     int screen_base = ((cnt >> 8) & 0x1F) * 0x800;
     int color256 = (cnt >> 7) & 1;
     int size = cnt >> 14;
-    int map_w = (size & 1) ? 512 : 256;
+    int wide = (gPcBgWide >> bg) & 1 && !(size & 1);
+    int map_w = (size & 1) || wide ? 512 : 256;
     int map_h = (size & 2) ? 512 : 256;
     int hofs = REG16(0x10 + bg * 4) & 0x1FF;
     int vofs = REG16(0x12 + bg * 4) & 0x1FF;
@@ -68,7 +69,8 @@ static void draw_text_bg(int bg, int line, int x_origin, int width)
         int mx = gx - ((gx % mos_h) + mos_h) % mos_h;
         int x = (mx + hofs) & (map_w - 1);
         int block = (x >> 8) + (y >> 8) * (map_w >> 8);
-        const uint16_t *map = (const uint16_t *)&gPcVram[screen_base + block * 0x800];
+        const uint16_t *map = wide && x >= 256 ? (const uint16_t *)gPcVramWide[bg]
+                                                : (const uint16_t *)&gPcVram[screen_base + block * 0x800];
         uint16_t entry = map[((y & 0xFF) >> 3) * 32 + ((x & 0xFF) >> 3)];
         int tx = x & 7, ty = y & 7;
         int index;
@@ -178,7 +180,6 @@ static void draw_objs(int line, int x_origin, int width)
         int row = line - y;
         if (row < 0 || row >= bh) continue;
         int x = a1 & 0x1FF;
-        if (x >= 256) x -= 512;
 
         int mode = (a0 >> 10) & 3;
         int color256 = (a0 >> 13) & 1;
@@ -195,7 +196,12 @@ static void draw_objs(int line, int x_origin, int width)
         int row_stride = one_d ? (w / 8) * (color256 ? 2 : 1) : 32;
 
         for (int c = 0; c < bw; c++) {
-            int sx = x + c + x_origin;
+            /* OBJ x is 9 bits and wraps at 512; split the circle halfway
+             * between the screen's right edge and 512 so wide frames see
+             * sprites hanging off either side. */
+            int gx = (x + c) & 0x1FF;
+            if (gx >= (512 + GBA_WIDTH) / 2) gx -= 512;
+            int sx = gx + x_origin;
             if (sx < 0 || sx >= width) continue;
             int tx, ty;
             int cc = mos ? c - (c % mos_h) : c;
@@ -284,7 +290,7 @@ static inline uint16_t darken(uint16_t c, int evy)
     return (uint16_t)(r | (g << 5) | (b << 10));
 }
 
-static void compose_line(uint32_t *out, int line, int x_origin, int width, int bg_enabled)
+static void compose_line(uint32_t *out, int line, int x_origin, int width, int bg_enabled, int wide_bgs)
 {
     uint16_t dispcnt = REG16(0x00);
     uint16_t bldcnt = REG16(0x50), bldalpha = REG16(0x52);
@@ -303,6 +309,7 @@ static void compose_line(uint32_t *out, int line, int x_origin, int width, int b
     for (int sx = 0; sx < width; sx++) {
         int x = sx - x_origin;
         int mask = 0x3F; /* layers BG0-3, OBJ, effects */
+        int bgs = (x < 0 || x >= GBA_WIDTH) ? bg_enabled & wide_bgs : bg_enabled;
 
         if (windows) {
             /* Columns outside the GBA screen use the "outside" setting. */
@@ -323,7 +330,7 @@ static void compose_line(uint32_t *out, int line, int x_origin, int width, int b
                 found++;
             }
             for (int bg = 0; bg < 4 && found < 2; bg++) {
-                if (!(bg_enabled & (1 << bg)) || !(mask & (1 << bg)) || bg_prio[bg] != prio)
+                if (!(bgs & (1 << bg)) || !(mask & (1 << bg)) || bg_prio[bg] != prio)
                     continue;
                 if (bg_line[bg][sx] == TRANSPARENT) continue;
                 if (found == 0) { top = bg_line[bg][sx]; top_layer = bg; }
@@ -351,7 +358,7 @@ static void compose_line(uint32_t *out, int line, int x_origin, int width, int b
     }
 }
 
-void PcRenderFrame(uint32_t *out, int width, void (*hblank)(int line))
+void PcRenderFrame(uint32_t *out, int width, int wide_bgs, void (*hblank)(int line))
 {
     int x_origin = (width - GBA_WIDTH) / 2;
 
@@ -402,7 +409,7 @@ void PcRenderFrame(uint32_t *out, int width, void (*hblank)(int line))
                     draw_affine_bg(bg, x_origin, width);    /* mode 1: BG2; mode 2: BG2/3 */
             }
             draw_objs(line, x_origin, width);
-            compose_line(row, line, x_origin, width, enabled);
+            compose_line(row, line, x_origin, width, enabled, wide_bgs);
         }
 
         for (int a = 0; a < 2; a++) {

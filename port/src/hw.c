@@ -4,6 +4,8 @@
 unsigned char gPcIo[PC_IO_SIZE] __attribute__((aligned(4)));
 unsigned char gPcPltt[PC_PLTT_SIZE] __attribute__((aligned(4)));
 unsigned char gPcVram[PC_VRAM_SIZE] __attribute__((aligned(4)));
+unsigned char gPcVramWide[4][0x800] __attribute__((aligned(4)));
+unsigned char gPcBgWide;
 unsigned char gPcOam[PC_OAM_SIZE] __attribute__((aligned(4)));
 unsigned char gPcFlash[PC_FLASH_SIZE] __attribute__((aligned(4)));
 

@@ -10,7 +10,11 @@
  *
  * PSG (the four Game Boy channels): synthesised from the sound registers the
  * engine's CgbSound driver writes each frame — duty squares with sweep and
- * envelopes, the 4-bit wave channel, and the LFSR noise channel. */
+ * envelopes, the 4-bit wave channel, and the LFSR noise channel.
+ *
+ * SOUND CHIP = GBA (hq_audio off) puts the console's grit back for purists:
+ * no interpolation, and the Direct Sound mix held at the engine's sample rate
+ * and quantised to 8 bits, as the console's FIFOs play it. */
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,6 +23,7 @@
 #include "gba/m4a_internal.h"
 #include "pc_mixer.h"
 #include "pc_hw.h"
+#include "pc_settings.h"
 
 #define FRAME_RATE 59.7275005696
 #define MAX_FRAME_SAMPLES 1024
@@ -84,7 +89,7 @@ static void mix_channel(struct SoundInfo *si, struct SoundChannel *chan, int n)
             a = wave_sample(wav, compressed, pos);
             b = wave_sample(wav, compressed, pos + 1);
         }
-        s = a + (b - a) * (float)frac;
+        s = gPcSettings.hq_audio ? a + (b - a) * (float)frac : a;
         ds_left[i] += s * vol_l;
         ds_right[i] += s * vol_r;
 
@@ -307,6 +312,27 @@ static void mix_psg(int n, float *left, float *right)
     }
 }
 
+/* GBA-accurate Direct Sound: sample-and-hold at the engine's rate, 8-bit. */
+static void gba_dac(struct SoundInfo *si, int n)
+{
+    static double phase;
+    static float hold_l, hold_r;
+    double step = (double)si->pcmFreq / PC_AUDIO_RATE;
+
+    for (int i = 0; i < n; i++) {
+        phase += step;
+        if (phase >= 1.0) {
+            phase -= (int)phase;
+            hold_l = floorf(ds_left[i]);
+            hold_r = floorf(ds_right[i]);
+            if (hold_l > 127) hold_l = 127; else if (hold_l < -128) hold_l = -128;
+            if (hold_r > 127) hold_r = 127; else if (hold_r < -128) hold_r = -128;
+        }
+        ds_left[i] = hold_l;
+        ds_right[i] = hold_r;
+    }
+}
+
 /* ---- the frame --------------------------------------------------------------------- */
 
 void PcMixerVBlank(struct SoundInfo *si)
@@ -330,6 +356,8 @@ void PcMixerVBlank(struct SoundInfo *si)
             mix_channel(si, chan, n);
     }
     apply_reverb(si, n);
+    if (!gPcSettings.hq_audio)
+        gba_dac(si, n);
 
     memset(psg_l, 0, n * sizeof(float));
     memset(psg_r, 0, n * sizeof(float));
@@ -344,12 +372,15 @@ void PcMixerVBlank(struct SoundInfo *si)
         if (only && !strcmp(only, "psg")) { memset(ds_left, 0, n * sizeof(float)); memset(ds_right, 0, n * sizeof(float)); }
     }
 
-    /* Both paths in the GBA's 10-bit DAC units (+-512), then soft-clip. */
+    /* Both paths in the GBA's 10-bit DAC units (+-512), then the volume
+     * setting (squared, so the steps sound even), then soft-clip. */
+    float master = gPcSettings.volume / 10.0f;
+    master *= master;
     for (int i = 0; i < n; i++) {
         float l = ds_left[i] * gain_l + psg_l[i];
         float r = ds_right[i] * gain_r + psg_r[i];
-        l /= 512.0f;
-        r /= 512.0f;
+        l *= master / 512.0f;
+        r *= master / 512.0f;
         out[i * 2] = l > 1.0f || l < -1.0f ? tanhf(l) : l;
         out[i * 2 + 1] = r > 1.0f || r < -1.0f ? tanhf(r) : r;
     }

@@ -21,6 +21,16 @@
 #include "constants/trainer_types.h"
 #include "constants/union_room.h"
 
+#ifdef PLATFORM_PC
+// Widescreen shows up to WIDE_VIEW_PX more pixels on each side of the GBA
+// screen, so objects spawn, stay and draw that much farther out.
+#define WIDE_VIEW_PX   96
+#define WIDE_VIEW_COLS (WIDE_VIEW_PX / 16)
+#else
+#define WIDE_VIEW_PX   0
+#define WIDE_VIEW_COLS 0
+#endif
+
 static void MoveCoordsInDirection(u32, s16 *, s16 *, s16, s16);
 static bool8 ObjectEventExecSingleMovementAction(struct ObjectEvent *, struct Sprite *);
 static u8 GetCollisionInDirection(struct ObjectEvent *, u8);
@@ -1796,8 +1806,8 @@ void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
 
     if (gMapHeader.events != NULL)
     {
-        s16 left = gSaveBlock1Ptr->pos.x - 2;
-        s16 right = gSaveBlock1Ptr->pos.x + MAP_OFFSET_W + 2;
+        s16 left = gSaveBlock1Ptr->pos.x - 2 - WIDE_VIEW_COLS;
+        s16 right = gSaveBlock1Ptr->pos.x + MAP_OFFSET_W + 2 + WIDE_VIEW_COLS;
         s16 top = gSaveBlock1Ptr->pos.y;
         s16 bottom = gSaveBlock1Ptr->pos.y + MAP_OFFSET_H + 2;
 
@@ -1840,8 +1850,8 @@ void RemoveObjectEventsOutsideView(void)
 
 static void RemoveObjectEventIfOutsideView(struct ObjectEvent *objectEvent)
 {
-    s16 left =   gSaveBlock1Ptr->pos.x - 2;
-    s16 right =  gSaveBlock1Ptr->pos.x + MAP_OFFSET_W + 2;
+    s16 left =   gSaveBlock1Ptr->pos.x - 2 - WIDE_VIEW_COLS;
+    s16 right =  gSaveBlock1Ptr->pos.x + MAP_OFFSET_W + 2 + WIDE_VIEW_COLS;
     s16 top =    gSaveBlock1Ptr->pos.y;
     s16 bottom = gSaveBlock1Ptr->pos.y + MAP_OFFSET_H + 2;
 
@@ -8001,7 +8011,7 @@ static void CalcWhetherObjectIsOffscreen(struct ObjectEvent *objectEvent, struct
     {
         minX = -16;
     }
-    if ((s16)x >= (DISPLAY_WIDTH + 16) || (s16)x2 < minX)
+    if ((s16)x >= (DISPLAY_WIDTH + 16 + WIDE_VIEW_PX) || (s16)x2 < minX - WIDE_VIEW_PX)
     {
         objectEvent->offScreen = TRUE;
     }
@@ -9204,7 +9214,7 @@ void UpdateObjectEventSpriteInvisibility(struct Sprite *sprite, bool8 invisible)
     x2 = x - (sprite->centerToCornerVecX >> 1);
     y2 = y - (sprite->centerToCornerVecY >> 1);
 
-    if ((s16)x >= DISPLAY_WIDTH + 16 || x2 < -16)
+    if ((s16)x >= DISPLAY_WIDTH + 16 + WIDE_VIEW_PX || (s16)x2 < -16 - WIDE_VIEW_PX)
         sprite->invisible = TRUE;
     if ((s16)y >= DISPLAY_HEIGHT + 16 || y2 < -16)
         sprite->invisible = TRUE;

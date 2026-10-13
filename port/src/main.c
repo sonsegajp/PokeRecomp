@@ -162,6 +162,7 @@ int main(int argc, char *argv[])
     int scripted = 0, shot_every = 0, muted = 0;
     const char *gl_dump = NULL;
     const char *shot_dir = NULL;
+    int test_width = 0;
 
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "--headless")) headless = 1;
@@ -172,6 +173,7 @@ int main(int argc, char *argv[])
         } else if (!strcmp(argv[i], "--wav") && i + 1 < argc) PcTestOpenWav(argv[++i]);
         else if (!strcmp(argv[i], "--mute")) muted = 1;
         else if (!strcmp(argv[i], "--gl-dump") && i + 1 < argc) gl_dump = argv[++i];
+        else if (!strcmp(argv[i], "--field-width") && i + 1 < argc) test_width = atoi(argv[++i]); /* test: widescreen field width */
         else if (!strcmp(argv[i], "--shots") && i + 2 < argc) {
             shot_every = atoi(argv[++i]);
             shot_dir = argv[++i];
@@ -200,7 +202,11 @@ int main(int argc, char *argv[])
         SwitchToFiber(game_fiber);   /* game logic until it waits for VBlank */
         if (getenv("PC_TRACE_FRAMES") && frames % 60 == 0) fprintf(stderr, "frame %d\n", frames);
 
-        PcRenderFrame(frame, frame_width, on_hblank);
+        /* Widescreen applies to the field; every other screen is the GBA's 240
+         * pixels, pillarboxed. Field BGs 1-3 extend into the margins. */
+        frame_width = gPcSettings.widescreen && PcFieldIsOnScreen() ? PcVideoDisplayWidth() : GBA_WIDTH;
+        if (test_width && PcFieldIsOnScreen()) frame_width = test_width;
+        PcRenderFrame(frame, frame_width, 0xE, on_hblank);
         if (shot_every && frames % shot_every == 0) {
             char path[512];
             snprintf(path, sizeof path, "%s/f%06d.bmp", shot_dir, frames);
