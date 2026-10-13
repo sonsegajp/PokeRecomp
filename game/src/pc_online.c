@@ -40,6 +40,7 @@
 #include "constants/trainers.h"
 #include "naming_screen.h"
 #include "pc_net.h"
+#include "pc_chat.h"
 #include "pc_online.h"
 
 bool32 PcFieldIsOnScreen(void); // overworld.c
@@ -908,6 +909,13 @@ static void DebugNetHooks(void)
     }
     if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled())
         return;
+    if (gPcDebugNet.chat[0])
+    {
+        PcChatOpen();
+        PcChatTypeUtf8(gPcDebugNet.chat);
+        PcChatSubmit();
+        gPcDebugNet.chat[0] = 0;
+    }
     if (gPcDebugNet.request_kind)
     {
         for (s = 0; s < PC_NET_MAX_PLAYERS; s++)

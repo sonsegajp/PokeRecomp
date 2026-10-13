@@ -3,6 +3,8 @@
 
 #include "pc_port.h"
 #include "pc_settings.h"
+#include "pc_chat.h"
+#include "pc_net.h"
 
 enum {
     KEY_A = 0x001, KEY_B = 0x002, KEY_SELECT = 0x004, KEY_START = 0x008,
@@ -36,6 +38,22 @@ uint16_t PcInputPoll(int *quit, int *fast_forward)
 
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) *quit = 1;
+        else if (PcChatActive() && (e.type == SDL_TEXTINPUT || e.type == SDL_KEYDOWN)) {
+            /* online chat input line: the keyboard types, the game sees nothing */
+            if (e.type == SDL_TEXTINPUT) PcChatTypeUtf8(e.text.text);
+            else if (e.key.keysym.scancode == SDL_SCANCODE_BACKSPACE) PcChatBackspace();
+            else if (e.key.keysym.scancode == SDL_SCANCODE_RETURN || e.key.keysym.scancode == SDL_SCANCODE_KP_ENTER) {
+                PcChatSubmit();
+                SDL_StopTextInput();
+            } else if (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+                PcChatCancel();
+                SDL_StopTextInput();
+            }
+        }
+        else if (e.type == SDL_KEYDOWN && !e.key.repeat && e.key.keysym.scancode == SDL_SCANCODE_T && PcNetConnected()) {
+            PcChatOpen();
+            SDL_StartTextInput();
+        }
         else if (e.type == SDL_KEYDOWN && !e.key.repeat) {
             if (e.key.keysym.scancode == SDL_SCANCODE_F11) {
                 gPcSettings.fullscreen ^= 1;
@@ -51,6 +69,10 @@ uint16_t PcInputPoll(int *quit, int *fast_forward)
     }
 
     keys = SDL_GetKeyboardState(NULL);
+    if (PcChatActive()) {   /* typing: the game gets no keyboard input */
+        *fast_forward = 0;
+        return 0x03FF;
+    }
     *fast_forward = keys[SDL_SCANCODE_TAB] ||
                     (pad && SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 16000);
     for (size_t i = 0; i < sizeof keymap / sizeof keymap[0]; i++)

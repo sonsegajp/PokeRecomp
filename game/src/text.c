@@ -1693,3 +1693,12 @@ static void DecompressGlyph_Bold(u16 glyphId)
     gGlyphInfo.width = 8;
     gGlyphInfo.height = 12;
 }
+
+#ifdef PLATFORM_PC
+// The online chat overlay (port/src/chat.c) draws with this font.
+const u16 *PcFontNormalGlyph(u16 glyphId, u8 *width)
+{
+    *width = sFontNormalLatinGlyphWidths[glyphId];
+    return sFontNormalLatinGlyphs + 0x20 * glyphId;
+}
+#endif

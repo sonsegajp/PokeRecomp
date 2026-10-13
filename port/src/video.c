@@ -11,10 +11,11 @@
 
 #include "pc_port.h"
 #include "pc_settings.h"
+#include "pc_chat.h"
 
 static SDL_Window *window;
 static SDL_GLContext gl;
-static GLuint program, vao, texture;
+static GLuint program, vao, texture, overlay_texture;
 static GLint u_tex, u_tex_size, u_out_size, u_filter, u_color;
 static int tex_w, tex_h;
 
@@ -135,6 +136,7 @@ static const char *fragment_src =
     "void main() {\n"
     "    vec2 t = uv * tex_size;\n"
     "    vec3 c;\n"
+    "    if (filter_mode == 99) { color = texture(tex, (floor(t) + 0.5) / tex_size); return; }\n" /* chat overlay */
     "    if (filter_mode == 0) c = nearest(t);\n"
     "    else if (filter_mode == 1) c = sharp(t);\n"
     "    else if (filter_mode == 2) c = texture(tex, uv).rgb;\n"
@@ -289,6 +291,30 @@ void PcVideoPresent(const uint32_t *frame, int width, int height)
     p_glBindVertexArray(vao);
     glBindTexture(GL_TEXTURE_2D, texture);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    /* online chat: the game's font at half size, over the game picture */
+    {
+        const uint32_t *chat = PcChatOverlay(width * 2, height * 2);
+        if (chat) {
+            if (!overlay_texture) {
+                glGenTextures(1, &overlay_texture);
+                glBindTexture(GL_TEXTURE_2D, overlay_texture);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            }
+            glBindTexture(GL_TEXTURE_2D, overlay_texture);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width * 2, height * 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, chat);
+            p_glUniform2f(u_tex_size, (float)(width * 2), (float)(height * 2));
+            p_glUniform1i(u_filter, 99);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            glDisable(GL_BLEND);
+            glBindTexture(GL_TEXTURE_2D, texture);
+        }
+    }
     SDL_GL_SwapWindow(window);
 }
 

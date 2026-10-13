@@ -16,6 +16,7 @@
 #include "pc_port.h"
 #include "pc_settings.h"
 #include "pc_net.h"
+#include "pc_chat.h"
 
 #define REG_DISPSTAT 0x04
 #define REG_VCOUNT   0x06
@@ -239,6 +240,7 @@ int main(int argc, char *argv[])
         }
         else if (!strcmp(argv[i], "--net-autojoin")) gPcDebugNet.autojoin = 1;
         else if (!strcmp(argv[i], "--net-accept")) gPcDebugNet.accept = 1;
+        else if (!strcmp(argv[i], "--net-chat") && i + 1 < argc) snprintf(gPcDebugNet.chat, sizeof gPcDebugNet.chat, "%s", argv[++i]);
         else if (!strcmp(argv[i], "--net-request") && i + 1 < argc) gPcDebugNet.request_kind = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--paced")) paced = 1; /* test: headless at real speed (online) */
         else if (!strcmp(argv[i], "--data-dir") && i + 1 < argc) {
@@ -302,6 +304,8 @@ int main(int argc, char *argv[])
             char path[512];
             snprintf(path, sizeof path, "%s/f%06d.bmp", shot_dir, frames);
             save_frame(path);
+            snprintf(path, sizeof path, "%s/f%06d_chat.bmp", shot_dir, frames);
+            PcChatDebugShot(frame, frame_width, GBA_HEIGHT, path);
         }
         run_vblank();
         PcAudioFrame();

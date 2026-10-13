@@ -13,6 +13,7 @@
 #include <ws2tcpip.h>
 
 #include "pc_net.h"
+#include "pc_chat.h"
 
 #define VERSION 1
 #define SECRET_LEN 32
@@ -25,8 +26,8 @@
 enum {
     M_HELLO = 0x01, M_REGISTER = 0x02, M_LOGIN = 0x03, M_LIST_SERVERS = 0x04, M_RENAME = 0x07,
     M_REGISTERED = 0x81, M_LOGIN_OK = 0x82, M_SERVER_LIST = 0x83, M_RENAMED = 0x85, M_ERROR = 0x8F,
-    S_JOIN = 0x40, S_POS = 0x41, S_REQUEST = 0x43, S_RESPOND = 0x44, S_LINK_CMD = 0x45, S_LINK_END = 0x46,
-    S_WELCOME = 0xC0, S_PLAYER = 0xC1, S_PLAYER_GONE = 0xC2, S_REQUESTED = 0xC4, S_DECLINED = 0xC5,
+    S_JOIN = 0x40, S_POS = 0x41, S_CHAT = 0x42, S_REQUEST = 0x43, S_RESPOND = 0x44, S_LINK_CMD = 0x45, S_LINK_END = 0x46,
+    S_WELCOME = 0xC0, S_PLAYER = 0xC1, S_PLAYER_GONE = 0xC2, S_CHAT_FROM = 0xC3, S_REQUESTED = 0xC4, S_DECLINED = 0xC5,
     S_SESSION = 0xC6, S_LINK_FRAME = 0xC7, S_SESSION_END = 0xC8, S_LINK_STATE = 0xC9, S_ERROR = 0xCF,
     S_LINK_OPEN = 0x47,
 };
@@ -63,6 +64,7 @@ static uint8_t join_gender;
 static struct { char name[25], host[65]; uint16_t port, players, max; } servers[PC_NET_MAX_SERVERS];
 static int server_count;
 static int connected;
+static uint16_t my_player_id;
 static char connected_name[25];
 
 /* world */
@@ -369,6 +371,13 @@ void PcNetSendPos(uint8_t group, uint8_t num, int16_t x, int16_t y, uint8_t faci
     conn_send(&game, S_POS, p, sizeof p);
 }
 
+void PcNetSendChat(const uint8_t *text, int len)
+{
+    if (!connected || len <= 0) return;
+    if (len > 64) len = 64;
+    conn_send(&game, S_CHAT, text, len);
+}
+
 const struct PcNetPlayer *PcNetGetPlayer(int slot)
 {
     return slot >= 0 && slot < PC_NET_MAX_PLAYERS && players[slot].active ? &players[slot] : NULL;
@@ -522,6 +531,7 @@ static void handle_game(uint8_t type, const uint8_t *p, int len)
     switch (type) {
     case S_WELCOME:
         connected = 1;
+        if (len >= 2) my_player_id = get16(p);
         if (op == OP_JOIN) finish_op(PC_NET_OP_OK);
         conn_close(&master);           /* the master is only needed until we're in */
         master_logged_in = 0;
@@ -538,6 +548,19 @@ static void handle_game(uint8_t type, const uint8_t *p, int len)
         pl->y = (int16_t)get16(p + 4);
         pl->facing = p[6];
         pl->flags = p[7];
+        break;
+    case S_CHAT_FROM:
+        if (len >= 3) {
+            uint8_t text[65];
+            int n = len - 2 > 64 ? 64 : len - 2;
+            uint16_t id = get16(p);
+            memcpy(text, p + 2, n);
+            text[n] = 0xFF;
+            if (id == my_player_id)
+                PcChatReceive(my_name, my_tag, text);
+            else if ((pl = player_slot(id, 0)) != NULL)
+                PcChatReceive(pl->name, pl->tag, text);
+        }
         break;
     case S_PLAYER_GONE:
         if (len >= 2 && (pl = player_slot(get16(p), 0))) pl->active = 0;

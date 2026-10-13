@@ -48,6 +48,7 @@ const char *PcNetConnectedServerName(void);
 
 /* presence */
 void PcNetSendPos(uint8_t group, uint8_t num, int16_t x, int16_t y, uint8_t facing, uint8_t flags);
+void PcNetSendChat(const uint8_t *text, int len);   /* game charset, 0xFF-terminated */
 const struct PcNetPlayer *PcNetGetPlayer(int slot);   /* slot 0..PC_NET_MAX_PLAYERS-1 */
 
 /* battle / trade requests */
