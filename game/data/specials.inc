@@ -467,5 +467,9 @@ gSpecials::
 	def_special Online_WonderTrade
 	def_special Online_CollectMail
 	def_special Online_OpenGts
+	def_special Online_GtsCheckOffer
+	def_special Online_GtsDeposit
+	def_special Online_GtsOffer
+	def_special Online_GtsWithdraw
 gSpecialsEnd::
 

@@ -324,11 +324,201 @@ Online_EventScript_MailboxNoRoom::
 	end
 
 Online_EventScript_Gts::
+	message Online_Text_GtsWhat
+	waitmessage
+	multichoice 17, 0, MULTICHOICE_GTS, FALSE
+	switch VAR_RESULT
+	case 0, Online_EventScript_GtsDeposit
+	case 1, Online_EventScript_GtsSearch
+	case 2, Online_EventScript_GtsMine
+	goto Online_EventScript_GlobalBye
+
+@ DEPOSIT: party Pokémon -> the GTS screen (what you want for it) -> save -> listed
+Online_EventScript_GtsDeposit::
+	msgbox Online_Text_GtsDepositChoose
+	special ChoosePartyMon
+	waitstate
+	goto_if_ge VAR_0x8004, PARTY_SIZE, Online_EventScript_GlobalBye
+	specialvar VAR_RESULT, GetPartyMonSpecies
+	goto_if_eq VAR_RESULT, SPECIES_EGG, Online_EventScript_GtsEgg
+	specialvar VAR_RESULT, CountPartyAliveNonEggMons_IgnoreVar0x8004Slot
+	goto_if_eq VAR_RESULT, 0, Online_EventScript_WonderLast
+	setvar VAR_0x8006, 0
 	fadescreen FADE_TO_BLACK
 	special Online_OpenGts
 	waitstate
+	goto_if_eq VAR_RESULT, 0, Online_EventScript_GlobalBye
+	special BufferMonNickname
+	msgbox Online_Text_GtsDepositConfirm, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Online_EventScript_GlobalBye
+	call EventScript_AskSaveGame
+	goto_if_eq VAR_RESULT, 0, Online_EventScript_GlobalBye
+	message Online_Text_Connecting
+	waitmessage
+	special Online_GtsDeposit
+	waitstate
+	switch VAR_RESULT
+	case 1, Online_EventScript_GtsDeposited
+	case 3, Online_EventScript_GlobalIllegal
+	case 4, Online_EventScript_GtsFull
+	goto Online_EventScript_GlobalFailed
+
+Online_EventScript_GtsDeposited::
+	playse SE_SUCCESS
+	msgbox Online_Text_GtsDeposited
 	release
 	end
+
+Online_EventScript_GtsFull::
+	msgbox Online_Text_GtsFull
+	release
+	end
+
+Online_EventScript_GtsEgg::
+	msgbox Online_Text_GtsEgg
+	release
+	end
+
+@ SEARCH: the GTS screen (species -> listings) -> offer a party Pokémon that fits
+Online_EventScript_GtsSearch::
+	setvar VAR_0x8006, 1
+	fadescreen FADE_TO_BLACK
+	special Online_OpenGts
+	waitstate
+	goto_if_eq VAR_RESULT, 0, Online_EventScript_GlobalBye
+	msgbox Online_Text_GtsOfferChoose
+	special ChoosePartyMon
+	waitstate
+	goto_if_ge VAR_0x8004, PARTY_SIZE, Online_EventScript_GlobalBye
+	special Online_GtsCheckOffer
+	switch VAR_RESULT
+	case 1, Online_EventScript_GtsWrongSpecies
+	case 2, Online_EventScript_GtsWrongLevel
+	case 3, Online_EventScript_GtsWrongGender
+	msgbox Online_Text_GtsOfferConfirm, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Online_EventScript_GlobalBye
+	call EventScript_AskSaveGame
+	goto_if_eq VAR_RESULT, 0, Online_EventScript_GlobalBye
+	message Online_Text_Connecting
+	waitmessage
+	special Online_GtsOffer
+	waitstate
+	switch VAR_RESULT
+	case 1, Online_EventScript_WonderGot
+	case 3, Online_EventScript_GlobalIllegal
+	case 5, Online_EventScript_GtsGone
+	case 6, Online_EventScript_GtsWrongSpecies
+	goto Online_EventScript_GlobalFailed
+
+Online_EventScript_GtsWrongSpecies::
+	msgbox Online_Text_GtsWrongSpecies
+	release
+	end
+
+Online_EventScript_GtsWrongLevel::
+	msgbox Online_Text_GtsWrongLevel
+	release
+	end
+
+Online_EventScript_GtsWrongGender::
+	msgbox Online_Text_GtsWrongGender
+	release
+	end
+
+Online_EventScript_GtsGone::
+	msgbox Online_Text_GtsGone
+	release
+	end
+
+@ MY POKéMON: the GTS screen (your listings) -> take one back
+Online_EventScript_GtsMine::
+	setvar VAR_0x8006, 2
+	fadescreen FADE_TO_BLACK
+	special Online_OpenGts
+	waitstate
+	goto_if_eq VAR_RESULT, 0, Online_EventScript_GlobalBye
+	msgbox Online_Text_GtsTakeBack, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Online_EventScript_GlobalBye
+	call EventScript_AskSaveGame
+	goto_if_eq VAR_RESULT, 0, Online_EventScript_GlobalBye
+	message Online_Text_Connecting
+	waitmessage
+	special Online_GtsWithdraw
+	waitstate
+	switch VAR_RESULT
+	case 1, Online_EventScript_GtsTookBack
+	case 5, Online_EventScript_GtsAlreadyTraded
+	case 7, Online_EventScript_MailboxNoRoom
+	goto Online_EventScript_GlobalFailed
+
+Online_EventScript_GtsTookBack::
+	playfanfare MUS_OBTAIN_ITEM
+	msgbox Online_Text_MailboxGot
+	waitfanfare
+	goto_if_eq VAR_0x8005, 0, Online_EventScript_GlobalBye
+	msgbox Online_Text_MailboxToPC
+	release
+	end
+
+Online_EventScript_GtsAlreadyTraded::
+	msgbox Online_Text_GtsAlreadyTraded
+	release
+	end
+
+Online_Text_GtsWhat::
+	.string "This is the GTS, the GLOBAL\n"
+	.string "TRADE STATION. What will you do?$"
+
+Online_Text_GtsDepositChoose::
+	.string "Which POKéMON will you put on\n"
+	.string "the GTS?$"
+
+Online_Text_GtsDepositConfirm::
+	.string "Put {STR_VAR_1} on the GTS and\n"
+	.string "ask for {STR_VAR_2} in return?$"
+
+Online_Text_GtsDeposited::
+	.string "{STR_VAR_1} is now on the GTS!\p"
+	.string "When someone trades for it, their\n"
+	.string "POKéMON goes to your MAILBOX.$"
+
+Online_Text_GtsFull::
+	.string "You already have three POKéMON\n"
+	.string "on the GTS.$"
+
+Online_Text_GtsEgg::
+	.string "Eggs can't be put on the GTS.$"
+
+Online_Text_GtsOfferChoose::
+	.string "To get {STR_VAR_1}, offer {STR_VAR_2}\n"
+	.string "({STR_VAR_3}). Which POKéMON?$"
+
+Online_Text_GtsOfferConfirm::
+	.string "Trade your POKéMON for\n"
+	.string "{STR_VAR_1}?$"
+
+Online_Text_GtsWrongSpecies::
+	.string "That trainer wants {STR_VAR_2}.$"
+
+Online_Text_GtsWrongLevel::
+	.string "That trainer wants {STR_VAR_2}\n"
+	.string "at {STR_VAR_3}.$"
+
+Online_Text_GtsWrongGender::
+	.string "That trainer wants {STR_VAR_2}\n"
+	.string "of the other gender.$"
+
+Online_Text_GtsGone::
+	.string "Sorry, someone else traded for\n"
+	.string "that POKéMON first.$"
+
+Online_Text_GtsTakeBack::
+	.string "Take {STR_VAR_1} back from\n"
+	.string "the GTS?$"
+
+Online_Text_GtsAlreadyTraded::
+	.string "{STR_VAR_1} was already traded!\n"
+	.string "Check the MAILBOX.$"
 
 Online_Text_GlobalWelcome::
 	.string "Welcome to the GLOBAL TRADE desk!\n"

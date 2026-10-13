@@ -420,6 +420,17 @@ static const struct MenuAction sMultichoiceList_GlobalTrade[] = {
     { sText_OnlineExit }
 };
 
+static const u8 sText_GtsDeposit[] = _("DEPOSIT");
+static const u8 sText_GtsSearch[] = _("SEARCH");
+static const u8 sText_GtsMine[] = _("MY POKéMON");
+static const u8 sText_GtsBack[] = _("BACK");
+static const struct MenuAction sMultichoiceList_Gts[] = {
+    { sText_GtsDeposit },
+    { sText_GtsSearch },
+    { sText_GtsMine },
+    { sText_GtsBack }
+};
+
 static const struct MenuAction sMultichoiceList_PokejumpDodrio[] = {
     { gText_PokemonJump },
     { gText_DodrioBerryPicking },
@@ -576,6 +587,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] = {
     [MULTICHOICE_TRADE_COLOSSEUM_2]                          = MULTICHOICE(sMultichoiceList_TradeColosseum_2),
     [MULTICHOICE_ONLINE_PLAYER]                              = MULTICHOICE(sMultichoiceList_OnlinePlayer),
     [MULTICHOICE_GLOBAL_TRADE]                               = MULTICHOICE(sMultichoiceList_GlobalTrade),
+    [MULTICHOICE_GTS]                                        = MULTICHOICE(sMultichoiceList_Gts),
     [MULTICHOICE_MUSHROOMS]                                  = MULTICHOICE(sMultichoiceList_Mushrooms),
     [MULTICHOICE_TRADE_COLOSSEUM_BLANK_CRUSH]                = MULTICHOICE(sMultichoiceList_TradeColosseumBlankCrush),
     [MULTICHOICE_TRADE_COLOSSEUM_BLANK]                      = MULTICHOICE(sMultichoiceList_TradeColosseumBlank),

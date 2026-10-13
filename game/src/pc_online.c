@@ -83,6 +83,7 @@ static const u8 sText_JoinFailed1[] = _("Couldn't join that server.");
 static const u8 sText_JoinFailed2[] = _("It may be full or offline.");
 static const u8 sText_Registered[] = _("Registered! Your online name is");
 static const u8 sText_Here[] = _("{RIGHT_ARROW}");
+static const u8 sText_GtsSearching[] = _("Searching the GTS…");
 
 static const u8 sTextColor[] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_LIGHT_GRAY};
 static const u8 sValueColor[] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_LIGHT_RED, TEXT_COLOR_RED};
@@ -129,8 +130,9 @@ static u8 *CopyNameWithTag(u8 *dst, const u8 *name, u16 tag)
 
 // ---- the ONLINE CLUB screen ---------------------------------------------------------------
 
-enum { MODE_BUSY, MODE_REGISTER, MODE_SERVERS, MODE_MESSAGE };
-enum { BUSY_LOGIN, BUSY_REGISTER, BUSY_JOIN, BUSY_RENAME };
+enum { MODE_BUSY, MODE_REGISTER, MODE_SERVERS, MODE_MESSAGE, MODE_GTS_PICK, MODE_GTS_WANT, MODE_GTS_LIST };
+enum { BUSY_LOGIN, BUSY_REGISTER, BUSY_JOIN, BUSY_RENAME, BUSY_GTS_SEARCH, BUSY_GTS_MINE };
+enum { GTS_NONE, GTS_DEPOSIT, GTS_SEARCH, GTS_MINE };   // the GTS screen: VAR_0x8006 + 1
 enum { ROW_SERVER, ROW_REFRESH, ROW_RENAME, ROW_DISCONNECT, ROW_BACK };
 enum { NAMING_NONE, NAMING_REGISTER, NAMING_RENAME };
 
@@ -154,6 +156,7 @@ struct OnlineScreen
     const u8 *message[3];
     u16 timer;
     u8 naming;           // coming back from the naming screen: what for
+    u8 gtsMode;          // GTS_* when this is the GTS screen
 };
 
 static EWRAM_DATA struct OnlineScreen *sOnline = NULL;
@@ -347,9 +350,11 @@ static void DrawRegister(void)
     PrintHint(sText_HintBrowse);
 }
 
+static const u8 *ScreenTitle(void);
+
 static void DrawBusy(const u8 *text)
 {
-    PrintHeader(sText_OnlineClub);
+    PrintHeader(ScreenTitle());
     FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
     PrintLine(2, text, sTextColor);
     FinishList();
@@ -360,7 +365,7 @@ static void DrawBusy(const u8 *text)
 static void DrawMessage(void)
 {
     int i;
-    PrintHeader(sText_OnlineClub);
+    PrintHeader(ScreenTitle());
     FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
     for (i = 0; i < 3; i++)
         if (sOnline->message[i])
@@ -388,7 +393,7 @@ static void StartBusy(u8 op)
     sOnline->busyOp = op;
     sOnline->timer = 0;
     DrawBusy(op == BUSY_REGISTER ? sText_Registering : op == BUSY_JOIN ? sText_Joining
-           : op == BUSY_RENAME ? sText_Renaming : sText_Connecting);
+           : op == BUSY_RENAME ? sText_Renaming : op == BUSY_GTS_SEARCH ? sText_GtsSearching : sText_Connecting);
 }
 
 static void ShowServers(void)
@@ -430,9 +435,16 @@ static void LeaveScreen(u8 taskId)
     gTasks[taskId].data[0] = 1;
 }
 
+static void GtsHandleBusy(void);
+
 static void HandleBusy(void)
 {
     int status = PcNetOpStatus();
+    if (sOnline->busyOp >= BUSY_GTS_SEARCH)
+    {
+        GtsHandleBusy();
+        return;
+    }
     if (status == PC_NET_OP_PENDING)
         return;
     switch (sOnline->busyOp)
@@ -535,6 +547,511 @@ static void HandleServerInput(u8 taskId)
     }
 }
 
+// ---- the GTS screen (same look; opened by Online_OpenGts) ---------------------------
+//
+// DEPOSIT: say what you want for the Pokemon chosen in the party menu.
+// SEARCH:  pick a species, browse its listings, choose one to offer for.
+// MINE:    your own listings, choose one to take back.
+// The trade itself happens back in the field script (Online_Gts* specials),
+// after the save prompt, so a reload can never duplicate a Pokemon.
+
+enum { MSG_GTS_DEPOSIT = 0x0A, MSG_GTS_SEARCH = 0x0B, MSG_GTS_OFFER = 0x0C, MSG_GTS_MINE = 0x0D, MSG_GTS_WITHDRAW = 0x0E };
+enum { NET_GENDER_ANY, NET_GENDER_MALE, NET_GENDER_FEMALE, NET_GENDER_NONE };
+enum { WANT_SPECIES, WANT_MIN, WANT_MAX, WANT_GENDER, WANT_OK, WANT_CANCEL, WANT_ROWS };
+
+static const u8 sText_GtsDeposit[] = _("GTS  DEPOSIT");
+static const u8 sText_GtsSearch[] = _("GTS  SEARCH");
+static const u8 sText_GtsMine[] = _("GTS  YOUR POKéMON");
+static const u8 sText_GtsWhich[] = _("WHICH POKéMON?");
+static const u8 sText_HintPick[] = _("{DPAD_UPDOWN}PICK {DPAD_LEFTRIGHT}PAGE {A_BUTTON}OK {B_BUTTON}BACK");
+static const u8 sText_HintChange[] = _("{DPAD_UPDOWN}PICK {DPAD_LEFTRIGHT}CHANGE {A_BUTTON}OK {B_BUTTON}BACK");
+static const u8 sText_GtsTradeFor[] = _("Trade your POKéMON for:");
+static const u8 sText_GtsWantSpecies[] = _("POKéMON");
+static const u8 sText_GtsWantMin[] = _("LEVEL FROM");
+static const u8 sText_GtsWantMax[] = _("LEVEL TO");
+static const u8 sText_GtsWantGender[] = _("GENDER");
+static const u8 sText_GtsDepositRow[] = _("DEPOSIT");
+static const u8 sText_GtsCancel[] = _("CANCEL");
+static const u8 sText_GtsAny[] = _("ANY");
+static const u8 sText_GtsMale[] = _("♂");
+static const u8 sText_GtsFemale[] = _("♀");
+static const u8 sText_GtsNone[] = _("-----");
+static const u8 sText_GtsEmpty[] = _("");
+static const u8 sText_GtsNobody1[] = _("Nobody is offering that");
+static const u8 sText_GtsNobody2[] = _("POKéMON right now.");
+static const u8 sText_GtsNoneOfYours1[] = _("You have no POKéMON");
+static const u8 sText_GtsNoneOfYours2[] = _("on the GTS.");
+static const u8 sText_GtsFrom[] = _("FROM ");
+static const u8 sText_GtsWants[] = _("WANTS ");
+static const u8 sText_GtsNoSeen1[] = _("No POKéMON have been seen");
+static const u8 sText_GtsNoSeen2[] = _("yet. Fill your POKéDEX first!");
+
+#define GTS_MAX_LISTINGS 16
+#define GTS_LIST_ROWS 5
+
+struct GtsListing
+{
+    u32 id;
+    u16 species;
+    u8 level, gender;
+    u16 want;
+    u8 wantMin, wantMax, wantGender;
+    u8 name[PLAYER_NAME_LENGTH + 1];
+};
+
+// What the screen hands back to the field script (lives past the screen).
+static EWRAM_DATA struct
+{
+    u32 id;               // the chosen listing (SEARCH / MINE)
+    u16 listedSpecies;    // ... and its Pokemon
+    u16 wantSpecies;      // DEPOSIT: what to ask for; SEARCH: what the listing wants
+    u8 wantMin, wantMax, wantGender;
+} sGts = {0};
+
+// Screen-only GTS data, allocated with the screen.
+struct GtsScreen
+{
+    u16 pick[NATIONAL_DEX_COUNT];
+    u16 pickCount;
+    u16 pickCursor;
+    u16 pickScroll;
+    u8 count;
+    struct GtsListing list[GTS_MAX_LISTINGS];
+};
+static EWRAM_DATA struct GtsScreen *sGtsScreen = NULL;
+
+static const u8 *ScreenTitle(void)
+{
+    switch (sOnline->gtsMode)
+    {
+    case GTS_DEPOSIT: return sText_GtsDeposit;
+    case GTS_SEARCH:  return sText_GtsSearch;
+    case GTS_MINE:    return sText_GtsMine;
+    }
+    return sText_OnlineClub;
+}
+
+static const u8 *GenderText(u8 gender)
+{
+    return gender == NET_GENDER_MALE ? sText_GtsMale : gender == NET_GENDER_FEMALE ? sText_GtsFemale
+         : gender == NET_GENDER_ANY ? sText_GtsAny : sText_GtsEmpty;
+}
+
+static u8 NetGender(struct Pokemon *mon)
+{
+    switch (GetMonGender(mon))
+    {
+    case MON_MALE:   return NET_GENDER_MALE;
+    case MON_FEMALE: return NET_GENDER_FEMALE;
+    }
+    return NET_GENDER_NONE;
+}
+
+// Which "want" genders make sense for a species.
+static bool8 GenderAllowed(u16 species, u8 gender)
+{
+    u8 ratio = gSpeciesInfo[species].genderRatio;
+    if (gender == NET_GENDER_ANY)
+        return TRUE;
+    if (ratio == MON_GENDERLESS)
+        return FALSE;
+    if (gender == NET_GENDER_MALE)
+        return ratio != MON_FEMALE;
+    return ratio != MON_MALE;
+}
+
+// "Lv5-100" / "Lv12"
+static u8 *LevelRange(u8 *dst, u8 lo, u8 hi)
+{
+    *dst++ = CHAR_LV;
+    dst = ConvertIntToDecimalStringN(dst, lo, STR_CONV_MODE_LEFT_ALIGN, 3);
+    if (hi != lo)
+    {
+        *dst++ = CHAR_HYPHEN;
+        dst = ConvertIntToDecimalStringN(dst, hi, STR_CONV_MODE_LEFT_ALIGN, 3);
+    }
+    return dst;
+}
+
+// Species picker: every species the player has seen, national dex order.
+static void BuildPickList(void)
+{
+    u16 n;
+    sGtsScreen->pickCount = 0;
+    for (n = 1; n <= NATIONAL_DEX_COUNT; n++)
+        if (GetSetPokedexFlag(n, FLAG_GET_SEEN))
+            sGtsScreen->pick[sGtsScreen->pickCount++] = n;
+}
+
+static void DrawPick(void)
+{
+    int i;
+    u8 num[8];
+
+    PrintHeader(sText_GtsWhich);
+    FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
+    for (i = 0; i < VISIBLE_ROWS && sGtsScreen->pickScroll + i < sGtsScreen->pickCount; i++)
+    {
+        u16 dex = sGtsScreen->pick[sGtsScreen->pickScroll + i];
+        num[0] = CHAR_N;
+        num[1] = CHAR_o;
+        num[2] = CHAR_PERIOD;
+        ConvertIntToDecimalStringN(num + 3, dex, STR_CONV_MODE_LEADING_ZEROS, 3);
+        AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 8, i * RowHeight() + 2, sValueColor, TEXT_SKIP_DRAW, num);
+        AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0x40, i * RowHeight() + 2, sTextColor, TEXT_SKIP_DRAW,
+                                     gSpeciesNames[NationalPokedexNumToSpecies(dex)]);
+    }
+    FinishList();
+    SetHighlight(sGtsScreen->pickCursor - sGtsScreen->pickScroll);
+    PrintHint(sText_HintPick);
+}
+
+static void GtsShowPick(void)
+{
+    if (sGtsScreen->pickCount == 0)
+    {
+        ShowMessage(sText_GtsNoSeen1, sText_GtsNoSeen2, NULL, TRUE, MODE_GTS_PICK);
+        return;
+    }
+    sOnline->mode = MODE_GTS_PICK;
+    DrawPick();
+}
+
+static void DrawWant(void)
+{
+    u8 buf[16];
+    int y;
+
+    PrintHeader(ScreenTitle());
+    FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
+    PrintLine(0, sText_GtsTradeFor, sTextColor);
+    PrintLine(1 + WANT_SPECIES, sText_GtsWantSpecies, sTextColor);
+    PrintLine(1 + WANT_MIN, sText_GtsWantMin, sTextColor);
+    PrintLine(1 + WANT_MAX, sText_GtsWantMax, sTextColor);
+    PrintLine(1 + WANT_GENDER, sText_GtsWantGender, sTextColor);
+    PrintLine(1 + WANT_OK, sText_GtsDepositRow, sTextColor);
+    PrintLine(1 + WANT_CANCEL, sText_GtsCancel, sTextColor);
+
+    y = (1 + WANT_SPECIES) * RowHeight() + 2;
+    AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0x70, y, sValueColor, TEXT_SKIP_DRAW,
+                                 sGts.wantSpecies ? gSpeciesNames[sGts.wantSpecies] : sText_GtsNone);
+    ConvertIntToDecimalStringN(buf, sGts.wantMin, STR_CONV_MODE_LEFT_ALIGN, 3);
+    AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0x70, (1 + WANT_MIN) * RowHeight() + 2, sValueColor, TEXT_SKIP_DRAW, buf);
+    ConvertIntToDecimalStringN(buf, sGts.wantMax, STR_CONV_MODE_LEFT_ALIGN, 3);
+    AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0x70, (1 + WANT_MAX) * RowHeight() + 2, sValueColor, TEXT_SKIP_DRAW, buf);
+    AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0x70, (1 + WANT_GENDER) * RowHeight() + 2, sValueColor, TEXT_SKIP_DRAW,
+                                 GenderText(sGts.wantGender));
+    FinishList();
+    SetHighlight(1 + sOnline->cursor);
+    PrintHint(sText_HintChange);
+}
+
+static void GtsShowWant(void)
+{
+    sOnline->mode = MODE_GTS_WANT;
+    DrawWant();
+}
+
+static void DrawListing(int line, const struct GtsListing *l)
+{
+    u8 buf[16];
+    int y = line * RowHeight() + 2;
+    PrintLine(line, gSpeciesNames[l->species], sTextColor);
+    *LevelRange(buf, l->level, l->level) = EOS;
+    AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0x60, y, sTextColor, TEXT_SKIP_DRAW, buf);
+    if (l->gender == NET_GENDER_MALE || l->gender == NET_GENDER_FEMALE)
+        AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0x88, y, sValueColor, TEXT_SKIP_DRAW, GenderText(l->gender));
+}
+
+static void DrawList(void)
+{
+    int i;
+    const struct GtsListing *cur = &sGtsScreen->list[sOnline->cursor];
+    u8 *end;
+
+    PrintHeader(ScreenTitle());
+    FillWindowPixelBuffer(WIN_LIST, PIXEL_FILL(1));
+    for (i = 0; i < GTS_LIST_ROWS && sOnline->scroll + i < sGtsScreen->count; i++)
+        DrawListing(i, &sGtsScreen->list[sOnline->scroll + i]);
+
+    // the highlighted listing: who offers it and what they want
+    if (sOnline->gtsMode == GTS_SEARCH)
+    {
+        end = StringCopy(gStringVar3, sText_GtsFrom);
+        StringCopy(end, cur->name);
+        PrintLine(GTS_LIST_ROWS, gStringVar3, sValueColor);
+    }
+    end = StringCopy(gStringVar3, sText_GtsWants);
+    end = StringCopy(end, gSpeciesNames[cur->want]);
+    *end++ = CHAR_SPACE;
+    end = LevelRange(end, cur->wantMin, cur->wantMax);
+    if (cur->wantGender == NET_GENDER_MALE || cur->wantGender == NET_GENDER_FEMALE)
+    {
+        *end++ = CHAR_SPACE;
+        end = StringCopy(end, GenderText(cur->wantGender));
+    }
+    *end = EOS;
+    PrintLine(GTS_LIST_ROWS + 1, gStringVar3, sValueColor);
+    FinishList();
+    SetHighlight(sOnline->cursor - sOnline->scroll);
+    PrintHint(sText_HintBrowse);
+}
+
+// STR_VAR_1 listed species, STR_VAR_2 wanted species, STR_VAR_3 "Lv5-100 ♂"
+// (again after the party menu, which uses the string vars itself)
+static void BufferGtsStrings(void)
+{
+    u8 *end;
+    StringCopy(gStringVar1, gSpeciesNames[sGts.listedSpecies]);
+    StringCopy(gStringVar2, gSpeciesNames[sGts.wantSpecies]);
+    end = LevelRange(gStringVar3, sGts.wantMin, sGts.wantMax);
+    if (sGts.wantGender == NET_GENDER_MALE || sGts.wantGender == NET_GENDER_FEMALE)
+    {
+        *end++ = CHAR_SPACE;
+        end = StringCopy(end, GenderText(sGts.wantGender));
+    }
+    *end = EOS;
+}
+
+static void GtsShowList(void)
+{
+    sOnline->mode = MODE_GTS_LIST;
+    sOnline->cursor = 0;
+    sOnline->scroll = 0;
+    DrawList();
+}
+
+static void GtsFinish(u8 taskId, u16 result)
+{
+    gSpecialVar_Result = result;
+    LeaveScreen(taskId);
+}
+
+// M_GTS_LIST: u8 n, n x (u32 id, u16 species, u8 level, u8 gender, u16 want, u8 min, u8 max, u8 want_gender, name[8])
+static void ParseListings(const u8 *p, int len)
+{
+    int i, n;
+    sGtsScreen->count = 0;
+    if (len < 1)
+        return;
+    n = p[0];
+    p++;
+    for (i = 0; i < n && i < GTS_MAX_LISTINGS && 1 + (i + 1) * 21 <= len; i++, p += 21)
+    {
+        struct GtsListing *l = &sGtsScreen->list[i];
+        int c;
+        l->id = p[0] | (p[1] << 8) | (p[2] << 16) | ((u32)p[3] << 24);
+        l->species = p[4] | (p[5] << 8);
+        l->level = p[6];
+        l->gender = p[7];
+        l->want = p[8] | (p[9] << 8);
+        l->wantMin = p[10];
+        l->wantMax = p[11];
+        l->wantGender = p[12];
+        for (c = 0; c < PLAYER_NAME_LENGTH && p[13 + c] != EOS; c++)
+            l->name[c] = p[13 + c];
+        l->name[c] = EOS;
+        if (l->species == SPECIES_NONE || l->species >= NUM_SPECIES || l->want == SPECIES_NONE || l->want >= NUM_SPECIES)
+            i--, n--;   // never show a listing this game doesn't know
+        else
+            sGtsScreen->count++;
+    }
+}
+
+static void GtsHandleBusy(void)
+{
+    int status = PcNetOpStatus();
+    u8 type;
+    const u8 *reply;
+    int len;
+
+    if (status == PC_NET_OP_PENDING)
+        return;
+    len = status == PC_NET_OP_OK ? PcNetMasterReply(&type, &reply) : 0;
+    if (status != PC_NET_OP_OK)
+    {
+        ShowMessage(sText_CantReach1, sText_CantReach2, NULL, TRUE, MODE_GTS_PICK);
+        return;
+    }
+    ParseListings(reply, len);
+    if (sGtsScreen->count)
+        GtsShowList();
+    else if (sOnline->busyOp == BUSY_GTS_SEARCH)
+        ShowMessage(sText_GtsNobody1, sText_GtsNobody2, NULL, FALSE, MODE_GTS_PICK);
+    else
+        ShowMessage(sText_GtsNoneOfYours1, sText_GtsNoneOfYours2, NULL, TRUE, MODE_GTS_PICK);
+}
+
+static void GtsPickInput(u8 taskId)
+{
+    s16 c = sGtsScreen->pickCursor;
+    s16 n = sGtsScreen->pickCount;
+
+    if (JOY_REPT(DPAD_UP))
+        c = c == 0 ? n - 1 : c - 1;
+    else if (JOY_REPT(DPAD_DOWN))
+        c = c + 1 >= n ? 0 : c + 1;
+    else if (JOY_REPT(DPAD_LEFT))
+        c = c >= VISIBLE_ROWS ? c - VISIBLE_ROWS : 0;
+    else if (JOY_REPT(DPAD_RIGHT))
+        c = c + VISIBLE_ROWS < n ? c + VISIBLE_ROWS : n - 1;
+    else if (JOY_NEW(B_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        if (sOnline->gtsMode == GTS_DEPOSIT)
+            GtsShowWant();
+        else
+            GtsFinish(taskId, 0);
+        return;
+    }
+    else if (JOY_NEW(A_BUTTON))
+    {
+        u16 species = NationalPokedexNumToSpecies(sGtsScreen->pick[c]);
+        u8 payload[4];
+        PlaySE(SE_SELECT);
+        if (sOnline->gtsMode == GTS_DEPOSIT)
+        {
+            sGts.wantSpecies = species;
+            if (!GenderAllowed(species, sGts.wantGender))
+                sGts.wantGender = NET_GENDER_ANY;
+            sOnline->cursor = WANT_OK;
+            GtsShowWant();
+            return;
+        }
+        payload[0] = species;
+        payload[1] = species >> 8;
+        payload[2] = 1;
+        payload[3] = MAX_LEVEL;
+        PcNetMasterRequest(MSG_GTS_SEARCH, payload, sizeof(payload));
+        StartBusy(BUSY_GTS_SEARCH);
+        return;
+    }
+    else
+    {
+        return;
+    }
+    if (c == sGtsScreen->pickCursor)
+        return;
+    sGtsScreen->pickCursor = c;
+    if (c < sGtsScreen->pickScroll)
+        sGtsScreen->pickScroll = c;
+    else if (c >= sGtsScreen->pickScroll + VISIBLE_ROWS)
+        sGtsScreen->pickScroll = c - VISIBLE_ROWS + 1;
+    PlaySE(SE_SELECT);
+    DrawPick();
+}
+
+static void GtsWantInput(u8 taskId)
+{
+    int delta = JOY_REPT(DPAD_LEFT) ? -1 : JOY_REPT(DPAD_RIGHT) ? 1 : 0;
+
+    if (JOY_REPT(DPAD_UP) || JOY_REPT(DPAD_DOWN))
+    {
+        sOnline->cursor = JOY_REPT(DPAD_UP) ? (sOnline->cursor + WANT_ROWS - 1) % WANT_ROWS : (sOnline->cursor + 1) % WANT_ROWS;
+        PlaySE(SE_SELECT);
+        DrawWant();
+    }
+    else if (delta)
+    {
+        switch (sOnline->cursor)
+        {
+        case WANT_MIN:
+            sGts.wantMin = sGts.wantMin + delta < 1 ? sGts.wantMax : sGts.wantMin + delta > sGts.wantMax ? 1 : sGts.wantMin + delta;
+            break;
+        case WANT_MAX:
+            sGts.wantMax = sGts.wantMax + delta < sGts.wantMin ? MAX_LEVEL : sGts.wantMax + delta > MAX_LEVEL ? sGts.wantMin : sGts.wantMax + delta;
+            break;
+        case WANT_GENDER:
+            do
+                sGts.wantGender = (sGts.wantGender + 3 + delta) % 3;
+            while (sGts.wantSpecies && !GenderAllowed(sGts.wantSpecies, sGts.wantGender));
+            break;
+        default:
+            return;
+        }
+        PlaySE(SE_SELECT);
+        DrawWant();
+    }
+    else if (JOY_NEW(B_BUTTON) || (JOY_NEW(A_BUTTON) && sOnline->cursor == WANT_CANCEL))
+    {
+        PlaySE(SE_SELECT);
+        GtsFinish(taskId, 0);
+    }
+    else if (JOY_NEW(A_BUTTON) && (sOnline->cursor == WANT_SPECIES || (sOnline->cursor == WANT_OK && !sGts.wantSpecies)))
+    {
+        PlaySE(SE_SELECT);
+        GtsShowPick();
+    }
+    else if (JOY_NEW(A_BUTTON) && sOnline->cursor == WANT_OK)
+    {
+        PlaySE(SE_SELECT);
+        StringCopy(gStringVar2, gSpeciesNames[sGts.wantSpecies]);
+        GtsFinish(taskId, 1);
+    }
+}
+
+static void GtsListInput(u8 taskId)
+{
+    if (JOY_REPT(DPAD_UP) || JOY_REPT(DPAD_DOWN))
+    {
+        if (JOY_REPT(DPAD_UP))
+            sOnline->cursor = sOnline->cursor == 0 ? sGtsScreen->count - 1 : sOnline->cursor - 1;
+        else
+            sOnline->cursor = sOnline->cursor + 1 >= sGtsScreen->count ? 0 : sOnline->cursor + 1;
+        if (sOnline->cursor < sOnline->scroll)
+            sOnline->scroll = sOnline->cursor;
+        else if (sOnline->cursor >= sOnline->scroll + GTS_LIST_ROWS)
+            sOnline->scroll = sOnline->cursor - GTS_LIST_ROWS + 1;
+        PlaySE(SE_SELECT);
+        DrawList();
+    }
+    else if (JOY_NEW(B_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        if (sOnline->gtsMode == GTS_SEARCH)
+            GtsShowPick();
+        else
+            GtsFinish(taskId, 0);
+    }
+    else if (JOY_NEW(A_BUTTON))
+    {
+        const struct GtsListing *l = &sGtsScreen->list[sOnline->cursor];
+        PlaySE(SE_SELECT);
+        sGts.id = l->id;
+        sGts.listedSpecies = l->species;
+        sGts.wantSpecies = l->want;
+        sGts.wantMin = l->wantMin;
+        sGts.wantMax = l->wantMax;
+        sGts.wantGender = l->wantGender;
+        BufferGtsStrings();
+        GtsFinish(taskId, 1);
+    }
+}
+
+static void GtsStart(void)
+{
+    sGtsScreen = AllocZeroed(sizeof(*sGtsScreen));
+    BuildPickList();
+    switch (sOnline->gtsMode)
+    {
+    case GTS_DEPOSIT:
+        sGts.wantSpecies = SPECIES_NONE;
+        sGts.wantMin = 1;
+        sGts.wantMax = MAX_LEVEL;
+        sGts.wantGender = NET_GENDER_ANY;
+        sOnline->cursor = WANT_SPECIES;
+        GtsShowWant();
+        break;
+    case GTS_SEARCH:
+        GtsShowPick();
+        break;
+    default:
+        PcNetMasterRequest(MSG_GTS_MINE, NULL, 0);
+        StartBusy(BUSY_GTS_MINE);
+        break;
+    }
+}
+
 static void Task_OnlineScreen(u8 taskId)
 {
     if (gTasks[taskId].data[0] == 2)   // off to the naming screen
@@ -553,6 +1070,7 @@ static void Task_OnlineScreen(u8 taskId)
         {
             FreeAllWindowBuffers();
             FREE_AND_SET_NULL(sOnline);
+            FREE_AND_SET_NULL(sGtsScreen);
             DestroyTask(taskId);
             if (sJoinedWarp)
             {
@@ -612,9 +1130,20 @@ static void Task_OnlineScreen(u8 taskId)
             PlaySE(SE_SELECT);
             if (sOnline->messageExit)
                 LeaveScreen(taskId);
+            else if (sOnline->messageMode == MODE_GTS_PICK)
+                GtsShowPick();
             else
                 ShowServers();
         }
+        break;
+    case MODE_GTS_PICK:
+        GtsPickInput(taskId);
+        break;
+    case MODE_GTS_WANT:
+        GtsWantInput(taskId);
+        break;
+    case MODE_GTS_LIST:
+        GtsListInput(taskId);
         break;
     }
 }
@@ -666,7 +1195,11 @@ static void CB2_OnlineInit(void)
         DrawFrames();
         break;
     case 5:
-        if (sOnline->naming == NAMING_REGISTER)
+        if (sOnline->gtsMode)
+        {
+            GtsStart();
+        }
+        else if (sOnline->naming == NAMING_REGISTER)
         {
             sOnline->naming = NAMING_NONE;
             if (sOnlineName[0] == EOS)
@@ -1152,7 +1685,7 @@ void Online_SessionKind(void)
 // ---- global trade: Wonder Trade + mailbox (GTS screen: Online_OpenGts) ----------
 
 enum { MSG_WONDER = 0x08, MSG_MAIL_COLLECT = 0x09 };
-enum { ERR_ILLEGAL_MON = 6 };
+enum { ERR_GTS_GONE = 4, ERR_GTS_FULL = 5, ERR_ILLEGAL_MON = 6, ERR_GTS_NO_MATCH = 7 };
 u8 PcGiveTradedMon(struct Pokemon *mon);   // pokemon.c
 
 STATIC_ASSERT(sizeof(struct Pokemon) == 100, PokemonIs100BytesOnTheWire);
@@ -1164,6 +1697,18 @@ static void RegisterReceivedMon(struct Pokemon *mon)
     GetSetPokedexFlag(dexNum, FLAG_SET_SEEN);
     GetSetPokedexFlag(dexNum, FLAG_SET_CAUGHT);
     StringCopy(gStringVar1, gSpeciesNames[species]);
+}
+
+// For specials followed by waitstate that can answer immediately.
+static void Task_EnableScript(u8 taskId)
+{
+    DestroyTask(taskId);
+    ScriptContext_Enable();
+}
+
+static void ResumeScriptNextFrame(void)
+{
+    CreateTask(Task_EnableScript, 80);
 }
 
 static bool8 HasRoomForMon(void)
@@ -1268,16 +1813,154 @@ void Online_CollectMail(void)
     if (!HasRoomForMon())
     {
         gSpecialVar_Result = 4;   // checked before asking, so nothing is taken from the server
+        ResumeScriptNextFrame();
         return;
     }
     CreateTask(Task_CollectMail, 80);
     PcNetMasterRequest(MSG_MAIL_COLLECT, NULL, 0);
 }
 
-// special Online_OpenGts (after fadescreen; then waitstate) -- the GTS screen.
+// special Online_OpenGts (VAR_0x8006 = GTS_DEPOSIT / SEARCH / MINE; after fadescreen;
+// then waitstate). VAR_RESULT = 1 if something was chosen:
+//   DEPOSIT: the wanted species etc. (STR_VAR_2 = its name)
+//   SEARCH:  a listing (STR_VAR_1 listed, STR_VAR_2 wanted, STR_VAR_3 "Lv5-100 ♂")
+//   MINE:    a listing to take back (STR_VAR_1)
 void Online_OpenGts(void)
 {
-    SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
+    sOnline = AllocZeroed(sizeof(*sOnline));
+    sOnline->gtsMode = gSpecialVar_0x8006 + 1;
+    gSpecialVar_Result = 0;
+    gMain.savedCallback = CB2_ReturnToFieldContinueScriptPlayMapMusic;
+    SetMainCallback2(CB2_OnlineInit);
+}
+
+// special Online_GtsCheckOffer (VAR_0x8004 = party slot): does it fit the chosen
+// listing? VAR_RESULT 0 yes, 1 wrong species, 2 wrong level, 3 wrong gender.
+// (The server checks again; this just gives a clear message.)
+void Online_GtsCheckOffer(void)
+{
+    struct Pokemon *mon = &gPlayerParty[gSpecialVar_0x8004];
+    u8 level = GetMonData(mon, MON_DATA_LEVEL, NULL);
+    BufferGtsStrings();
+    if (GetMonData(mon, MON_DATA_SPECIES_OR_EGG, NULL) != sGts.wantSpecies)
+        gSpecialVar_Result = 1;
+    else if (level < sGts.wantMin || level > sGts.wantMax)
+        gSpecialVar_Result = 2;
+    else if (sGts.wantGender != NET_GENDER_ANY && NetGender(mon) != sGts.wantGender)
+        gSpecialVar_Result = 3;
+    else
+        gSpecialVar_Result = 0;
+}
+
+static u16 GtsErrorResult(void)
+{
+    switch (PcNetMasterError())
+    {
+    case ERR_ILLEGAL_MON: return 3;
+    case ERR_GTS_FULL:    return 4;
+    case ERR_GTS_GONE:    return 5;
+    case ERR_GTS_NO_MATCH: return 6;
+    }
+    return 0;
+}
+
+// VAR_RESULT: 0 failed, 1 done, 3 not legal, 4 too many listings, 5 listing gone,
+// 6 doesn't fit the listing. The game is saved right after any change.
+static void Task_GtsReply(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    int status = PcNetOpStatus();
+    u8 type;
+    const u8 *reply;
+    int len;
+
+    if (status == PC_NET_OP_PENDING)
+        return;
+    len = status == PC_NET_OP_OK ? PcNetMasterReply(&type, &reply) : 0;
+    gSpecialVar_0x8005 = 0;
+    if (data[0] != MSG_GTS_DEPOSIT)
+        BufferGtsStrings();   // for the messages (a received Pokemon replaces STR_VAR_1)
+    if (status != PC_NET_OP_OK)
+    {
+        gSpecialVar_Result = GtsErrorResult();
+    }
+    else if (data[0] == MSG_GTS_DEPOSIT)
+    {
+        ZeroMonData(&gPlayerParty[data[1]]);
+        CompactPartySlots();
+        CalculatePlayerPartyCount();
+        TrySavingData(SAVE_NORMAL);
+        gSpecialVar_Result = 1;
+    }
+    else if (len >= 1 + (int)sizeof(struct Pokemon) && reply[0] == 1)
+    {
+        struct Pokemon mon;
+        memcpy(&mon, reply + 1, sizeof(mon));
+        if (data[0] == MSG_GTS_OFFER)
+            gPlayerParty[data[1]] = mon;
+        else
+            gSpecialVar_0x8005 = PcGiveTradedMon(&mon) == MON_GIVEN_TO_PC;
+        RegisterReceivedMon(&mon);
+        TrySavingData(SAVE_NORMAL);
+        gSpecialVar_Result = 1;
+    }
+    else
+    {
+        gSpecialVar_Result = 0;
+    }
+    DestroyTask(taskId);
+    ScriptContext_Enable();
+}
+
+static void StartGtsRequest(u8 msg, const void *payload, int len)
+{
+    u8 taskId = CreateTask(Task_GtsReply, 80);
+    gTasks[taskId].data[0] = msg;
+    gTasks[taskId].data[1] = gSpecialVar_0x8004;
+    PcNetMasterRequest(msg, payload, len);
+}
+
+// special Online_GtsDeposit (VAR_0x8004 = party slot; then waitstate)
+void Online_GtsDeposit(void)
+{
+    u8 payload[sizeof(struct Pokemon) + 5];
+    memcpy(payload, &gPlayerParty[gSpecialVar_0x8004], sizeof(struct Pokemon));
+    payload[100] = sGts.wantSpecies;
+    payload[101] = sGts.wantSpecies >> 8;
+    payload[102] = sGts.wantMin;
+    payload[103] = sGts.wantMax;
+    payload[104] = sGts.wantGender;
+    StartGtsRequest(MSG_GTS_DEPOSIT, payload, sizeof(payload));
+}
+
+// special Online_GtsOffer (VAR_0x8004 = party slot; then waitstate): STR_VAR_1 = received
+void Online_GtsOffer(void)
+{
+    u8 payload[4 + sizeof(struct Pokemon)];
+    payload[0] = sGts.id;
+    payload[1] = sGts.id >> 8;
+    payload[2] = sGts.id >> 16;
+    payload[3] = sGts.id >> 24;
+    memcpy(payload + 4, &gPlayerParty[gSpecialVar_0x8004], sizeof(struct Pokemon));
+    StartGtsRequest(MSG_GTS_OFFER, payload, sizeof(payload));
+}
+
+// special Online_GtsWithdraw (then waitstate): STR_VAR_1 = the Pokemon,
+// VAR_0x8005 = 1 if it went to the PC; VAR_RESULT 7 = no room.
+void Online_GtsWithdraw(void)
+{
+    u8 payload[4];
+    if (!HasRoomForMon())
+    {
+        gSpecialVar_Result = 7;
+        ResumeScriptNextFrame();
+        return;
+    }
+    payload[0] = sGts.id;
+    payload[1] = sGts.id >> 8;
+    payload[2] = sGts.id >> 16;
+    payload[3] = sGts.id >> 24;
+    StartGtsRequest(MSG_GTS_WITHDRAW, payload, sizeof(payload));
 }
 
 #else
@@ -1296,4 +1979,8 @@ void Online_HasAccount(void) {}
 void Online_WonderTrade(void) {}
 void Online_CollectMail(void) {}
 void Online_OpenGts(void) {}
+void Online_GtsCheckOffer(void) {}
+void Online_GtsDeposit(void) {}
+void Online_GtsOffer(void) {}
+void Online_GtsWithdraw(void) {}
 #endif

@@ -71,6 +71,7 @@
 #define MULTICHOICE_TRAINER_TOWER_MODE                         64
 #define MULTICHOICE_ONLINE_PLAYER                              65  // PC port: BATTLE / TRADE / CANCEL
 #define MULTICHOICE_GLOBAL_TRADE                               66  // PC port: WONDER TRADE / GTS / MAILBOX / EXIT
+#define MULTICHOICE_GTS                                        67  // PC port: DEPOSIT / SEARCH / MY POKéMON / BACK
 
 #define MULTICHOICE_NONE                                      255
 
