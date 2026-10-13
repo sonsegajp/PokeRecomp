@@ -29,12 +29,17 @@ void PcRenderFrame(uint32_t *out, int width, void (*hblank)(int line));
 int PcVideoInit(const char *title);
 void PcVideoPresent(const uint32_t *frame, int width, int height);
 void PcVideoShutdown(void);
+int PcVideoDisplayWidth(void);   /* logical width for the widescreen setting */
+void PcVideoDumpScreen(const char *path);
+int PcVideoVsyncPaces(void);
 
 /* input.c */
-uint16_t PcInputPoll(int *quit);   /* returns KEYINPUT (active-low) */
+/* Returns KEYINPUT (active-low). Also handles host hotkeys:
+ * F11 fullscreen, F2 next filter, Tab (hold) fast-forward. */
+uint16_t PcInputPoll(int *quit, int *fast_forward);
 
 /* audio.c */
-void PcAudioInit(void);
+void PcAudioInit(int muted);
 void PcAudioFrame(void);           /* after each VBlank */
 
 /* nullguard.c */

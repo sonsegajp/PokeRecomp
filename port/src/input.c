@@ -2,6 +2,7 @@
 #include <SDL.h>
 
 #include "pc_port.h"
+#include "pc_settings.h"
 
 enum {
     KEY_A = 0x001, KEY_B = 0x002, KEY_SELECT = 0x004, KEY_START = 0x008,
@@ -27,7 +28,7 @@ static const struct { SDL_GameControllerButton button; uint16_t bit; } padmap[] 
 
 static SDL_GameController *pad;
 
-uint16_t PcInputPoll(int *quit)
+uint16_t PcInputPoll(int *quit, int *fast_forward)
 {
     SDL_Event e;
     uint16_t held = 0;
@@ -35,11 +36,23 @@ uint16_t PcInputPoll(int *quit)
 
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) *quit = 1;
+        else if (e.type == SDL_KEYDOWN && !e.key.repeat) {
+            if (e.key.keysym.scancode == SDL_SCANCODE_F11) {
+                gPcSettings.fullscreen ^= 1;
+                PcSettingsApplyVideo();
+                PcSettingsSave();
+            } else if (e.key.keysym.scancode == SDL_SCANCODE_F2) {
+                gPcSettings.filter = (gPcSettings.filter + 1) % PC_FILTER_COUNT;
+                PcSettingsSave();
+            }
+        }
         else if (e.type == SDL_CONTROLLERDEVICEADDED && !pad) pad = SDL_GameControllerOpen(e.cdevice.which);
         else if (e.type == SDL_CONTROLLERDEVICEREMOVED && pad) { SDL_GameControllerClose(pad); pad = NULL; }
     }
 
     keys = SDL_GetKeyboardState(NULL);
+    *fast_forward = keys[SDL_SCANCODE_TAB] ||
+                    (pad && SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 16000);
     for (size_t i = 0; i < sizeof keymap / sizeof keymap[0]; i++)
         if (keys[keymap[i].key]) held |= keymap[i].bit;
     if (pad) {

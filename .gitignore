@@ -8,3 +8,4 @@ game/*.gba
 game/*.elf
 game/*.map
 game/tools/*/*.exe
+dist/

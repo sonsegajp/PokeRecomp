@@ -14,6 +14,7 @@
 
 #include "pc_hw.h"
 #include "pc_port.h"
+#include "pc_settings.h"
 
 #define REG_DISPSTAT 0x04
 #define REG_VCOUNT   0x06
@@ -158,7 +159,8 @@ int main(int argc, char *argv[])
     uint64_t freq, next_frame;
     int headless = 0, max_frames = 0;
     const char *dump_path = NULL;
-    int scripted = 0, shot_every = 0;
+    int scripted = 0, shot_every = 0, muted = 0;
+    const char *gl_dump = NULL;
     const char *shot_dir = NULL;
 
     for (int i = 1; i < argc; i++) {
@@ -168,6 +170,8 @@ int main(int argc, char *argv[])
         else if (!strcmp(argv[i], "--input") && i + 1 < argc) {
             if (PcTestLoadInput(argv[++i]) == 0) scripted = 1;
         } else if (!strcmp(argv[i], "--wav") && i + 1 < argc) PcTestOpenWav(argv[++i]);
+        else if (!strcmp(argv[i], "--mute")) muted = 1;
+        else if (!strcmp(argv[i], "--gl-dump") && i + 1 < argc) gl_dump = argv[++i];
         else if (!strcmp(argv[i], "--shots") && i + 2 < argc) {
             shot_every = atoi(argv[++i]);
             shot_dir = argv[++i];
@@ -175,12 +179,13 @@ int main(int argc, char *argv[])
     }
 
     PcNullGuardInstall();
+    PcSettingsLoad();
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS) != 0)
         PcFatal("SDL_Init: %s", SDL_GetError());
     if (!headless && PcVideoInit("FireRed PC") != 0)
         PcFatal("could not open the game window");
-    if (!headless)
-        PcAudioInit();   /* headless runs are silent (use --wav to capture) */
+    /* headless runs are silent (use --wav to capture) */
+    PcAudioInit(headless || muted);
     PcSaveLoad();
     PcIoWrite16(REG_KEYINPUT, 0x03FF);
 
@@ -208,19 +213,32 @@ int main(int argc, char *argv[])
         if (scripted)
             PcIoWrite16(REG_KEYINPUT, PcTestInput(frames + 1));
         if (!headless) {
-            PcVideoPresent(frame, frame_width, GBA_HEIGHT);
-            uint16_t keys = PcInputPoll(&quit_requested);
+            static int turbo, skip;
+            /* While fast-forwarding, show only every Nth frame so vsync can't cap the speed. */
+            if (!turbo || ++skip >= gPcSettings.fast_forward) {
+                skip = 0;
+                PcVideoPresent(frame, frame_width, GBA_HEIGHT);
+            }
+            uint16_t keys = PcInputPoll(&quit_requested, &turbo);
             if (!scripted) PcIoWrite16(REG_KEYINPUT, keys);
 
-            next_frame += (uint64_t)(FRAME_SECONDS * freq);
-            uint64_t now = SDL_GetPerformanceCounter();
-            if (now < next_frame) {
-                uint32_t ms = (uint32_t)((next_frame - now) * 1000 / freq);
-                if (ms > 1) SDL_Delay(ms - 1);
-                while (SDL_GetPerformanceCounter() < next_frame) {}
-            } else if (now - next_frame > freq / 10) {
-                next_frame = now; /* fell far behind: don't try to catch up */
+            if (gl_dump) {
+                /* test capture: run unpaced */
+            } else if (turbo || !PcVideoVsyncPaces()) {
+                next_frame += (uint64_t)(FRAME_SECONDS * freq / (turbo ? gPcSettings.fast_forward : 1));
+                uint64_t now = SDL_GetPerformanceCounter();
+                if (now < next_frame) {
+                    uint32_t ms = (uint32_t)((next_frame - now) * 1000 / freq);
+                    if (ms > 1) SDL_Delay(ms - 1);
+                    while (SDL_GetPerformanceCounter() < next_frame) {}
+                } else if (now - next_frame > freq / 10) {
+                    next_frame = now; /* fell far behind: don't try to catch up */
+                }
+            } else {
+                next_frame = SDL_GetPerformanceCounter();
             }
+            if (gl_dump && max_frames && frames == max_frames - 1)
+                PcVideoDumpScreen(gl_dump);
         }
     }
 

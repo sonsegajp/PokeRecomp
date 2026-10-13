@@ -19,3 +19,10 @@ NULL access at eip=00493ab7 addr=00001e18
 NULL access at eip=00493ad3 addr=00001e1a
 NULL access at eip=00493b10 addr=00001e1c
 NULL access at eip=00493b4d addr=00001e1e
+NULL access at eip=00eb1ccb addr=00001e22
+NULL access at eip=00eb1e77 addr=00001e28
+NULL access at eip=00eb1e85 addr=00000001
+NULL access at eip=00eb3ab7 addr=00001e18
+NULL access at eip=00eb3ad3 addr=00001e1a
+NULL access at eip=00eb3b10 addr=00001e1c
+NULL access at eip=00eb3b4d addr=00001e1e

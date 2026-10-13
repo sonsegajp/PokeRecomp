@@ -46,9 +46,12 @@ static void SDLCALL callback(void *user, Uint8 *stream, int len)
     }
 }
 
-void PcAudioInit(void)
+void PcAudioInit(int muted)
 {
     SDL_AudioSpec want = {0}, have;
+
+    if (muted)
+        return;
 
     want.freq = PC_AUDIO_RATE;
     want.format = AUDIO_F32SYS;
