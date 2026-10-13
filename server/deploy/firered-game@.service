@@ -1,0 +1,19 @@
+[Unit]
+Description=FireRed PC online - game server %i
+After=firered-master.service
+Wants=firered-master.service
+StartLimitIntervalSec=600
+StartLimitBurst=5
+
+[Service]
+User=firered
+WorkingDirectory=/opt/firered-server
+Environment=PYTHONUNBUFFERED=1 PYTHONIOENCODING=utf-8
+EnvironmentFile=/opt/firered-server/game-%i.env
+ExecStart=/usr/bin/python3 gameserver.py --name ${NAME} --port ${PORT} --public-host 74.208.169.223 --master 127.0.0.1:27100
+Restart=always
+UMask=0077
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

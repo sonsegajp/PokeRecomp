@@ -1,0 +1,17 @@
+[Unit]
+Description=FireRed PC online - master server (accounts, server list, GTS, market, guilds)
+After=network-online.target
+StartLimitIntervalSec=600
+StartLimitBurst=5
+
+[Service]
+User=firered
+WorkingDirectory=/opt/firered-server
+Environment=PYTHONUNBUFFERED=1 PYTHONIOENCODING=utf-8
+ExecStart=/usr/bin/python3 master.py --port 27100
+Restart=always
+UMask=0077
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

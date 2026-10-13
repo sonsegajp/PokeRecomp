@@ -21,7 +21,7 @@
 #define CONNECT_TIMEOUT_MS 6000
 #define CREDENTIALS_PATH "online.dat"
 #define CONFIG_PATH "online.ini"
-#define DEFAULT_MASTER "127.0.0.1:27100"
+#define DEFAULT_MASTER "74.208.169.223:27100"   /* online.ini "master = host:port" overrides */
 
 enum {
     M_HELLO = 0x01, M_REGISTER = 0x02, M_LOGIN = 0x03, M_LIST_SERVERS = 0x04, M_RENAME = 0x07,
@@ -571,6 +571,14 @@ static void handle_master(uint8_t type, const uint8_t *p, int len)
         break;
     case M_ERROR:
         if (op == OP_REQUEST) master_error = len ? p[0] : 0;
+        if (op == OP_LOGIN && len && p[0] == 2 /* ERR_BAD_LOGIN */) {
+            /* this master doesn't know us (a different server, or a reset):
+             * keep the old login aside and register afresh */
+            remove(CREDENTIALS_PATH ".old");
+            rename(CREDENTIALS_PATH, CREDENTIALS_PATH ".old");
+            account_id = 0;
+            have_account = 0;
+        }
         if (op == OP_REGISTER || op == OP_LOGIN || op == OP_RENAME || op == OP_REQUEST) finish_op(PC_NET_OP_FAILED);
         break;
     }

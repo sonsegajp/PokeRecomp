@@ -1021,6 +1021,13 @@ static void HandleBusy(void)
     case BUSY_LOGIN:
         if (status == PC_NET_OP_OK)
             ShowServers();
+        else if (!PcNetHasAccount())   // the service didn't know this login: register
+        {
+            StringCopy(sOnlineName, gSaveBlock2Ptr->playerName);
+            sOnline->mode = MODE_REGISTER;
+            sOnline->cursor = 0;
+            DrawRegister();
+        }
         else
             ShowMessage(sText_CantReach1, sText_CantReach2, NULL, TRUE, MODE_SERVERS);
         break;
