@@ -1,0 +1,10 @@
+build/
+FireRedPC.exe
+*.sav
+*.sav.tmp
+ref/
+game/build/
+game/*.gba
+game/*.elf
+game/*.map
+game/tools/*/*.exe

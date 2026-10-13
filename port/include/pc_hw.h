@@ -1,0 +1,36 @@
+/* pc_hw.h — the GBA hardware the game addresses directly, as host memory.
+ *
+ * Included by pret's gba/defines.h and gba/io_reg.h when PLATFORM_PC is
+ * defined. The game keeps writing "registers" and "VRAM" exactly as on the
+ * console; the platform layer (renderer, DMA unit, mixer) reads them back.
+ * Plain C only: this is seen by every game translation unit. */
+#ifndef PC_HW_H
+#define PC_HW_H
+
+#define PC_VRAM_SIZE 0x18000
+#define PC_PLTT_SIZE 0x400
+#define PC_OAM_SIZE  0x400
+#define PC_IO_SIZE   0x400
+#define PC_FLASH_SIZE 0x20000
+
+extern unsigned char gPcIo[PC_IO_SIZE];      /* 0x04000000 I/O registers */
+extern unsigned char gPcPltt[PC_PLTT_SIZE];  /* 0x05000000 palette RAM */
+extern unsigned char gPcVram[PC_VRAM_SIZE];  /* 0x06000000 VRAM */
+extern unsigned char gPcOam[PC_OAM_SIZE];    /* 0x07000000 OAM */
+extern unsigned char gPcFlash[PC_FLASH_SIZE];/* 0x0E000000 flash save chip */
+
+/* Words the BIOS keeps at the top of IWRAM. */
+extern void *gPcSoundInfoPtr;      /* 0x03007FF0 */
+extern unsigned short gPcIntrCheck;/* 0x03007FF8 */
+extern void *gPcIntrVector;        /* 0x03007FFC */
+
+/* DMA register writes go through here: immediate channels run at once,
+ * HBlank/VBlank-timed channels are remembered for the renderer. */
+void PcDmaSet(int channel, const void *src, void *dest, unsigned int control);
+void PcDmaStop(int channel);
+
+/* Give the host a chance to run (draw, deliver interrupts) until any of the
+ * interrupt flags in `mask` has been raised by a handler. */
+void PcWaitForInterrupt(unsigned short mask);
+
+#endif
