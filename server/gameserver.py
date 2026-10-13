@@ -41,6 +41,7 @@ class Player:
         self.tag = 0
         self.guild = 0
         self.gender = 0
+        self.game = GAME_FIRERED
         self.pos = (0, 0, 0, 0, 0, 0)       # group, num, x, y, facing, flags
         self.session = None
         self.pending_to = None              # (target id, kind) we asked
@@ -49,7 +50,7 @@ class Player:
 
     def info(self):
         return frame(S_PLAYER, struct.pack("<H", self.id) + self.name + struct.pack("<HB", self.tag, self.gender)
-                     + struct.pack("<BBhhBB", *self.pos))
+                     + struct.pack("<BBhhBB", *self.pos) + bytes([self.game]))
 
     def send(self, data):
         try:
@@ -88,7 +89,8 @@ class GameServer:
             try:
                 reader, writer = await asyncio.open_connection(host, int(port))
                 writer.write(frame(G_REGISTER, fixed(key, 32) + text(self.args.name, 24)
-                                   + text(self.args.public_host, 64) + struct.pack("<HH", self.args.port, self.args.max)))
+                                   + text(self.args.public_host, 64) + struct.pack("<HH", self.args.port, self.args.max)
+                                   + bytes([REGION_NAMES[self.args.region]])))
                 self.master_writer = writer
                 for p in self.players.values():
                     writer.write(frame(G_PRESENCE, struct.pack("<IB", p.account, 1)))
@@ -174,6 +176,8 @@ class GameServer:
             self.next_id = self.next_id % 60000 + 1
             player.account, player.name, player.tag, player.guild = who
             player.gender = gender
+            if len(msg[1]) >= TOKEN_LEN + 4:
+                player.game = msg[1][TOKEN_LEN + 3]
             self.players[player.id] = player
             self.presence(player, 1)
             player.send(frame(S_WELCOME, struct.pack("<H", player.id) + text(self.args.name, 24)))
@@ -340,6 +344,8 @@ class GameServer:
 async def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--name", default="Kanto")
+    ap.add_argument("--region", default="kanto", choices=sorted(REGION_NAMES),
+                    help="kanto: FireRed/LeafGreen world; hoenn: Ruby/Sapphire/Emerald world")
     ap.add_argument("--port", type=int, default=27200)
     ap.add_argument("--public-host", default="127.0.0.1", help="address players use to reach this server")
     ap.add_argument("--master", default="127.0.0.1:27100")

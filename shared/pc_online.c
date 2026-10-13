@@ -7,15 +7,34 @@
 // Club code over a virtual link cable (see link.c NetLinkFrame).
 #include "global.h"
 #ifdef PLATFORM_PC
+#ifdef EMERALD
+#include "bg.h"
+#include "window.h"
+#include "text.h"
+#include "sprite.h"
+#include "palette.h"
+#include "gpu_regs.h"
+#include "malloc.h"
+#include "dma3.h"
+#include "string_util.h"
+#include "decompress.h"
+#include "main.h"
+#include "field_screen_effect.h"
+#include "mail.h"
+#include "constants/rgb.h"
+#else
 #include "gflib.h"
+#include "field_fadetransition.h"
+#include "new_menu_helpers.h"
+#include "text_window_graphics.h"
+#include "mail_data.h"
+#endif
 #include "event_data.h"
 #include "event_object_movement.h"
 #include "event_scripts.h"
 #include "fieldmap.h"
-#include "field_fadetransition.h"
 #include "field_player_avatar.h"
 #include "menu.h"
-#include "new_menu_helpers.h"
 #include "overworld.h"
 #include "scanline_effect.h"
 #include "script.h"
@@ -23,7 +42,6 @@
 #include "strings.h"
 #include "task.h"
 #include "text_window.h"
-#include "text_window_graphics.h"
 #include "constants/event_objects.h"
 #include "constants/event_object_movement.h"
 #include "constants/songs.h"
@@ -46,9 +64,9 @@
 #include "pc_net.h"
 #include "pc_chat.h"
 #include "pc_online.h"
+#include "pc_game.h"
 #include "item.h"
 #include "money.h"
-#include "mail_data.h"
 #include "constants/items.h"
 #include "random.h"
 
@@ -80,7 +98,11 @@ static const u8 sText_NoServers[] = _("No servers are open right now.");
 static const u8 sText_Joined[] = _("{STR_VAR_1}");
 static const u8 sText_YouAreOn[] = _("Connected!");
 static const u8 sText_YouAreOn2[] = _("Other trainers on this server");
+#ifdef EMERALD
+static const u8 sText_YouAreOn3[] = _("now appear around HOENN.");
+#else
 static const u8 sText_YouAreOn3[] = _("now appear around KANTO.");
+#endif
 static const u8 sText_LeftServer[] = _("You left the server.");
 static const u8 sText_CantReach1[] = _("Couldn't reach the online");
 static const u8 sText_CantReach2[] = _("service. Check your connection.");
@@ -89,6 +111,8 @@ static const u8 sText_JoinFailed2[] = _("It may be full or offline.");
 static const u8 sText_Registered[] = _("Registered! Your online name is");
 static const u8 sText_Here[] = _("{RIGHT_ARROW}");
 static const u8 sText_Friends[] = _("FRIENDS");
+static const u8 sText_RegionKanto[] = _("KANTO");
+static const u8 sText_RegionHoenn[] = _("HOENN");
 static const u8 sText_Guild[] = _("GUILD");
 static const u8 sText_Market[] = _("POKéMON MARKET");
 static const u8 sText_GtsSearching[] = _("Searching the GTS…");
@@ -201,7 +225,13 @@ static EWRAM_DATA u8 sOnlineName[PLAYER_NAME_LENGTH + 1] = {0};   // edited on t
 static EWRAM_DATA bool8 sJoinedWarp = FALSE;     // joined: leave the screen into Pallet Town
 static EWRAM_DATA bool8 sShowJoinedMessage = FALSE;
 
+#ifdef EMERALD
+// Emerald's OPTION screen look: its text palette, background and window frame
+static const u16 sOnlinePalette[] = INCGFX_U16("graphics/interface/option_menu_text.pal", ".gbapal");
+static const u16 sOnlineBgPalette[] = {RGB(17, 18, 31)};
+#else
 static const u16 sOnlinePalette[] = INCBIN_U16("graphics/misc/option_menu.gbapal");
+#endif
 
 static const struct WindowTemplate sOnlineWindows[] =
 {
@@ -240,6 +270,28 @@ static void CB2_OnlineRun(void)
 
 // The same framed look as the OPTION screen (and its frame-type setting).
 static void DrawFrames(void)
+#ifdef EMERALD
+{
+    // both windows in the player's frame (tiles at 0x1AA, palette 2)
+    FillBgTilemapBufferRect(1, 0x1AA, 1, 2, 1, 1, 2);
+    FillBgTilemapBufferRect(1, 0x1AB, 2, 2, 0x1A, 1, 2);
+    FillBgTilemapBufferRect(1, 0x1AC, 0x1C, 2, 1, 1, 2);
+    FillBgTilemapBufferRect(1, 0x1AD, 1, 3, 1, 2, 2);
+    FillBgTilemapBufferRect(1, 0x1AF, 0x1C, 3, 1, 2, 2);
+    FillBgTilemapBufferRect(1, 0x1B0, 1, 5, 1, 1, 2);
+    FillBgTilemapBufferRect(1, 0x1B1, 2, 5, 0x1A, 1, 2);
+    FillBgTilemapBufferRect(1, 0x1B2, 0x1C, 5, 1, 1, 2);
+    FillBgTilemapBufferRect(1, 0x1AA, 1, 6, 1, 1, 2);
+    FillBgTilemapBufferRect(1, 0x1AB, 2, 6, 0x1A, 1, 2);
+    FillBgTilemapBufferRect(1, 0x1AC, 0x1C, 6, 1, 1, 2);
+    FillBgTilemapBufferRect(1, 0x1AD, 1, 7, 1, 0x10, 2);
+    FillBgTilemapBufferRect(1, 0x1AF, 0x1C, 7, 1, 0x10, 2);
+    FillBgTilemapBufferRect(1, 0x1B0, 1, 0x13, 1, 1, 2);
+    FillBgTilemapBufferRect(1, 0x1B1, 2, 0x13, 0x1A, 1, 2);
+    FillBgTilemapBufferRect(1, 0x1B2, 0x1C, 0x13, 1, 1, 2);
+    CopyBgTilemapBufferToVram(1);
+}
+#else
 {
     FillBgTilemapBufferRect(1, 0x1B3, 1, 2, 1, 1, 3);
     FillBgTilemapBufferRect(1, 0x1B4, 2, 2, 0x1B, 1, 3);
@@ -259,6 +311,7 @@ static void DrawFrames(void)
     FillBgTilemapBufferRect(1, 0x1B2, 0x1C, 0x13, 1, 1, 2);
     CopyBgTilemapBufferToVram(1);
 }
+#endif
 
 static u8 RowHeight(void)
 {
@@ -322,10 +375,20 @@ static void FinishList(void)
 static void BuildServerRows(void)
 {
     int i, n = 0;
-    for (i = 0; i < PcNetServerCount() && n < PC_NET_MAX_SERVERS; i++, n++)
+    // this region's worlds, then the other region's if the player owns that game
+    for (i = 0; i < PcNetServerCount() && n < PC_NET_MAX_SERVERS; i++)
     {
+        if (PcNetServerRegion(i) != PC_NET_REGION)
+            continue;
         sOnline->rows[n] = ROW_SERVER;
-        sOnline->serverOf[n] = i;
+        sOnline->serverOf[n++] = i;
+    }
+    for (i = 0; i < PcNetServerCount() && n < PC_NET_MAX_SERVERS; i++)
+    {
+        if (PcNetServerRegion(i) == PC_NET_REGION || !PcNetOwnsRegion(PcNetServerRegion(i)))
+            continue;
+        sOnline->rows[n] = ROW_SERVER;
+        sOnline->serverOf[n++] = i;
     }
     sOnline->rows[n++] = ROW_FRIENDS;
     sOnline->rows[n++] = ROW_GUILD;
@@ -371,6 +434,12 @@ static void DrawServers(void)
             }
             AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0xC0 - GetStringWidth(FONT_NORMAL, count, 0), line * RowHeight() + 2,
                                          sValueColor, TEXT_SKIP_DRAW, count);
+            if (PcNetServerRegion(s) != PC_NET_REGION)   // another region's world: travel there
+            {
+                const u8 *region = PcNetServerRegion(s) == PC_NET_REGION_HOENN ? sText_RegionHoenn : sText_RegionKanto;
+                AddTextPrinterParameterized3(WIN_LIST, FONT_SMALL, 0x98 - GetStringWidth(FONT_SMALL, region, 0), line * RowHeight() + 3,
+                                             sTextColor, TEXT_SKIP_DRAW, region);
+            }
             break;
         }
         case ROW_FRIENDS:    PrintLine(line, sText_Friends, sTextColor); break;
@@ -1038,6 +1107,7 @@ static void HandleBusy(void)
             CopyNameWithTag(sNameTag, PcNetMyName(), PcNetMyTag());
             PlaySE(SE_SUCCESS);
             ShowMessage(sText_Registered, sNameTag, NULL, FALSE, MODE_SERVERS);
+            sOnline->cursor = sOnline->scroll = 0;   // the browser starts on the first world
             BuildServerRows();
         }
         else
@@ -2423,11 +2493,16 @@ static void Task_OnlineScreen(u8 taskId)
             DestroyTask(taskId);
             if (sJoinedWarp)
             {
-                // Everyone on a server starts out in Pallet Town, in front of
-                // the player's house; the welcome message plays on arrival.
+                // Everyone on a server starts out in their region's first
+                // town (Pallet / Littleroot), between the houses; the welcome
+                // message plays on arrival.
                 sJoinedWarp = FALSE;
                 sShowJoinedMessage = TRUE;
+#ifdef EMERALD
+                SetWarpDestination(MAP_GROUP(MAP_LITTLEROOT_TOWN), MAP_NUM(MAP_LITTLEROOT_TOWN), -1, 10, 10);
+#else
                 SetWarpDestination(MAP_GROUP(MAP_PALLET_TOWN), MAP_NUM(MAP_PALLET_TOWN), -1, 6, 8);
+#endif
                 WarpIntoMap();
                 gFieldCallback = FieldCB_DefaultWarpExit;
                 SetMainCallback2(CB2_LoadMap);
@@ -2568,11 +2643,19 @@ static void CB2_OnlineInit(void)
         ScanlineEffect_Stop();
         break;
     case 3:
+#ifdef EMERALD
+        LoadBgTiles(1, GetWindowFrameTilesPal(gSaveBlock2Ptr->optionsWindowFrameType)->tiles, 0x120, 0x1AA);
+        LoadPalette(GetWindowFrameTilesPal(gSaveBlock2Ptr->optionsWindowFrameType)->pal, BG_PLTT_ID(2), PLTT_SIZE_4BPP);
+        LoadPalette(sOnlineBgPalette, BG_PLTT_ID(0), sizeof(sOnlineBgPalette));
+        LoadPalette(sOnlinePalette, BG_PLTT_ID(1), sizeof(sOnlinePalette));
+        LoadPalette(GetTextWindowPalette(2), BG_PLTT_ID(15), PLTT_SIZE_4BPP);
+#else
         LoadBgTiles(1, GetUserWindowGraphics(gSaveBlock2Ptr->optionsWindowFrameType)->tiles, 0x120, 0x1AA);
         LoadPalette(GetUserWindowGraphics(gSaveBlock2Ptr->optionsWindowFrameType)->palette, BG_PLTT_ID(2), PLTT_SIZE_4BPP);
         LoadPalette(sOnlinePalette, BG_PLTT_ID(1), sizeof(sOnlinePalette));
         LoadPalette(GetTextWindowPalette(2), BG_PLTT_ID(15), PLTT_SIZE_4BPP);
         LoadStdWindowGfxOnBg(1, 0x1B3, BG_PLTT_ID(3));
+#endif
         break;
     case 4:
         DrawFrames();
@@ -2720,6 +2803,23 @@ static EWRAM_DATA u16 sIncomingFrom = 0;
 static EWRAM_DATA u8 sIncomingKind = 0;
 static EWRAM_DATA u16 sIncomingWait = 0;
 
+// Every trainer looks like their own game's hero: Kanto players as Red/Leaf,
+// Hoenn players as Brendan/May (both engines carry the other's sprites for
+// link play).
+static u16 AvatarGfx(const struct PcNetPlayer *p)
+{
+    bool8 hoenn = p->game == PC_NET_GAME_EMERALD || p->game == PC_NET_GAME_RUBY || p->game == PC_NET_GAME_SAPPHIRE;
+#ifdef EMERALD
+    if (!hoenn)
+        return p->gender ? OBJ_EVENT_GFX_LEAF : OBJ_EVENT_GFX_RED;
+    return p->gender ? OBJ_EVENT_GFX_MAY_NORMAL : OBJ_EVENT_GFX_BRENDAN_NORMAL;
+#else
+    if (hoenn)
+        return p->gender ? OBJ_EVENT_GFX_RS_MAY : OBJ_EVENT_GFX_RS_BRENDAN;
+    return p->gender ? OBJ_EVENT_GFX_GREEN_NORMAL : OBJ_EVENT_GFX_RED_NORMAL;
+#endif
+}
+
 static const struct PcNetPlayer *AvatarPlayer(int a)
 {
     return sAvatarSlot[a] ? PcNetGetPlayer(sAvatarSlot[a] - 1) : NULL;
@@ -2798,12 +2898,54 @@ static void UpdateAvatars(void)
         }
         if (a < MAX_AVATARS || free < 0)
             continue;
-        if (SpawnSpecialObjectEventParameterized(p->gender ? OBJ_EVENT_GFX_GREEN_NORMAL : OBJ_EVENT_GFX_RED_NORMAL,
+        if (SpawnSpecialObjectEventParameterized(AvatarGfx(p),
                                                  MOVEMENT_TYPE_NONE, AVATAR_LOCALID_BASE + free,
                                                  p->x + MAP_OFFSET, p->y + MAP_OFFSET,
                                                  gObjectEvents[gPlayerAvatar.objectEventId].currentElevation) < OBJECT_EVENTS_COUNT)
             sAvatarSlot[free] = s + 1;
     }
+}
+
+// One name tag over a field object, at the top-center of its sprite.
+static int AddNameTag(int n, int16_t *x, int16_t *y, u8 (*names)[8], u8 *self,
+                      u8 objId, const u8 *name, u8 isSelf)
+{
+    struct Sprite *sprite;
+    int i;
+
+    if (n >= PC_CHAT_MAX_TAGS || objId >= OBJECT_EVENTS_COUNT || !gObjectEvents[objId].active)
+        return n;
+    sprite = &gSprites[gObjectEvents[objId].spriteId];
+    if (sprite->invisible || gObjectEvents[objId].invisible)
+        return n;
+    // where it was last drawn: the OAM entry (9-bit x, 8-bit y, both wrap)
+    x[n] = (sprite->oam.x >= 256 ? sprite->oam.x - 512 : sprite->oam.x) - sprite->centerToCornerVecX;
+    y[n] = (sprite->oam.y >= 192 ? sprite->oam.y - 256 : sprite->oam.y) + 9;   // trainer frames are blank above the head
+    for (i = 0; i < 7 && name[i] != EOS; i++)
+        names[n][i] = name[i];
+    names[n][i] = EOS;
+    self[n] = isSelf;
+    return n + 1;
+}
+
+// Everyone's online name over their head while walking around.
+static void UpdateNameTags(void)
+{
+    int16_t x[PC_CHAT_MAX_TAGS], y[PC_CHAT_MAX_TAGS];
+    u8 names[PC_CHAT_MAX_TAGS][8], self[PC_CHAT_MAX_TAGS];
+    int a, n = 0;
+    u8 objId;
+
+    if (gPaletteFade.active || ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled())
+        return;   // a menu, a message or a warp is up: the tags would sit on top of it
+    n = AddNameTag(n, x, y, names, self, gPlayerAvatar.objectEventId, PcNetMyName(), TRUE);
+    for (a = 0; a < MAX_AVATARS; a++)
+    {
+        const struct PcNetPlayer *p = AvatarPlayer(a);
+        if (p && TryGetObjectEventIdByLocalIdAndMap(AVATAR_LOCALID_BASE + a, sAvatarMapNum, sAvatarMapGroup, &objId) == 0)
+            n = AddNameTag(n, x, y, names, self, objId, p->name, FALSE);
+    }
+    PcChatSetNameTags(n, x, y, (const uint8_t (*)[8])names, self);
 }
 
 static void SendPresence(void)
@@ -2864,7 +3006,11 @@ static void DebugNetHooks(void)
         case 1:
             if (PcNetOpStatus() == PC_NET_OP_OK)
             {
-                PcNetBeginJoin(0, gSaveBlock2Ptr->playerGender);
+                int i, pick = 0;
+                for (i = PcNetServerCount() - 1; i >= 0; i--)   // the first world of our own region
+                    if (PcNetServerRegion(i) == PC_NET_REGION)
+                        pick = i;
+                PcNetBeginJoin(pick, gSaveBlock2Ptr->playerGender);
                 stage = 2;
             }
             else if (PcNetOpStatus() == PC_NET_OP_FAILED)
@@ -2938,6 +3084,7 @@ void Online_OverworldUpdate(void)
     }
     SendPresence();
     UpdateAvatars();
+    UpdateNameTags();
 
     if (sShowJoinedMessage && !ArePlayerFieldControlsLocked() && !ScriptContext_IsEnabled())
     {
@@ -3082,10 +3229,17 @@ static void Task_OnlineStartBattle(u8 taskId)
     case 3:
         if (gReceivedRemoteLinkPlayers)
             break;
+#ifdef EMERALD
+        if (gLinkPlayers[0].trainerId & 1)
+            PlayMapChosenOrBattleBGM(MUS_VS_GYM_LEADER);
+        else
+            PlayMapChosenOrBattleBGM(MUS_VS_TRAINER);
+#else
         if (gLinkPlayers[0].trainerId & 1)
             PlayMapChosenOrBattleBGM(MUS_RS_VS_GYM_LEADER);
         else
             PlayMapChosenOrBattleBGM(MUS_RS_VS_TRAINER);
+#endif
         gBattleTypeFlags = BATTLE_TYPE_TRAINER | BATTLE_TYPE_LINK;
         if (gSpecialVar_0x8004 == USING_DOUBLE_BATTLE)
             gBattleTypeFlags |= BATTLE_TYPE_DOUBLE;

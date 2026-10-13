@@ -10,6 +10,21 @@
 
 enum { PC_NET_OP_IDLE, PC_NET_OP_PENDING, PC_NET_OP_OK, PC_NET_OP_FAILED };
 enum { PC_NET_KIND_SINGLE = 1, PC_NET_KIND_DOUBLE = 2, PC_NET_KIND_TRADE = 3 };
+/* which game a trainer plays (sent on join; decides how others see them) */
+enum { PC_NET_GAME_FIRERED, PC_NET_GAME_LEAFGREEN, PC_NET_GAME_EMERALD, PC_NET_GAME_RUBY, PC_NET_GAME_SAPPHIRE };
+enum { PC_NET_REGION_KANTO, PC_NET_REGION_HOENN };
+#if defined(EMERALD)
+#define PC_NET_REGION PC_NET_REGION_HOENN
+#else
+#define PC_NET_REGION PC_NET_REGION_KANTO
+#endif
+#if defined(EMERALD)
+#define PC_NET_GAME PC_NET_GAME_EMERALD
+#elif defined(LEAFGREEN)
+#define PC_NET_GAME PC_NET_GAME_LEAFGREEN
+#else
+#define PC_NET_GAME PC_NET_GAME_FIRERED
+#endif
 
 #define PC_NET_NAME_LEN    8     /* game name buffer, 0xFF-terminated */
 #define PC_NET_MAX_SERVERS 16
@@ -21,6 +36,7 @@ struct PcNetPlayer {
     uint8_t name[PC_NET_NAME_LEN];
     uint16_t tag;
     uint8_t gender;
+    uint8_t game;               /* PC_NET_GAME_* */
     uint8_t mapGroup, mapNum;
     int16_t x, y;
     uint8_t facing, flags;
@@ -61,6 +77,8 @@ uint16_t PcNetMyTag(void);
 int PcNetServerCount(void);
 const char *PcNetServerName(int i);
 int PcNetServerPlayers(int i);
+int PcNetServerRegion(int i);           /* PC_NET_REGION_* */
+int PcNetOwnsRegion(int region);        /* this player can play there (owns that region's game) */
 void PcNetBeginJoin(int index, uint8_t gender);
 void PcNetDisconnect(void);
 int PcNetConnected(void);

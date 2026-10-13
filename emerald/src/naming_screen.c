@@ -1726,6 +1726,9 @@ static void (*const sDrawTextEntryBoxFuncs[])(void) =
     [NAMING_SCREEN_CAUGHT_MON] = DrawMonTextEntryBox,
     [NAMING_SCREEN_NICKNAME]   = DrawMonTextEntryBox,
     [NAMING_SCREEN_WALDA]      = DrawNormalTextEntryBox,
+#ifdef PLATFORM_PC
+    [NAMING_SCREEN_GUILD]      = DrawNormalTextEntryBox,
+#endif
 };
 
 static void DrawTextEntryBox(void)
@@ -2128,6 +2131,20 @@ static const struct NamingScreenTemplate sWaldaWordsScreenTemplate =
     .title = gText_TellHimTheWords,
 };
 
+#ifdef PLATFORM_PC
+static const u8 sText_GuildName[] = _("GUILD NAME?");
+static const struct NamingScreenTemplate sGuildNamingScreenTemplate =
+{
+    .copyExistingString = FALSE,
+    .maxChars = BOX_NAME_LENGTH,
+    .iconFunction = 2,
+    .addGenderIcon = FALSE,
+    .initialPage = KBPAGE_LETTERS_UPPER,
+    .unused = 19,
+    .title = sText_GuildName,
+};
+#endif
+
 static const struct NamingScreenTemplate *const sNamingScreenTemplates[] =
 {
     [NAMING_SCREEN_PLAYER]     = &sPlayerNamingScreenTemplate,
@@ -2135,6 +2152,9 @@ static const struct NamingScreenTemplate *const sNamingScreenTemplates[] =
     [NAMING_SCREEN_CAUGHT_MON] = &sMonNamingScreenTemplate,
     [NAMING_SCREEN_NICKNAME]   = &sMonNamingScreenTemplate,
     [NAMING_SCREEN_WALDA]      = &sWaldaWordsScreenTemplate,
+#ifdef PLATFORM_PC
+    [NAMING_SCREEN_GUILD]      = &sGuildNamingScreenTemplate,
+#endif
 };
 
 static const struct OamData sOam_8x8 =

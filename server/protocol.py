@@ -69,7 +69,7 @@ GENDER_ANY, GENDER_MALE, GENDER_FEMALE, GENDER_NONE = 0, 1, 2, 3
 MAIL_WONDER, MAIL_GTS = 1, 2
 
 # game server <-> master
-G_REGISTER       = 0x20  # key[32] name[24] host[64] u16 port u16 max
+G_REGISTER       = 0x20  # key[32] name[24] host[64] u16 port u16 max, u8 region (REGION_*)
 G_HEARTBEAT      = 0x21  # u16 players
 G_VERIFY         = 0x22  # u32 req, token[16]
 G_PRESENCE       = 0x23  # u32 account_id, u8 online
@@ -78,7 +78,7 @@ G_GUILD_CHAT     = 0x25  # both ways: u32 guild, name[8], u16 tag, text
 G_VERIFIED       = 0xA0  # u32 req, u8 ok, u32 account_id, name[8], u16 tag, u32 guild
 
 # client <-> game server
-S_JOIN           = 0x40  # token[16], u8 gender, u16 version
+S_JOIN           = 0x40  # token[16], u8 gender, u16 version, u8 game (GAME_*)
 S_POS            = 0x41  # u8 group, u8 num, s16 x, s16 y, u8 facing, u8 flags
 S_CHAT           = 0x42  # text (game charset, 0xFF-terminated, <= 64)
 S_REQUEST        = 0x43  # u16 target, u8 kind
@@ -88,7 +88,7 @@ S_LINK_END       = 0x46
 S_LINK_OPEN      = 0x47  # u8 open (this player's end of the cable)
 S_GUILD_CHAT     = 0x48  # text (game charset) -> the sender's guild, on every server
 S_WELCOME        = 0xC0  # u16 my_id, name[24] server_name
-S_PLAYER         = 0xC1  # u16 id, name[8], u16 tag, u8 gender, u8 group, u8 num, s16 x, s16 y, u8 facing, u8 flags
+S_PLAYER         = 0xC1  # u16 id, name[8], u16 tag, u8 gender, u8 group, u8 num, s16 x, s16 y, u8 facing, u8 flags, u8 game
 S_PLAYER_GONE    = 0xC2  # u16 id
 S_CHAT_FROM      = 0xC3  # u16 id, text
 S_REQUESTED      = 0xC4  # u16 from, u8 kind
@@ -136,3 +136,9 @@ async def read_frame(reader):
     return body[0], body[1:]
 
 EVENT_NONE, EVENT_OUTBREAK = 0, 1
+
+# which game a trainer plays; a server is Kanto (FireRed/LeafGreen) or Hoenn (Ruby/Sapphire/Emerald)
+GAME_FIRERED, GAME_LEAFGREEN, GAME_EMERALD, GAME_RUBY, GAME_SAPPHIRE = 0, 1, 2, 3, 4
+REGION_KANTO, REGION_HOENN = 0, 1
+REGION_NAMES = {"kanto": REGION_KANTO, "hoenn": REGION_HOENN}
+GAME_REGION = {GAME_FIRERED: "kanto", GAME_LEAFGREEN: "kanto", GAME_EMERALD: "hoenn", GAME_RUBY: "hoenn", GAME_SAPPHIRE: "hoenn"}

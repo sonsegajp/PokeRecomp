@@ -4,6 +4,10 @@
 #define GUARD_PC_GAME_H
 
 #ifdef EMERALD
+#define JOY_REPT JOY_REPEAT
+// bag pockets: Emerald calls the TM case and berry pouch pockets these
+#define POCKET_TM_CASE     POCKET_TM_HM
+#define POCKET_BERRY_POUCH POCKET_BERRIES
 // pokeemerald renamed the item getters
 #define ItemId_GetPocket     GetItemPocket
 #define ItemId_GetImportance GetItemImportance

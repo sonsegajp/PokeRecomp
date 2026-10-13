@@ -122,6 +122,9 @@
 #define MULTI_SLATEPORT_TENT_RULES         111
 #define MULTI_FALLARBOR_TENT_RULES         112
 #define MULTI_TAG_MATCH_TYPE               113
+#define MULTI_ONLINE_PLAYER                114  // PC port: BATTLE / TRADE / ADD FRIEND / CANCEL
+#define MULTI_GLOBAL_TRADE                 115  // PC port: WONDER TRADE / GTS / MAILBOX / EXIT
+#define MULTI_GTS                          116  // PC port: DEPOSIT / SEARCH / MY POKeMON / BACK
 
 // Lilycove SS Tidal Multichoice Selections
 #define SSTIDAL_SELECTION_SLATEPORT        0

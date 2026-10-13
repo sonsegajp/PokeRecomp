@@ -17,6 +17,14 @@ void PcChatCancel(void);
 void PcChatReceive(const uint8_t *name, uint16_t tag, const uint8_t *text);   /* name NULL = the server */
 void PcChatReceiveGuild(const uint8_t *name, uint16_t tag, const uint8_t *text);
 
+/* Online name tags over the field: (x, y) is the point just above a
+ * trainer's head in the game's 240x160 screen space (a wider field extends
+ * it left and right). The game sets them every overworld frame; they vanish
+ * when it stops (a menu, a battle, a fade). self = the player's own tag. */
+#define PC_CHAT_MAX_TAGS 16
+void PcChatSetNameTags(int count, const int16_t *x, const int16_t *y,
+                       const uint8_t (*names)[8], const uint8_t *self);
+
 /* The overlay for this frame at (w, h) = 2x the game's logical size, RGBA;
  * NULL when there is nothing to show. */
 const uint32_t *PcChatOverlay(int w, int h);

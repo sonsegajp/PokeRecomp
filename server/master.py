@@ -127,11 +127,12 @@ class Master:
 
     def server_list(self):
         now = time.time()
-        live = [s for s in self.servers.values() if now - s["seen"] < SERVER_TIMEOUT]
+        live = [s for s in self.servers.values() if now - s["seen"] < SERVER_TIMEOUT][:32]
         body = struct.pack("<B", len(live))
-        for s in live[:32]:
+        for s in live:
             body += text(s["name"], 24) + text(s["host"], 64) + struct.pack("<HHH", s["port"], s["players"], s["max"])
-        return body
+        # then each server's region (older clients stop reading before this)
+        return body + bytes(s.get("region", REGION_KANTO) for s in live)
 
     async def handle(self, reader, writer):
         peer = writer.get_extra_info("peername")
@@ -215,7 +216,8 @@ class Master:
                 return frame(M_ERROR, bytes([ERR_BAD_LOGIN]))
             name, host = untext(p[32:56]), untext(p[56:120])
             port, mx = struct.unpack_from("<HH", p, 120)
-            self.servers[writer] = dict(name=name, host=host, port=port, max=mx, players=0, seen=time.time())
+            region = p[124] if len(p) > 124 else REGION_KANTO
+            self.servers[writer] = dict(name=name, host=host, port=port, max=mx, players=0, seen=time.time(), region=region)
             print("master: game server up:", name, f"{host}:{port}")
             return None
         if writer in self.servers:

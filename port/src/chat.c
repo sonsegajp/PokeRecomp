@@ -29,6 +29,8 @@ const uint16_t *PcFontNormalGlyph(uint16_t glyphId, uint8_t *width);
 #define COL_SYSTEM 0xFF60D8F8u   /* gold: the server's announcements */
 #define COL_GUILD  0xFF78F088u   /* green: guild chat */
 #define COL_BOX    0x99000000u
+#define COL_SELF   0xFF78E8F8u   /* yellow: your own name tag */
+#define TAG_MS     100           /* tags not refreshed for this long are gone */
 #define COL_INPUT  0xCC181818u
 
 struct Line {
@@ -47,6 +49,29 @@ static uint8_t input[MAX_INPUT + 1];
 static int input_len;
 static int swallow_t;   /* the T that opened the line also arrives as text */
 static uint32_t overlay[960 * 320];
+
+static struct {
+    int count;
+    int16_t x[PC_CHAT_MAX_TAGS], y[PC_CHAT_MAX_TAGS];
+    uint8_t name[PC_CHAT_MAX_TAGS][8];
+    uint8_t self[PC_CHAT_MAX_TAGS];
+    ULONGLONG when;
+} tags;
+
+void PcChatSetNameTags(int count, const int16_t *x, const int16_t *y,
+                       const uint8_t (*names)[8], const uint8_t *self)
+{
+    if (count > PC_CHAT_MAX_TAGS) count = PC_CHAT_MAX_TAGS;
+    tags.count = count;
+    for (int i = 0; i < count; i++) {
+        tags.x[i] = x[i];
+        tags.y[i] = y[i];
+        memcpy(tags.name[i], names[i], 8);
+        tags.name[i][7] = EOS;
+        tags.self[i] = self[i];
+    }
+    tags.when = GetTickCount64();
+}
 
 /* ---- charset ------------------------------------------------------------------ */
 
@@ -222,6 +247,19 @@ const uint32_t *PcChatOverlay(int w, int h)
     ov_w = w;
     ov_h = h;
     memset(overlay, 0, (size_t)w * h * 4);
+
+    /* name tags: the overlay is 2x the game, centered on the 240-wide screen */
+    if (tags.count && now - tags.when < TAG_MS) {
+        int x_origin = (w / 2 - 240) / 2;
+        for (i = 0; i < tags.count; i++) {
+            int tw = text_width(tags.name[i]);
+            int tx = 2 * (tags.x[i] + x_origin) - tw / 2, ty = 2 * tags.y[i] - LINE_H;
+            if (tx + tw < 0 || tx >= w || ty + LINE_H < 0 || ty >= h) continue;
+            fill(tx - 2, ty + 1, tw + 4, LINE_H - 2, COL_BOX);
+            text(tx, ty, tags.name[i], tags.self[i] ? COL_SELF : COL_NAME, 255);
+            shown = 1;
+        }
+    }
 
     y = h - MARGIN - LINE_H;
     if (input_open) {

@@ -1,4 +1,7 @@
 #include "global.h"
+#ifdef PLATFORM_PC
+#include "pc_net.h"
+#endif
 #include "m4a.h"
 #include "malloc.h"
 #include "reload_save.h"
@@ -399,6 +402,9 @@ void OpenLink(void)
 
 void CloseLink(void)
 {
+#ifdef PLATFORM_PC
+    PcNetLinkSetOpen(FALSE);   // the session itself ends back in the overworld
+#endif
     gReceivedRemoteLinkPlayers = FALSE;
     if (gWirelessCommType)
         LinkRfu_Shutdown();
@@ -1566,6 +1572,9 @@ static void TrySetLinkErrorBuffer(void)
     {
         // Link error has occurred, handle message details if
         // necessary, then stop the link.
+#ifdef PLATFORM_PC
+        PcNetLogLinkError(gLinkStatus, gLink.state, gLink.sendQueue.count, gLink.recvQueue.count, gLink.lag, gLink.queueFull);
+#endif
         if (!gSuppressLinkErrorMessage)
         {
             sLinkErrorBuffer.status = gLinkStatus;
@@ -1891,11 +1900,78 @@ void ResetSerial(void)
 
 // link_main1.c
 
+#ifdef PLATFORM_PC
+// Online: the "cable" is a game-server session. Instead of the SIO handshake
+// the server tells us the player count and our id; each frame one queued
+// command goes out and the server's merged frames (the same for every player,
+// like the cable's broadcast) come into the receive queue. Everything above
+// this queue layer in link.c runs unchanged.
+static void NetLinkFrame(u8 *shouldAdvanceLinkState, u16 *sendCmd, u16 (*recvCmds)[CMD_LENGTH])
+{
+    u16 frame[MAX_LINK_PLAYERS][CMD_LENGTH];
+    u8 i, j, index;
+
+    if (gLink.state == LINK_STATE_START0 || gLink.state == LINK_STATE_START1)
+        return;  // OpenLink's own reset steps run first
+    PcNetLinkSetOpen(TRUE);
+    if (!PcNetLinkConnected())
+    {
+        // the other end isn't open yet: still handshaking, as on a cable
+        DequeueRecvCmds(recvCmds);
+        return;
+    }
+    if (gLink.state != LINK_STATE_CONN_ESTABLISHED)
+    {
+        gLink.playerCount = PcNetLinkPlayers();
+        gLink.localId = PcNetLinkId();
+        gLink.isMaster = gLink.localId == 0 ? LINK_MASTER : LINK_SLAVE;
+        gLink.state = LINK_STATE_CONN_ESTABLISHED;
+    }
+    // The cable hardware reports our player number and master/slave in
+    // SIOCNT, and GetMultiplayerId() reads it from there.
+    REG_SIOCNT = (REG_SIOCNT & ~(SIO_ID | SIO_MULTI_SI)) | SIO_MULTI_SD
+               | (gLink.localId << 4) | (gLink.localId != 0 ? SIO_MULTI_SI : 0);
+    EnqueueSendCmd(sendCmd);
+    if (gLink.sendQueue.count > 0)
+    {
+        u16 cmd[CMD_LENGTH];
+        for (j = 0; j < CMD_LENGTH; j++)
+            cmd[j] = gLink.sendQueue.data[j][gLink.sendQueue.pos];
+        PcNetLinkSend(cmd);
+        gLink.sendQueue.count--;
+        if (++gLink.sendQueue.pos >= QUEUE_CAPACITY)
+            gLink.sendQueue.pos = 0;
+    }
+    while (gLink.recvQueue.count < QUEUE_CAPACITY && PcNetLinkRecv(frame))
+    {
+        index = gLink.recvQueue.pos + gLink.recvQueue.count;
+        if (index >= QUEUE_CAPACITY)
+            index -= QUEUE_CAPACITY;
+        for (i = 0; i < gLink.playerCount; i++)
+            for (j = 0; j < CMD_LENGTH; j++)
+                gLink.recvQueue.data[i][j][index] = frame[i][j];
+        gLink.recvQueue.count++;
+    }
+    DequeueRecvCmds(recvCmds);
+}
+#endif
+
 u32 LinkMain1(u8 *shouldAdvanceLinkState, u16 *sendCmd, u16 (*recvCmds)[CMD_LENGTH])
 {
     u32 retVal;
     u32 retVal2;
 
+#ifdef PLATFORM_PC
+    if (PcNetLinkActive() && gLink.state != LINK_STATE_START0 && gLink.state != LINK_STATE_START1)
+    {
+        NetLinkFrame(shouldAdvanceLinkState, sendCmd, recvCmds);
+    }
+    else if (PcNetLinkBroken() && gLink.state == LINK_STATE_CONN_ESTABLISHED)
+    {
+        gLink.hardwareError = TRUE;  // partner dropped: surfaces as a link error
+    }
+    else
+#endif
     switch (gLink.state)
     {
         case LINK_STATE_START0:
@@ -2089,6 +2165,15 @@ static void DequeueRecvCmds(u16 (*recvCmds)[CMD_LENGTH])
 
 void LinkVSync(void)
 {
+#ifdef PLATFORM_PC
+    // The network cable has no serial interrupt to time out on (that check
+    // would flag every online session as lagging).
+    if (PcNetLinkActive())
+    {
+        gLink.lag = LAG_NONE;
+        return;
+    }
+#endif
     if (gLink.isMaster)
     {
         switch (gLink.state)

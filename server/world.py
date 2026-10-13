@@ -47,10 +47,13 @@ class World:
         self.args = args
         here = os.path.dirname(os.path.abspath(__file__))
         dumps = [json.load(open(p, encoding="utf-8")) for p in sorted(glob.glob(os.path.join(here, "legality_data*.json")))]
-        self.names = {int(k): v for k, v in dumps[0]["names"].items()}
+        self.names = {}
+        for d in dumps:                       # every game's names (Emerald knows them all)
+            self.names.update({int(k): v for k, v in d["names"].items()})
         self.type_names = dumps[0]["type_names"]
         places = {}
         self.all_places = {}       # (group, num) -> (name, lowest level, highest level)
+        dumps = [d for d in dumps if d.get("region", "kanto") == getattr(args, "region", "kanto")] or dumps
         for d in dumps:
             for w in d["wild"]:
                 if "CHAMBER" in w["name"] or not w["land"]:

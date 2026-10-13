@@ -973,16 +973,18 @@ EventScript_CableClub_SetVarResult0::
 	setvar VAR_RESULT, 0
 	return
 
+@ PC port: the 2F desks are online now (data/scripts/pc_online.inc):
+@ ONLINE CLUB, GLOBAL TRADE (Wonder Trade / GTS / mailbox), POKeMON MARKET.
 Common_EventScript_UnionRoomAttendant::
-	call CableClub_EventScript_UnionRoomAttendant
+	goto Online_EventScript_GlobalTrade
 	end
 
 Common_EventScript_WirelessClubAttendant::
-	call CableClub_EventScript_WirelessClubAttendant
+	goto Online_EventScript_Attendant
 	end
 
 Common_EventScript_DirectCornerAttendant::
-	call CableClub_EventScript_DirectCornerAttendant
+	goto Online_EventScript_Market
 	end
 
 Common_EventScript_RemoveStaticPokemon::
@@ -1053,6 +1055,7 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/scripts/move_tutors.inc"
 	.include "data/scripts/trainer_hill.inc"
 	.include "data/scripts/test_signpost.inc"
+	.include "data/scripts/pc_online.inc"
 	.include "data/text/frontier_brain.inc"
 	.include "data/text/save.inc"
 	.include "data/text/birch_speech.inc"

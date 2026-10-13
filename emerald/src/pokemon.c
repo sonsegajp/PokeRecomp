@@ -7183,3 +7183,23 @@ u8 *MonSpritesGfxManager_GetSpritePtr(u8 managerId, u8 spriteNum)
         return gfx->spritePointers[spriteNum];
     }
 }
+
+#ifdef PLATFORM_PC
+// Online global trade: a received Pokemon keeps its original trainer (unlike
+// GiveMonToPlayer); party first, else the PC.
+u8 PcGiveTradedMon(struct Pokemon *mon)
+{
+    s32 i;
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, NULL) == SPECIES_NONE)
+        {
+            CopyMon(&gPlayerParty[i], mon, sizeof(*mon));
+            gPlayerPartyCount = i + 1;
+            return MON_GIVEN_TO_PARTY;
+        }
+    }
+    return CopyMonToPC(mon);
+}
+#endif

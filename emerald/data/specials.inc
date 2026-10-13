@@ -540,3 +540,24 @@ gSpecials::
 	def_special RemoveRecordsWindow
 	def_special CloseDeptStoreElevatorWindow
 	def_special TrySetBattleTowerLinkType
+	@ PC port: online play (shared/pc_online.c)
+	def_special Online_OpenScreen
+	def_special Online_IsConnected
+	def_special Online_BufferServerName
+	def_special Online_BufferTarget
+	def_special Online_SendRequest
+	def_special Online_AcceptRequest
+	def_special Online_DeclineRequest
+	def_special Online_SessionKind
+	def_special Online_StartBattle
+	def_special Online_StartTrade
+	def_special Online_HasAccount
+	def_special Online_WonderTrade
+	def_special Online_CollectMail
+	def_special Online_OpenGts
+	def_special Online_GtsCheckOffer
+	def_special Online_GtsDeposit
+	def_special Online_GtsOffer
+	def_special Online_GtsWithdraw
+	def_special Online_AddFriend
+	def_special Online_OpenMarket

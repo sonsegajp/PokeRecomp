@@ -2,7 +2,7 @@
 
 Rules come from legality_data.json, dumped from the game's own tables
 (FireRedPC.exe --dump-legality), so server and game always agree. Other
-versions' dumps (legality_data_lg.json from LeafGreenPC.exe) add the moves
+games' dumps (legality_data_lg.json, legality_data_em.json) add the moves
 only they teach: a Pokémon is legal if any version could have made it.
 
     check(raw100) -> None if legal, else a short reason string
@@ -17,13 +17,17 @@ import os
 import struct
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-DATA = json.load(open(os.path.join(_HERE, "legality_data.json")))
+DATA = json.load(open(os.path.join(_HERE, "legality_data.json"), encoding="utf-8"))
 SPECIES = {int(k): v for k, v in DATA["species"].items()}
+# Every Gen 3 game trades with every other: a move any of them teaches is fine.
 for _name in sorted(os.listdir(_HERE)):
     if _name.startswith("legality_data_") and _name.endswith(".json"):
-        for _k, _v in json.load(open(os.path.join(_HERE, _name)))["species"].items():
-            _mine = SPECIES[int(_k)]["levelup"]
-            _mine.extend(m for m in _v["levelup"] if m not in _mine)
+        for _k, _v in json.load(open(os.path.join(_HERE, _name), encoding="utf-8"))["species"].items():
+            _mine = SPECIES.get(int(_k))
+            if _mine is None:
+                continue
+            for _key in ("levelup", "tmhm", "tutor", "egg", "evolves_to"):
+                _mine[_key].extend(m for m in _v[_key] if m not in _mine[_key])
 SMEARGLE, SHEDINJA = 235, 303
 
 # Substructure orders by personality % 24 (G = growth, A = attacks, E = EVs/condition, M = misc)

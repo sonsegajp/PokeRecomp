@@ -1,4 +1,7 @@
 #include "global.h"
+#ifdef PLATFORM_PC
+#include "pc_net.h"
+#endif
 #include "main.h"
 #include "battle.h"
 #include "battle_records.h"
@@ -274,7 +277,12 @@ static void Task_LinkupAwaitConfirmation(u8 taskId)
 
     UpdateLinkPlayerCountDisplay(taskId, linkPlayerCount);
 
+#ifdef PLATFORM_PC
+    // online: both trainers already agreed, so the leader confirms itself
+    if (!(JOY_NEW(A_BUTTON)) && !PcNetLinkActive())
+#else
     if (!(JOY_NEW(A_BUTTON)))
+#endif
         return;
 
     if (linkPlayerCount < tMinPlayers)
@@ -306,7 +314,11 @@ static void Task_LinkupTryConfirmation(u8 taskId)
             ShowFieldAutoScrollMessage(gText_ConfirmLinkWhenPlayersReady);
             gTasks[taskId].func = Task_LinkupConfirmWhenReady;
         }
+#ifdef PLATFORM_PC
+        else if (JOY_HELD(A_BUTTON) || PcNetLinkActive())
+#else
         else if (JOY_HELD(A_BUTTON))
+#endif
         {
             PlaySE(SE_SELECT);
             CheckShouldAdvanceLinkState();

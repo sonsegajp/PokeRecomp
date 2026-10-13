@@ -71,6 +71,7 @@
 #include "item.h"
 #include "script_pokemon_util.h"
 #include "constants/items.h"
+#include "pc_online.h"
 #endif
 
 struct CableClubPlayer
@@ -1483,6 +1484,7 @@ static void DoCB1_Overworld(u16 newKeys, u16 heldKeys)
 void CB1_Overworld(void)
 {
 #ifdef PLATFORM_PC
+    Online_OverworldUpdate();
     // Test hooks (--give-mon, --give-item, --warp): run once the player can move.
     if (gPcDebugGiveMon[0].species && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
     {

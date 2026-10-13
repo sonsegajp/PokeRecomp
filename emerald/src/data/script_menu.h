@@ -782,6 +782,29 @@ struct MultichoiceListStruct
     u8 count;
 };
 
+// PC port: online menus
+static const u8 sText_OnlineBattle[] = _("BATTLE");
+static const u8 sText_OnlineTrade[] = _("TRADE");
+static const u8 sText_OnlineAddFriend[] = _("ADD FRIEND");
+static const u8 sText_OnlineCancel[] = _("CANCEL");
+static const u8 sText_OnlineWonderTrade[] = _("WONDER TRADE");
+static const u8 sText_OnlineGts[] = _("GTS");
+static const u8 sText_OnlineMailbox[] = _("MAILBOX");
+static const u8 sText_OnlineExit[] = _("EXIT");
+static const u8 sText_GtsDeposit[] = _("DEPOSIT");
+static const u8 sText_GtsSearch[] = _("SEARCH");
+static const u8 sText_GtsMine[] = _("MY POKéMON");
+static const u8 sText_GtsBack[] = _("BACK");
+static const struct MenuAction MultichoiceList_OnlinePlayer[] = {
+    {sText_OnlineBattle}, {sText_OnlineTrade}, {sText_OnlineAddFriend}, {sText_OnlineCancel},
+};
+static const struct MenuAction MultichoiceList_GlobalTrade[] = {
+    {sText_OnlineWonderTrade}, {sText_OnlineGts}, {sText_OnlineMailbox}, {sText_OnlineExit},
+};
+static const struct MenuAction MultichoiceList_Gts[] = {
+    {sText_GtsDeposit}, {sText_GtsSearch}, {sText_GtsMine}, {sText_GtsBack},
+};
+
 static const struct MultichoiceListStruct sMultichoiceLists[] =
 {
     [MULTI_BRINEY_ON_DEWFORD]          = MULTICHOICE(MultichoiceList_BrineyOnDewford),
@@ -898,6 +921,9 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_SLATEPORT_TENT_RULES]       = MULTICHOICE(MultichoiceList_SlateportTentRules),
     [MULTI_FALLARBOR_TENT_RULES]       = MULTICHOICE(MultichoiceList_FallarborTentRules),
     [MULTI_TAG_MATCH_TYPE]             = MULTICHOICE(MultichoiceList_TagMatchType),
+    [MULTI_ONLINE_PLAYER]              = MULTICHOICE(MultichoiceList_OnlinePlayer),
+    [MULTI_GLOBAL_TRADE]               = MULTICHOICE(MultichoiceList_GlobalTrade),
+    [MULTI_GTS]                        = MULTICHOICE(MultichoiceList_Gts),
 };
 
 const u8 *const gStdStrings[] =

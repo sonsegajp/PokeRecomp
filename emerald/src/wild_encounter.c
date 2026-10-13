@@ -1,4 +1,7 @@
 #include "global.h"
+#ifdef PLATFORM_PC
+#include "pc_online.h"
+#endif
 #include "battle_setup.h"
 #include "battle_pike.h"
 #include "battle_pyramid.h"
@@ -411,7 +414,18 @@ static void CreateWildMon(u16 species, u8 level)
         return;
     }
 
+#ifdef PLATFORM_PC
+    {
+        u8 nature = PickWildMonNature();
+        u8 rerolls = Online_ShinyRerolls(species);   // the day's boosted type, online
+
+        CreateMonWithNature(&gEnemyParty[0], species, level, USE_RANDOM_IVS, nature);
+        while (rerolls-- > 0 && !IsMonShiny(&gEnemyParty[0]))
+            CreateMonWithNature(&gEnemyParty[0], species, level, USE_RANDOM_IVS, nature);
+    }
+#else
     CreateMonWithNature(&gEnemyParty[0], species, level, USE_RANDOM_IVS, PickWildMonNature());
+#endif
 }
 #ifdef BUGFIX
 #define TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildPokemon, type, ability, ptr, count) TryGetAbilityInfluencedWildMonIndex(wildPokemon, type, ability, ptr, count)
@@ -446,6 +460,19 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
     }
 
     level = ChooseWildMonLevel(&wildMonInfo->wildPokemon[wildMonIndex]);
+#ifdef PLATFORM_PC
+    {
+        u16 outbreakSpecies;   // an online mass outbreak on this map
+        u8 outbreakLevel;
+        if (area == WILD_AREA_LAND && Online_OutbreakMon(&outbreakSpecies, &outbreakLevel))
+        {
+            if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(outbreakLevel))
+                return FALSE;
+            CreateWildMon(outbreakSpecies, outbreakLevel);
+            return TRUE;
+        }
+    }
+#endif
     if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(level))
         return FALSE;
     if (gMapHeader.mapLayoutId != LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_WILD_MONS && flags & WILD_CHECK_KEEN_EYE && !IsAbilityAllowingEncounter(level))

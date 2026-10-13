@@ -5,6 +5,13 @@
 #include "text.h"
 #include "match_call.h"
 #include "field_message_box.h"
+#ifdef PLATFORM_PC
+#include "pc_net.h"
+
+// Online link prompts ("A Button: Confirm") scroll by themselves: both
+// trainers already agreed, so nobody is there to press A through them.
+static bool8 sPcLinkAutoScroll;
+#endif
 
 static EWRAM_DATA u8 sFieldMessageBoxMode = 0;
 
@@ -39,6 +46,13 @@ static void Task_DrawFieldMessage(u8 taskId)
         case 2:
             if (RunTextPrintersAndIsPrinter0Active() != TRUE)
             {
+#ifdef PLATFORM_PC
+                if (sPcLinkAutoScroll)
+                {
+                    sPcLinkAutoScroll = FALSE;
+                    gTextFlags.autoScroll = FALSE;
+                }
+#endif
                 sFieldMessageBoxMode = FIELD_MESSAGE_BOX_HIDDEN;
                 DestroyTask(taskId);
             }
@@ -93,6 +107,13 @@ bool8 ShowFieldAutoScrollMessage(const u8 *str)
     if (sFieldMessageBoxMode != FIELD_MESSAGE_BOX_HIDDEN)
         return FALSE;
     sFieldMessageBoxMode = FIELD_MESSAGE_BOX_AUTO_SCROLL;
+#ifdef PLATFORM_PC
+    if (PcNetLinkActive() && !gTextFlags.autoScroll)
+    {
+        sPcLinkAutoScroll = TRUE;
+        gTextFlags.autoScroll = TRUE;
+    }
+#endif
     ExpandStringAndStartDrawFieldMessage(str, FALSE);
     return TRUE;
 }
@@ -133,6 +154,13 @@ void HideFieldMessageBox(void)
     DestroyTask_DrawFieldMessage();
     ClearDialogWindowAndFrame(0, TRUE);
     sFieldMessageBoxMode = FIELD_MESSAGE_BOX_HIDDEN;
+#ifdef PLATFORM_PC
+    if (sPcLinkAutoScroll)
+    {
+        sPcLinkAutoScroll = FALSE;
+        gTextFlags.autoScroll = FALSE;
+    }
+#endif
 }
 
 u8 GetFieldMessageBoxMode(void)

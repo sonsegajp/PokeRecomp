@@ -65,7 +65,7 @@ static int reply_len, master_error;
 static uint8_t join_gender;
 
 /* servers */
-static struct { char name[25], host[65]; uint16_t port, players, max; } servers[PC_NET_MAX_SERVERS];
+static struct { char name[25], host[65]; uint16_t port, players, max; uint8_t region; } servers[PC_NET_MAX_SERVERS];
 static int server_count;
 static int connected;
 static uint16_t my_player_id;
@@ -352,6 +352,28 @@ uint16_t PcNetMyTag(void) { return my_tag; }
 int PcNetServerCount(void) { return server_count; }
 const char *PcNetServerName(int i) { return i >= 0 && i < server_count ? servers[i].name : ""; }
 int PcNetServerPlayers(int i) { return i >= 0 && i < server_count ? servers[i].players : 0; }
+int PcNetServerRegion(int i) { return i >= 0 && i < server_count ? servers[i].region : PC_NET_REGION_KANTO; }
+
+/* A region's game is owned when its .pkmn (made from the player's own ROM)
+ * sits next to the runner: kanto = FireRed or LeafGreen, hoenn = Emerald
+ * (Ruby/Sapphire later). */
+int PcNetOwnsRegion(int region)
+{
+    static const wchar_t *const kanto[] = {L"firered.pkmn", L"leafgreen.pkmn", NULL};
+    static const wchar_t *const hoenn[] = {L"emerald.pkmn", L"ruby.pkmn", L"sapphire.pkmn", NULL};
+    const wchar_t *const *names = region == PC_NET_REGION_HOENN ? hoenn : kanto;
+    wchar_t dir[MAX_PATH], path[MAX_PATH], *slash;
+
+    if (region == PC_NET_REGION) return 1;
+    GetModuleFileNameW(NULL, dir, MAX_PATH);
+    if ((slash = wcsrchr(dir, L'\\')) != NULL) *slash = 0;
+    for (; *names; names++) {
+        _snwprintf(path, MAX_PATH, L"%ls\\%ls", dir, *names);
+        if (GetFileAttributesW(path) != INVALID_FILE_ATTRIBUTES) return 1;
+    }
+    return 0;
+}
+
 int PcNetConnected(void) { return connected; }
 const char *PcNetConnectedServerName(void) { return connected_name; }
 
@@ -364,10 +386,11 @@ void PcNetBeginJoin(int index, uint8_t gender)
     join_gender = gender;
     snprintf(connected_name, sizeof connected_name, "%s", servers[index].name);
     if (!conn_open(&game, servers[index].host, servers[index].port)) { finish_op(PC_NET_OP_FAILED); return; }
-    uint8_t p[TOKEN_LEN + 3];
+    uint8_t p[TOKEN_LEN + 4];
     memcpy(p, token, TOKEN_LEN);
     p[TOKEN_LEN] = gender;
     put16(p + TOKEN_LEN + 1, VERSION);
+    p[TOKEN_LEN + 3] = PC_NET_GAME;      /* how others see us: Red/Leaf or Brendan/May */
     conn_send(&game, S_JOIN, p, sizeof p);
 }
 
@@ -553,8 +576,11 @@ static void handle_master(uint8_t type, const uint8_t *p, int len)
             servers[server_count].port = get16(p + off + 88);
             servers[server_count].players = get16(p + off + 90);
             servers[server_count].max = get16(p + off + 92);
+            servers[server_count].region = PC_NET_REGION_KANTO;
             server_count++;
         }
+        for (int i = 0; i < server_count && off + i < len; i++)   /* regions follow the entries */
+            servers[i].region = p[off + i];
         if (op == OP_REGISTER || op == OP_LOGIN || op == OP_RENAME) finish_op(PC_NET_OP_OK);
         break;
     }
@@ -616,6 +642,7 @@ static void handle_game(uint8_t type, const uint8_t *p, int len)
         pl->y = (int16_t)get16(p + 4);
         pl->facing = p[6];
         pl->flags = p[7];
+        pl->game = len >= 2 + PC_NET_NAME_LEN + 3 + 9 ? p[8] : PC_NET_GAME_FIRERED;
         break;
     case S_CHAT_FROM:
         if (len >= 3) {

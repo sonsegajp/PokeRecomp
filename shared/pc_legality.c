@@ -141,7 +141,14 @@ void PcDumpLegality(const char *path)
 
     if (!f)
         return;
-    fprintf(f, "{\"num_species\":%d,\"moves_count\":%d,\"items_count\":%d,"
+#if defined(EMERALD)
+    fprintf(f, "{\"game\":\"emerald\",\"region\":\"hoenn\",");
+#elif defined(LEAFGREEN)
+    fprintf(f, "{\"game\":\"leafgreen\",\"region\":\"kanto\",");
+#else
+    fprintf(f, "{\"game\":\"firered\",\"region\":\"kanto\",");
+#endif
+    fprintf(f, "\"num_species\":%d,\"moves_count\":%d,\"items_count\":%d,"
                "\"old_unown\":[%d,%d],\"max_level\":%d,\n",
             NUM_SPECIES, MOVES_COUNT, ITEMS_COUNT, SPECIES_OLD_UNOWN_B, SPECIES_OLD_UNOWN_Z, MAX_LEVEL);
 
