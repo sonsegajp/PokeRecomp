@@ -26,7 +26,10 @@ from social import Guilds
 from market import Market
 
 TOKEN_TTL = 24 * 3600
+TICKET_TTL = 60            # a join ticket: one world, once, within a minute
 SERVER_TIMEOUT = 30
+MAX_SERVERS = 64           # listed worlds
+MAX_PER_HOST = 4           # community worlds from one address
 
 
 def hash_secret(secret, salt):
@@ -47,7 +50,9 @@ class Master:
         """)
         self.server_key = server_key
         self.tokens = {}       # token -> (account_id, expiry)
-        self.servers = {}      # writer -> dict(name, host, port, max, players, seen)
+        self.tickets = {}      # join ticket -> (account_id, server id, expiry)
+        self.servers = {}      # writer -> dict(id, name, host, port, max, players, seen, region, official, verified)
+        self.next_server_id = 1
         self.online = {}       # account_id -> server name
         self.trades = Trades(self.db)
         self.guilds = Guilds(self.db)
@@ -127,12 +132,27 @@ class Master:
 
     def server_list(self):
         now = time.time()
-        live = [s for s in self.servers.values() if now - s["seen"] < SERVER_TIMEOUT][:32]
+        live = [s for s in self.servers.values() if now - s["seen"] < SERVER_TIMEOUT]
+        live.sort(key=lambda s: (not s["official"], s["name"].lower()))   # ours first
+        live = live[:MAX_SERVERS]
         body = struct.pack("<B", len(live))
         for s in live:
             body += text(s["name"], 24) + text(s["host"], 64) + struct.pack("<HHH", s["port"], s["players"], s["max"])
-        # then each server's region (older clients stop reading before this)
-        return body + bytes(s.get("region", REGION_KANTO) for s in live)
+        # then (older clients stop reading before each of these) regions, ids, flags
+        body += bytes(s.get("region", REGION_KANTO) for s in live)
+        body += b"".join(struct.pack("<I", s["id"]) for s in live)
+        return body + bytes(SERVER_OFFICIAL if s["official"] else 0 for s in live)
+
+    def ticket(self, account_id, server_id):
+        """A one-use pass onto one world: what a player hands that world's server.
+        A community server never sees anything it could log in elsewhere with."""
+        now = time.time()
+        self.tickets = {k: v for k, v in self.tickets.items() if v[2] > now}
+        if not any(s["id"] == server_id for s in self.servers.values()):
+            return None
+        t = os.urandom(TOKEN_LEN)
+        self.tickets[t] = (account_id, server_id, now + TICKET_TTL)
+        return t
 
     async def handle(self, reader, writer):
         peer = writer.get_extra_info("peername")
@@ -189,6 +209,9 @@ class Master:
                 return reply
         if t == M_LIST_SERVERS:
             return frame(M_SERVER_LIST, self.server_list())
+        if t == M_JOIN_TICKET and account_id and len(p) >= 4:
+            ticket = self.ticket(account_id, struct.unpack_from("<I", p)[0])
+            return frame(M_JOIN_TICKET_OK, ticket) if ticket else frame(M_ERROR, bytes([ERR_NOT_FOUND]))
         if t == M_FRIEND_ADD and account_id and len(p) >= NAME_LEN + 2:
             (tag,) = struct.unpack_from("<H", p, NAME_LEN)
             ok = self.add_friend(account_id, bytes(p[:NAME_LEN]), tag)
@@ -212,13 +235,26 @@ class Master:
 
         # game servers
         if t == G_REGISTER and len(p) >= 32 + 24 + 64 + 4:
-            if not secrets.compare_digest(bytes(p[:32]), fixed(self.server_key, 32)):
-                return frame(M_ERROR, bytes([ERR_BAD_LOGIN]))
-            name, host = untext(p[32:56]), untext(p[56:120])
+            key = bytes(p[:32])
+            official = secrets.compare_digest(key, fixed(self.server_key, 32))
+            if not official and any(key):
+                return frame(M_ERROR, bytes([ERR_BAD_LOGIN]))   # a wrong key: not a community world either
+            name, host = untext(p[32:56]).strip(), untext(p[56:120]).strip()
             port, mx = struct.unpack_from("<HH", p, 120)
             region = p[124] if len(p) > 124 else REGION_KANTO
-            self.servers[writer] = dict(name=name, host=host, port=port, max=mx, players=0, seen=time.time(), region=region)
-            print("master: game server up:", name, f"{host}:{port}")
+            peer = (writer.get_extra_info("peername") or ("",))[0]
+            if not official:
+                # anyone may host: players reach it where it connects from
+                host = peer
+                if sum(1 for s in self.servers.values() if not s["official"] and s["host"] == host) >= MAX_PER_HOST:
+                    return frame(M_ERROR, bytes([ERR_FULL]))
+                name = name or "Community World"
+            elif not host:
+                host = peer
+            self.servers[writer] = dict(id=self.next_server_id, name=name, host=host, port=port, max=min(mx, 200),
+                                        players=0, seen=time.time(), region=region, official=official, verified=set())
+            self.next_server_id += 1
+            print("master: game server up:", name, "(official)" if official else "(community)", f"{host}:{port}")
             return None
         if writer in self.servers:
             s = self.servers[writer]
@@ -227,19 +263,34 @@ class Master:
                 s["seen"] = time.time()
             elif t == G_VERIFY:
                 req, token = struct.unpack_from("<I", p)[0], bytes(p[4:4 + TOKEN_LEN])
-                entry = self.tokens.get(token)
-                if entry and entry[1] > time.time():
-                    name, tag = self.account(entry[0])
+                ticket = self.tickets.pop(token, None)
+                aid = None
+                if ticket and ticket[1] == s["id"] and ticket[2] > time.time():
+                    aid = ticket[0]
+                elif s["official"]:                   # older clients: their login token, on our worlds only
+                    entry = self.tokens.get(token)
+                    if entry and entry[1] > time.time():
+                        aid = entry[0]
+                if aid:
+                    s["verified"].add(aid)
+                    name, tag = self.account(aid)
+                    entry = (aid,)
                     return frame(G_VERIFIED, struct.pack("<IBI", req, 1, entry[0]) + fixed(name, NAME_LEN)
                                  + struct.pack("<HI", tag, self.guilds.guild_of(entry[0])))
                 return frame(G_VERIFIED, struct.pack("<IBI", req, 0, 0) + bytes(NAME_LEN) + bytes(6))
-            elif t == G_GUILD_CHAT and len(p) >= 4 + NAME_LEN + 2:
-                self.to_servers(frame(G_GUILD_CHAT, bytes(p[:4 + NAME_LEN + 2 + 64])))
+            elif t == G_GUILD_CHAT and len(p) >= 4:
+                # only for a player this world verified; their guild and name come from here
+                (aid,) = struct.unpack_from("<I", p)
+                guild = self.guilds.guild_of(aid)
+                if aid in s["verified"] and guild:
+                    name, tag = self.account(aid)
+                    self.to_servers(frame(G_GUILD_CHAT, struct.pack("<I", guild) + fixed(name, NAME_LEN)
+                                          + struct.pack("<H", tag) + bytes(p[4:4 + 64])))
             elif t == G_PRESENCE:
                 aid, on = struct.unpack_from("<IB", p)
-                if on:
+                if on and aid in s["verified"]:
                     self.online[aid] = s["name"]
-                else:
+                elif not on and self.online.get(aid) == s["name"]:
                     self.online.pop(aid, None)
             return None
         return frame(M_ERROR, bytes([ERR_BAD_REQUEST]))

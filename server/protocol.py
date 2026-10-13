@@ -47,9 +47,11 @@ M_MARKET_BUY     = 0x16  # u32 id, u16 quantity, u32 price_each -> M_MARKET_OK (
 M_MARKET_MINE    = 0x17  # -> M_MARKET_MINE_LIST
 M_MARKET_CANCEL  = 0x18  # u32 id -> M_MARKET_OK (u16 item, u16 quantity)
 M_MARKET_COLLECT = 0x19  # u32 room (most money the player can take) -> M_MARKET_OK (u32 amount)
+M_JOIN_TICKET    = 0x1A  # u32 server id -> M_JOIN_TICKET_OK: a one-use pass for that world only
 M_REGISTERED     = 0x81  # u32 account_id, u16 tag
 M_LOGIN_OK       = 0x82  # token[16], name[8], u16 tag
-M_SERVER_LIST    = 0x83  # u8 n, n * (name[24], host[64], u16 port, u16 players, u16 max)
+M_SERVER_LIST    = 0x83  # u8 n, n * (name[24], host[64], u16 port, u16 players, u16 max),
+                         #   then n * u8 region, then n * u32 server id, then n * u8 flags (SERVER_*)
 M_FRIENDS        = 0x84  # u8 n, n * (u32 id, name[8], u16 tag, u8 online, name[24] server)
 M_RENAMED        = 0x85  # name[8], u16 tag
 M_WONDER_RESULT  = 0x86  # u8 status (1 traded: mon follows, 2 waiting), mon[100]
@@ -62,6 +64,8 @@ M_MARKET_LIST    = 0x8D  # u8 n, n * (u32 id, u16 item, u16 quantity, u32 price_
 M_MARKET_MINE_LIST = 0x8E  # u32 wallet, u8 n, n * (u32 id, u16 item, u16 quantity, u32 price_each)
 M_GUILD          = 0x8B  # u8 in_guild, name[10], u8 n, n * (name[8], u16 tag, u8 online, u8 owner)
 M_ERROR          = 0x8F  # u8 code
+M_JOIN_TICKET_OK = 0x90  # token[16]: S_JOIN with it (valid a minute, once, on that world)
+SERVER_OFFICIAL = 1      # flags: run by us (the server key), not a community world
 ERR_BAD_VERSION, ERR_BAD_LOGIN, ERR_BAD_REQUEST, ERR_NOT_FOUND, ERR_FULL = 1, 2, 3, 4, 5
 ERR_ILLEGAL, ERR_NO_MATCH = 6, 7
 MON_SIZE = 100
@@ -70,11 +74,14 @@ MAIL_WONDER, MAIL_GTS = 1, 2
 
 # game server <-> master
 G_REGISTER       = 0x20  # key[32] name[24] host[64] u16 port u16 max, u8 region (REGION_*)
+                         #   key all zero: a community world (anyone may host); host "" = the
+                         #   address it connects from
 G_HEARTBEAT      = 0x21  # u16 players
 G_VERIFY         = 0x22  # u32 req, token[16]
 G_PRESENCE       = 0x23  # u32 account_id, u8 online
 G_GUILD_SET      = 0x24  # master -> servers: u32 account_id, u32 guild (0 = none)
-G_GUILD_CHAT     = 0x25  # both ways: u32 guild, name[8], u16 tag, text
+G_GUILD_CHAT     = 0x25  # server -> master: u32 account_id, text (a player it verified);
+                         #   master -> servers: u32 guild, name[8], u16 tag, text
 G_VERIFIED       = 0xA0  # u32 req, u8 ok, u32 account_id, name[8], u16 tag, u32 guild
 
 # client <-> game server

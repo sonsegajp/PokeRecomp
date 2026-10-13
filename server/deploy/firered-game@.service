@@ -10,7 +10,7 @@ User=firered
 WorkingDirectory=/opt/firered-server
 Environment=PYTHONUNBUFFERED=1 PYTHONIOENCODING=utf-8
 EnvironmentFile=/opt/firered-server/game-%i.env
-ExecStart=/usr/bin/python3 gameserver.py --name ${NAME} --port ${PORT} --public-host 74.208.169.223 --master 127.0.0.1:27100
+ExecStart=/usr/bin/python3 gameserver.py --name ${NAME} --region ${REGION} --port ${PORT} --public-host 74.208.169.223 --master 127.0.0.1:27100
 Restart=always
 UMask=0077
 RestartSec=3

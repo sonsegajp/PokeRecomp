@@ -21,26 +21,18 @@ GAME_ID := emerald
 VERSION_DEF := -D EMERALD=1
 SHA1S  := emerald/rom.sha1
 PREPROC_ARGS := -g build/assets
-# visitors from Kanto: Red / Leaf, from FireRed or LeafGreen
-FOREIGN := kanto
-FOREIGN_SHA1S := game/firered.sha1 game/firered_rev1.sha1 game/leafgreen.sha1 game/leafgreen_rev1.sha1
 else ifeq ($(VERSION),LEAFGREEN)
 BUILD  := build/pc_lg
 ARMOBJ := $(GAME)/build/leafgreen_modern
 GAME_ID := leafgreen
 VERSION_DEF := -D LEAFGREEN=1
 SHA1S  := game/leafgreen.sha1 game/leafgreen_rev1.sha1
-FOREIGN := hoenn
-FOREIGN_SHA1S := emerald/rom.sha1
 else
 BUILD  := build/pc
 ARMOBJ := $(GAME)/build/firered_modern
 GAME_ID := firered
 VERSION_DEF := -D FIRERED=1
 SHA1S  := game/firered.sha1 game/firered_rev1.sha1
-# visitors from Hoenn: Brendan / May, from Emerald
-FOREIGN := hoenn
-FOREIGN_SHA1S := emerald/rom.sha1
 endif
 
 CC     := gcc
@@ -69,8 +61,9 @@ GAME_SRCS := $(filter-out $(addprefix $(GAME)/src/,$(GAME_SKIP)),$(wildcard $(GA
 GAME_OBJS := $(patsubst $(GAME)/src/%.c,$(BUILD)/game/%.o,$(GAME_SRCS))
 # Our game-side code shared by every game, built with that game's headers.
 SHARED_OBJS := $(patsubst shared/%.c,$(BUILD)/shared/%.o,$(wildcard shared/*.c))
-# the other region's player sprites, for visitors: their sheets and palettes
-# come from the player's copy of that game (rompack --foreign)
+# the other region's player sprites, for visitors and other online players:
+# kept in the DLL, so every player sees them (rompack --foreign could take
+# them out against the other game's ROM instead)
 XGFX_OBJS := $(BUILD)/xgfx/pc_visitor_gfx.o
 
 DATA_ARM  := $(filter-out $(ARMOBJ)/data/mystery_event_msg.o $(ARMOBJ)/data/mystery_gift.o,$(wildcard $(ARMOBJ)/data/*.o)) $(wildcard $(ARMOBJ)/sound/songs/midi/*.o)
@@ -97,9 +90,7 @@ ROMPACK := build/rompack.exe
 $(DLL): $(BUILD)/game.dll $(ROMPACK) tools/game_ranges.py
 	@mkdir -p games
 	$(PY) tools/game_ranges.py $(BUILD)/FireRedPC.map $(BUILD)/game_ranges.txt $(BUILD)/game/ $(BUILD)/shared/ $(BUILD)/data/
-	$(PY) tools/game_ranges.py $(BUILD)/FireRedPC.map $(BUILD)/foreign_ranges.txt $(BUILD)/xgfx/
-	$(ROMPACK) $(BUILD)/game.dll $@ --allow $(BUILD)/game_ranges.txt $(foreach f,$(SHA1S),--sha1 $(firstword $(shell cat $(f)))) $(foreach d,$(ROM_DIRS),--dir $(d)) \
-	  --foreign $(FOREIGN) --foreign-allow $(BUILD)/foreign_ranges.txt $(foreach f,$(FOREIGN_SHA1S),--foreign-sha1 $(firstword $(shell cat $(f))))
+	$(ROMPACK) $(BUILD)/game.dll $@ --allow $(BUILD)/game_ranges.txt $(foreach f,$(SHA1S),--sha1 $(firstword $(shell cat $(f)))) $(foreach d,$(ROM_DIRS),--dir $(d))
 
 $(ROMPACK): tools/rompack.c
 	/c/msys64/mingw64/bin/gcc -O2 -o $@ $<

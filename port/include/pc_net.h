@@ -27,7 +27,7 @@ enum { PC_NET_REGION_KANTO, PC_NET_REGION_HOENN };
 #endif
 
 #define PC_NET_NAME_LEN    8     /* game name buffer, 0xFF-terminated */
-#define PC_NET_MAX_SERVERS 16
+#define PC_NET_MAX_SERVERS 64
 #define PC_NET_MAX_PLAYERS 64
 
 struct PcNetPlayer {

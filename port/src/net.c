@@ -26,6 +26,7 @@
 enum {
     M_HELLO = 0x01, M_REGISTER = 0x02, M_LOGIN = 0x03, M_LIST_SERVERS = 0x04, M_RENAME = 0x07,
     M_REGISTERED = 0x81, M_LOGIN_OK = 0x82, M_SERVER_LIST = 0x83, M_RENAMED = 0x85, M_ERROR = 0x8F,
+    M_JOIN_TICKET = 0x1A, M_JOIN_TICKET_OK = 0x90,
     S_JOIN = 0x40, S_POS = 0x41, S_CHAT = 0x42, S_REQUEST = 0x43, S_RESPOND = 0x44, S_LINK_CMD = 0x45, S_LINK_END = 0x46,
     S_WELCOME = 0xC0, S_PLAYER = 0xC1, S_PLAYER_GONE = 0xC2, S_CHAT_FROM = 0xC3, S_REQUESTED = 0xC4, S_DECLINED = 0xC5,
     S_SESSION = 0xC6, S_LINK_FRAME = 0xC7, S_SESSION_END = 0xC8, S_LINK_STATE = 0xC9, S_WORLD = 0xCA, S_GUILD_CHAT_FROM = 0xCB, S_ERROR = 0xCF,
@@ -67,7 +68,8 @@ static uint8_t join_gender;
 /* servers */
 /* S_WELCOME: where this account was when it last left this server */
 static struct { int valid; uint8_t group, num, facing; int16_t x, y; } last_pos;
-static struct { char name[25], host[65]; uint16_t port, players, max; uint8_t region; } servers[PC_NET_MAX_SERVERS];
+static struct { char name[25], host[65]; uint16_t port, players, max; uint8_t region; uint32_t id; } servers[PC_NET_MAX_SERVERS];
+static int join_index;          /* OP_JOIN: the world, once the master gives us a ticket for it */
 static int server_count;
 static int connected;
 static uint16_t my_player_id;
@@ -394,6 +396,26 @@ const char *PcNetConnectedServerName(void) { return connected_name; }
 static uint8_t net_game = PC_NET_GAME;
 void PcNetSetGame(uint8_t game) { net_game = game; }
 
+/* Joining: the master gives a one-use ticket for that world (a world never
+ * sees our login, so anyone can host one), then we connect with it. */
+static void request_ticket(void)
+{
+    uint8_t p[4];
+    put32(p, servers[join_index].id);
+    conn_send(&master, M_JOIN_TICKET, p, sizeof p);
+}
+
+static void join_with(const uint8_t *ticket)
+{
+    uint8_t p[TOKEN_LEN + 4];
+    if (!conn_open(&game, servers[join_index].host, servers[join_index].port)) { finish_op(PC_NET_OP_FAILED); return; }
+    memcpy(p, ticket, TOKEN_LEN);
+    p[TOKEN_LEN] = join_gender;
+    put16(p + TOKEN_LEN + 1, VERSION);
+    p[TOKEN_LEN + 3] = net_game;         /* how others see us: Red/Leaf or Brendan/May */
+    conn_send(&game, S_JOIN, p, sizeof p);
+}
+
 void PcNetBeginJoin(int index, uint8_t gender)
 {
     if (index < 0 || index >= server_count) { op_status = PC_NET_OP_FAILED; return; }
@@ -401,14 +423,14 @@ void PcNetBeginJoin(int index, uint8_t gender)
     op = OP_JOIN;
     op_status = PC_NET_OP_PENDING;
     join_gender = gender;
+    join_index = index;
     snprintf(connected_name, sizeof connected_name, "%s", servers[index].name);
-    if (!conn_open(&game, servers[index].host, servers[index].port)) { finish_op(PC_NET_OP_FAILED); return; }
-    uint8_t p[TOKEN_LEN + 4];
-    memcpy(p, token, TOKEN_LEN);
-    p[TOKEN_LEN] = gender;
-    put16(p + TOKEN_LEN + 1, VERSION);
-    p[TOKEN_LEN + 3] = net_game;         /* how others see us: Red/Leaf or Brendan/May */
-    conn_send(&game, S_JOIN, p, sizeof p);
+    if (master.s != INVALID_SOCKET && master_logged_in) {
+        request_ticket();
+        return;
+    }
+    if (!PcNetHasAccount() || !open_master()) { finish_op(PC_NET_OP_FAILED); return; }
+    send_login();
 }
 
 static void reset_world(void)
@@ -568,7 +590,9 @@ static void handle_master(uint8_t type, const uint8_t *p, int len)
         memcpy(my_name, p + TOKEN_LEN, PC_NET_NAME_LEN);
         my_tag = get16(p + TOKEN_LEN + PC_NET_NAME_LEN);
         master_logged_in = 1;
-        if (op == OP_RENAME)
+        if (op == OP_JOIN)
+            request_ticket();
+        else if (op == OP_RENAME)
             conn_send(&master, M_RENAME, rename_to, PC_NET_NAME_LEN);
         else if (op == OP_REQUEST)
             conn_send(&master, request_type, request_data, request_len);
@@ -598,9 +622,15 @@ static void handle_master(uint8_t type, const uint8_t *p, int len)
         }
         for (int i = 0; i < server_count && off + i < len; i++)   /* regions follow the entries */
             servers[i].region = p[off + i];
+        off += n;
+        for (int i = 0; i < server_count && off + 4 * i + 4 <= len; i++)   /* then their ids */
+            servers[i].id = get32(p + off + 4 * i);
         if (op == OP_REGISTER || op == OP_LOGIN || op == OP_RENAME) finish_op(PC_NET_OP_OK);
         break;
     }
+    case M_JOIN_TICKET_OK:
+        if (op == OP_JOIN && len >= TOKEN_LEN) join_with(p);
+        break;
     case 0x84:                                                /* M_FRIENDS */
     case 0x86: case 0x87: case 0x88: case 0x89: case 0x8A:   /* M_WONDER_RESULT .. M_GTS_RESULT */
     case 0x8B:                                                /* M_GUILD */
@@ -614,6 +644,7 @@ static void handle_master(uint8_t type, const uint8_t *p, int len)
         break;
     case M_ERROR:
         if (op == OP_REQUEST) master_error = len ? p[0] : 0;
+        if (op == OP_JOIN) finish_op(PC_NET_OP_FAILED);      /* no ticket: that world is gone */
         if (op == OP_LOGIN && len && p[0] == 2 /* ERR_BAD_LOGIN */) {
             /* this master doesn't know us (a different server, or a reset):
              * keep the old login aside and register afresh */

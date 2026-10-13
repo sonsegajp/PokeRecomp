@@ -29,6 +29,10 @@ from protocol import *  # noqa: F401,F403
 import legality
 from world import World
 
+# The PokeRecomp master every world registers with (and players log in to).
+# Not printed anywhere: hosts and players only ever see world names.
+OFFICIAL_MASTER = "74.208.169.223:27100"
+
 TICK = 1 / 60
 MAX_QUEUE = 600          # commands a client may have waiting (10 s) before it is cut off
 MAX_CATCHUP = 8          # extra merged frames per tick when a member is ahead
@@ -117,7 +121,10 @@ class GameServer:
 
     async def master_loop(self):
         host, port = self.args.master.rsplit(":", 1)
-        key = open(self.args.key_file).read().strip().encode()
+        try:                      # our own worlds have the server key; anyone else hosts a community world
+            key = open(self.args.key_file).read().strip().encode()
+        except OSError:
+            key = b""
         while True:
             try:
                 reader, writer = await asyncio.open_connection(host, int(port))
@@ -127,7 +134,9 @@ class GameServer:
                 self.master_writer = writer
                 for p in self.players.values():
                     writer.write(frame(G_PRESENCE, struct.pack("<IB", p.account, 1)))
-                print("game: registered with master")
+                print("game: registered with the PokeRecomp master"
+                      + ("" if key else " as a community world: players connect to this PC on TCP port %d"
+                                        " (forward it on your router)" % self.args.port))
                 beat = asyncio.ensure_future(self.heartbeat(writer))
                 while True:
                     msg = await read_frame(reader)
@@ -152,10 +161,12 @@ class GameServer:
                             if guild and pl.guild == guild:
                                 pl.send(data)
                     elif t == M_ERROR:
-                        print("game: master refused us (bad server key?)")
+                        code = p[0] if p else 0
+                        print("game: the master refused this world:",
+                              "too many worlds from this address" if code == ERR_FULL else "wrong server key")
                 beat.cancel()
-            except OSError as e:
-                print("game: master unreachable:", e)
+            except OSError:
+                print("game: can't reach the PokeRecomp master; retrying")
             self.master_writer = None
             await asyncio.sleep(5)
 
@@ -248,8 +259,7 @@ class GameServer:
         elif t == S_CHAT:
             self.broadcast(frame(S_CHAT_FROM, struct.pack("<H", player.id) + bytes(p[:64])))
         elif t == S_GUILD_CHAT and player.guild and self.master_writer:
-            self.master_writer.write(frame(G_GUILD_CHAT, struct.pack("<I", player.guild) + player.name
-                                           + struct.pack("<H", player.tag) + bytes(p[:64])))
+            self.master_writer.write(frame(G_GUILD_CHAT, struct.pack("<I", player.account) + bytes(p[:64])))
         elif t == S_REQUEST and len(p) >= 3:
             target_id, kind = struct.unpack_from("<HB", p)
             target = self.players.get(target_id)
@@ -383,9 +393,9 @@ async def main():
     ap.add_argument("--region", default="kanto", choices=sorted(REGION_NAMES),
                     help="kanto: FireRed/LeafGreen world; hoenn: Ruby/Sapphire/Emerald world")
     ap.add_argument("--port", type=int, default=27200)
-    ap.add_argument("--public-host", default="127.0.0.1", help="address players use to reach this server")
-    ap.add_argument("--master", default="127.0.0.1:27100")
-    ap.add_argument("--key-file", default="server_key.txt")
+    ap.add_argument("--public-host", default="", help="address players use to reach this server (default: the one it connects from)")
+    ap.add_argument("--master", default=OFFICIAL_MASTER, help=argparse.SUPPRESS)   # tests: a local master
+    ap.add_argument("--key-file", default="server_key.txt", help="our own worlds only; without it this is a community world")
     ap.add_argument("--max", type=int, default=100)
     ap.add_argument("--positions", help="file keeping each player's last position (default: positions_PORT.json)")
     ap.add_argument("--shiny-odds", type=int, default=512, help="1 in N for the day's boosted type (normally 8192)")

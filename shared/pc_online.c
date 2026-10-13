@@ -372,6 +372,19 @@ static void PrintLine(int line, const u8 *text, const u8 *color)
     AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 8, line * RowHeight() + 2, color, TEXT_SKIP_DRAW, text);
 }
 
+// A long list shows arrows at its right edge while more of it is above / below.
+static void DrawScrollArrows(int scroll, int count, int rows)
+{
+    static const u8 sUpArrow[] = {CHAR_UP_ARROW, EOS};
+    static const u8 sDownArrow[] = {CHAR_DOWN_ARROW, EOS};
+
+    if (scroll > 0)
+        AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0xC6, 2, sTextColor, TEXT_SKIP_DRAW, sUpArrow);
+    if (scroll + rows < count)
+        AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0xC6, (rows - 1) * RowHeight() + 2, sTextColor,
+                                     TEXT_SKIP_DRAW, sDownArrow);
+}
+
 static void FinishList(void)
 {
     PutWindowTilemap(WIN_LIST);
@@ -456,6 +469,7 @@ static void DrawServers(void)
         case ROW_BACK:       PrintLine(line, sText_Back, sTextColor); break;
         }
     }
+    DrawScrollArrows(sOnline->scroll, sOnline->rowCount, VISIBLE_ROWS);
     FinishList();
     SetHighlight(sOnline->cursor - sOnline->scroll + (PcNetServerCount() == 0 ? 1 : 0));
     PrintHint(sText_HintBrowse);
@@ -667,8 +681,26 @@ static void ClampList(u8 count)
         sOnline->scroll = sOnline->cursor - VISIBLE_ROWS + 1;
 }
 
+// L / R: a page up or down a long list.
+static bool8 ListPage(u8 *cursor, u8 count)
+{
+    if (JOY_NEW(L_BUTTON) && *cursor > 0)
+        *cursor = *cursor > VISIBLE_ROWS ? *cursor - VISIBLE_ROWS : 0;
+    else if (JOY_NEW(R_BUTTON) && *cursor + 1 < count)
+        *cursor = *cursor + VISIBLE_ROWS < count ? *cursor + VISIBLE_ROWS : count - 1;
+    else
+        return FALSE;
+    return TRUE;
+}
+
 static bool8 ListMove(u8 count)
 {
+    if (ListPage(&sOnline->cursor, count))
+    {
+        ClampList(count);
+        PlaySE(SE_SELECT);
+        return TRUE;
+    }
     if (!JOY_REPT(DPAD_UP) && !JOY_REPT(DPAD_DOWN))
         return FALSE;
     if (JOY_REPT(DPAD_UP))
@@ -725,6 +757,7 @@ static void DrawFriends(void)
             PrintRight(i, sText_Offline, sTextColor);
         }
     }
+    DrawScrollArrows(sOnline->scroll, count, VISIBLE_ROWS);
     FinishList();
     SetHighlight(sOnline->cursor - sOnline->scroll);
     PrintHint(sText_HintBrowse);
@@ -838,6 +871,7 @@ static void DrawGuild(void)
             PrintRight(i, m->online ? sText_Online : sText_Offline, m->online ? sValueColor : sTextColor);
         }
     }
+    DrawScrollArrows(sOnline->scroll, GuildRowCount(), VISIBLE_ROWS);
     FinishList();
     SetHighlight(sOnline->cursor - sOnline->scroll);
     PrintHint(sText_HintGuild);
@@ -1174,7 +1208,13 @@ static void HandleBusy(void)
 
 static void HandleServerInput(u8 taskId)
 {
-    if (JOY_REPT(DPAD_UP) || JOY_REPT(DPAD_DOWN))
+    if (ListPage(&sOnline->cursor, sOnline->rowCount))
+    {
+        ClampList(sOnline->rowCount);
+        PlaySE(SE_SELECT);
+        DrawServers();
+    }
+    else if (JOY_REPT(DPAD_UP) || JOY_REPT(DPAD_DOWN))
     {
         if (JOY_REPT(DPAD_UP))
             sOnline->cursor = sOnline->cursor == 0 ? sOnline->rowCount - 1 : sOnline->cursor - 1;
@@ -1390,6 +1430,7 @@ static void DrawPick(void)
         AddTextPrinterParameterized3(WIN_LIST, FONT_NORMAL, 0x40, i * RowHeight() + 2, sTextColor, TEXT_SKIP_DRAW,
                                      gSpeciesNames[NationalPokedexNumToSpecies(dex)]);
     }
+    DrawScrollArrows(sGtsScreen->pickScroll, sGtsScreen->pickCount, VISIBLE_ROWS);
     FinishList();
     SetHighlight(sGtsScreen->pickCursor - sGtsScreen->pickScroll);
     PrintHint(sText_HintPick);
@@ -1481,6 +1522,7 @@ static void DrawList(void)
     }
     *end = EOS;
     PrintLine(GTS_LIST_ROWS + 1, gStringVar3, sValueColor);
+    DrawScrollArrows(sOnline->scroll, sGtsScreen->count, GTS_LIST_ROWS);
     FinishList();
     SetHighlight(sOnline->cursor - sOnline->scroll);
     PrintHint(sText_HintBrowse);
@@ -1921,6 +1963,7 @@ static void DrawSellItems(void)
         *QtyText(buf, sMkt->bagQty[row]) = EOS;
         MarketPrintRight(i, buf, sValueColor);
     }
+    DrawScrollArrows(sOnline->scroll, sMkt->bagCount, VISIBLE_ROWS);
     FinishList();
     SetHighlight(sOnline->cursor - sOnline->scroll);
     PrintHint(sText_HintBrowse);
@@ -1998,6 +2041,7 @@ static void DrawBrowse(void)
     end = StringCopy(buf, sText_MktFrom);
     StringCopy(end, sMkt->list[sOnline->cursor].name);
     PrintLine(MKT_LIST_ROWS, buf, sValueColor);
+    DrawScrollArrows(sOnline->scroll, sMkt->count, MKT_LIST_ROWS);
     FinishList();
     SetHighlight(sOnline->cursor - sOnline->scroll);
     PrintHint(sText_HintBrowse);
@@ -2097,6 +2141,7 @@ static void DrawMine(void)
             MarketPrintRight(line, buf, sValueColor);
         }
     }
+    DrawScrollArrows(sOnline->scroll, MineRowCount(), VISIBLE_ROWS);
     FinishList();
     SetHighlight(sOnline->cursor - sOnline->scroll + (sMkt->count == 0 && !sMkt->rowsBeforeListings ? 3 : 0));
     PrintHint(sText_HintBrowse);
