@@ -10,6 +10,11 @@
 #include "strings.h"
 #include "field_fadetransition.h"
 #include "gba/m4a_internal.h"
+#ifdef PLATFORM_PC
+#include "pc_settings.h"
+#include "sound.h"
+#include "constants/songs.h"
+#endif
 
 // can't include the one in menu_helpers.h since Task_OptionMenu needs bool32 for matching
 bool32 IsActiveOverworldLinkBusy(void);
@@ -42,6 +47,9 @@ struct OptionMenu
     /*0x10*/ u8 loadState;
     /*0x11*/ u8 state;
     /*0x12*/ u8 loadPaletteState;
+#ifdef PLATFORM_PC
+    u8 page; // 0 = the game's options, 1.. = PC SETTINGS pages
+#endif
 };
 
 static EWRAM_DATA struct OptionMenu *sOptionMenuPtr = NULL;
@@ -176,7 +184,172 @@ static const u8 *const sButtonTypeOptions[] =
 	gText_ButtonTypeLEqualsA
 };
 
-static const u8 sOptionMenuPickSwitchCancelTextColor[] = {TEXT_DYNAMIC_COLOR_6, TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY};
+#ifdef PLATFORM_PC
+// PC SETTINGS: extra pages after the game's own options. Each row edits a
+// field of gPcSettings; changes apply immediately and are saved on exit.
+#define PC_PAGE_COUNT 3   // page 0 is the game's OPTION list
+
+enum { PCROW_VALUE, PCROW_BACK, PCROW_NEXT };
+
+struct PcOptionRow
+{
+    const u8 *name;
+    u8 kind;
+    int *value;
+    int min, max;
+    const u8 *const *labels;   // NULL: print the number (with prefix/suffix)
+    const u8 *prefix;
+    const u8 *suffix;
+};
+
+static const u8 sText_PcSettings[] = _("PC SETTINGS");
+static const u8 sText_PcDisplay[] = _("PC SETTINGS - DISPLAY");
+static const u8 sText_PcAudio[] = _("PC SETTINGS - SOUND & SPEED");
+static const u8 sText_PcHint[] = _("{DPAD_UPDOWN}PICK {DPAD_LEFTRIGHT}SWITCH {B_BUTTON}BACK");
+static const u8 sText_NextPage[] = _("SOUND & SPEED");
+static const u8 sText_Back[] = _("BACK");
+static const u8 sText_More[] = _("{RIGHT_ARROW}");
+
+static const u8 sText_Screen[] = _("SCREEN");
+static const u8 sText_Filter[] = _("FILTER");
+static const u8 sText_Scaling[] = _("SCALING");
+static const u8 sText_Colors[] = _("COLORS");
+static const u8 sText_Widescreen[] = _("WIDESCREEN");
+static const u8 sText_Vsync[] = _("VSYNC");
+static const u8 sText_Volume[] = _("VOLUME");
+static const u8 sText_Mixer[] = _("SOUND CHIP");
+static const u8 sText_FastForward[] = _("FAST FORWARD");
+
+static const u8 sText_X[] = _("x");
+static const u8 sText_Empty[] = _("");
+static const u8 sText_Percent[] = _("0%");
+
+static const u8 sText_FilterNearest[] = _("PIXELS");
+static const u8 sText_FilterSharp[] = _("SHARP");
+static const u8 sText_FilterSmooth[] = _("SMOOTH");
+static const u8 sText_FilterLcd[] = _("GBA LCD");
+static const u8 sText_FilterCrt[] = _("CRT");
+static const u8 *const sFilterLabels[] = {sText_FilterNearest, sText_FilterSharp, sText_FilterSmooth, sText_FilterLcd, sText_FilterCrt};
+
+static const u8 sText_ScaleFit[] = _("FIT");
+static const u8 sText_ScaleInteger[] = _("INTEGER");
+static const u8 sText_ScaleStretch[] = _("STRETCH");
+static const u8 *const sScalingLabels[] = {sText_ScaleFit, sText_ScaleInteger, sText_ScaleStretch};
+
+static const u8 sText_ColorsPc[] = _("VIVID");
+static const u8 sText_ColorsGba[] = _("GBA LCD");
+static const u8 *const sColorLabels[] = {sText_ColorsPc, sText_ColorsGba};
+
+static const u8 sText_WideOff[] = _("OFF");
+static const u8 sText_Wide1610[] = _("16:10");
+static const u8 sText_Wide169[] = _("16:9");
+static const u8 *const sWideLabels[] = {sText_WideOff, sText_Wide1610, sText_Wide169};
+
+static const u8 sText_On[] = _("ON");
+static const u8 *const sOffOnLabels[] = {sText_WideOff, sText_On};
+
+static const u8 sText_MixerGba[] = _("GBA");
+static const u8 sText_MixerHq[] = _("HI-FI");
+static const u8 *const sMixerLabels[] = {sText_MixerGba, sText_MixerHq};
+
+// SCREEN: x2..x8 window sizes, then FULL (stored as fullscreen=1)
+static int sScreenChoice;
+static const u8 sText_Full[] = _("FULL");
+
+static const struct PcOptionRow sPcPages[PC_PAGE_COUNT][7] =
+{
+    [1] = {
+        {sText_Screen, PCROW_VALUE, &sScreenChoice, 2, 9, NULL, sText_X, sText_Empty},
+        {sText_Filter, PCROW_VALUE, &gPcSettings.filter, 0, PC_FILTER_COUNT - 1, sFilterLabels},
+        {sText_Scaling, PCROW_VALUE, &gPcSettings.scaling, 0, PC_SCALE_COUNT - 1, sScalingLabels},
+        {sText_Colors, PCROW_VALUE, &gPcSettings.color_correct, 0, 1, sColorLabels},
+        {sText_Widescreen, PCROW_VALUE, &gPcSettings.widescreen, 0, PC_WIDE_COUNT - 1, sWideLabels},
+        {sText_Vsync, PCROW_VALUE, &gPcSettings.vsync, 0, 1, sOffOnLabels},
+        {sText_NextPage, PCROW_NEXT},
+    },
+    [2] = {
+        {sText_Volume, PCROW_VALUE, &gPcSettings.volume, 0, 10, NULL, sText_Empty, sText_Percent},
+        {sText_Mixer, PCROW_VALUE, &gPcSettings.hq_audio, 0, 1, sMixerLabels},
+        {sText_FastForward, PCROW_VALUE, &gPcSettings.fast_forward, 2, 8, NULL, sText_X, sText_Empty},
+        {sText_Back, PCROW_BACK},
+    },
+};
+
+static u8 PcPageRowCount(u8 page)
+{
+    u8 n = 0;
+    while (n < 7 && sPcPages[page][n].name != NULL)
+        n++;
+    return n;
+}
+
+static void PcScreenChoiceLoad(void)
+{
+    sScreenChoice = gPcSettings.fullscreen ? 9 : gPcSettings.window_scale;
+    if (sScreenChoice < 2)
+        sScreenChoice = 2;
+}
+
+static void PcScreenChoiceStore(void)
+{
+    if (sScreenChoice == 9)
+    {
+        gPcSettings.fullscreen = TRUE;
+    }
+    else
+    {
+        gPcSettings.fullscreen = FALSE;
+        gPcSettings.window_scale = sScreenChoice;
+    }
+}
+
+// Left/right on a PC row. Returns TRUE if the value changed.
+static bool8 PcRowStep(const struct PcOptionRow *row, int dir)
+{
+    int v;
+
+    if (row->kind != PCROW_VALUE)
+        return FALSE;
+    v = *row->value + dir;
+    if (v > row->max)
+        v = row->min;
+    if (v < row->min)
+        v = row->max;
+    *row->value = v;
+    if (row->value == &sScreenChoice)
+        PcScreenChoiceStore();
+    PcSettingsApplyVideo();
+    return TRUE;
+}
+
+static void PcRowValueString(const struct PcOptionRow *row, u8 *dst)
+{
+    u8 buf[8];
+
+    *dst = EOS;
+    if (row->kind == PCROW_NEXT)
+        StringCopy(dst, sText_More);
+    if (row->kind != PCROW_VALUE)
+        return;
+    if (row->value == &sScreenChoice && sScreenChoice == 9)
+    {
+        StringCopy(dst, sText_Full);
+    }
+    else if (row->labels)
+    {
+        StringCopy(dst, row->labels[*row->value - row->min]);
+    }
+    else
+    {
+        StringCopy(dst, row->prefix);
+        ConvertIntToDecimalStringN(buf, *row->value, STR_CONV_MODE_LEFT_ALIGN, 2);
+        StringAppend(dst, buf);
+        StringAppend(dst, row->suffix);
+    }
+}
+#endif
+
+static const u8 sOptionMenuPickSwitchCancelTextColor[]= {TEXT_DYNAMIC_COLOR_6, TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY};
 static const u8 sOptionMenuTextColor[] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_LIGHT_RED, TEXT_COLOR_RED};
 
 // Functions
@@ -218,6 +391,10 @@ void CB2_OptionsMenuFromStartMenu(void)
         if (sOptionMenuPtr->option[i] > (sOptionMenuItemCounts[i]) - 1)
             sOptionMenuPtr->option[i] = 0;
     }
+#ifdef PLATFORM_PC
+    sOptionMenuPtr->page = 0;
+    PcScreenChoiceLoad();
+#endif
     SetHelpContext(HELPCONTEXT_OPTIONS);
     SetMainCallback2(CB2_OptionMenu);
 }
@@ -316,8 +493,19 @@ static void InitOptionMenuBg(void)
 static void OptionMenu_PickSwitchCancel(void)
 {
     s32 x;
+#ifdef PLATFORM_PC
+    if (sOptionMenuPtr->page != 0)
+    {
+        x = 0xE4 - GetStringWidth(FONT_SMALL, sText_PcHint, 0);
+        FillWindowPixelBuffer(2, PIXEL_FILL(15));
+        AddTextPrinterParameterized3(2, FONT_SMALL, x, 0, sOptionMenuPickSwitchCancelTextColor, 0, sText_PcHint);
+        PutWindowTilemap(2);
+        CopyWindowToVram(2, COPYWIN_FULL);
+        return;
+    }
+#endif
     x = 0xE4 - GetStringWidth(FONT_SMALL, gText_PickSwitchCancel, 0);
-    FillWindowPixelBuffer(2, PIXEL_FILL(15)); 
+    FillWindowPixelBuffer(2, PIXEL_FILL(15));
     AddTextPrinterParameterized3(2, FONT_SMALL, x, 0, sOptionMenuPickSwitchCancelTextColor, 0, gText_PickSwitchCancel);
     PutWindowTilemap(2);
     CopyWindowToVram(2, COPYWIN_FULL);
@@ -358,6 +546,9 @@ static bool8 LoadOptionMenuPalette(void)
 
 static void Task_OptionMenu(u8 taskId)
 {
+#ifdef PLATFORM_PC
+    u8 i;
+#endif
     switch (sOptionMenuPtr->loadState)
     {
     case 0:
@@ -391,6 +582,16 @@ static void Task_OptionMenu(u8 taskId)
         case 4:
             BufferOptionMenuString(sOptionMenuPtr->cursorPos);
             break;
+#ifdef PLATFORM_PC
+        case 5: // page changed
+            PrintOptionMenuHeader();
+            LoadOptionMenuItemNames();
+            for (i = 0; i < MENUITEM_COUNT; i++)
+                BufferOptionMenuString(i);
+            UpdateSettingSelectionDisplay(sOptionMenuPtr->cursorPos);
+            OptionMenu_PickSwitchCancel();
+            break;
+#endif
         }
         break;
     case 3:
@@ -408,10 +609,56 @@ static void Task_OptionMenu(u8 taskId)
     }
 }
 
+#ifdef PLATFORM_PC
+static u8 PcSwitchPage(u8 page)
+{
+    sOptionMenuPtr->page = page;
+    sOptionMenuPtr->cursorPos = 0;
+    PlaySE(SE_SELECT);
+    return 5;
+}
+
+// Input on the PC pages. Same conventions as the game's page.
+static u8 PcOptionMenu_ProcessInput(void)
+{
+    u8 page = sOptionMenuPtr->page;
+    u8 count = PcPageRowCount(page);
+    const struct PcOptionRow *row = &sPcPages[page][sOptionMenuPtr->cursorPos];
+
+    if (JOY_NEW(A_BUTTON) && row->kind == PCROW_NEXT)
+        return PcSwitchPage(page + 1 < PC_PAGE_COUNT ? page + 1 : 0);
+    if (JOY_REPT(DPAD_RIGHT) || JOY_REPT(DPAD_LEFT))
+        return PcRowStep(row, JOY_REPT(DPAD_RIGHT) ? 1 : -1) ? 4 : 0;
+    if (JOY_REPT(DPAD_UP))
+    {
+        sOptionMenuPtr->cursorPos = sOptionMenuPtr->cursorPos == 0 ? count - 1 : sOptionMenuPtr->cursorPos - 1;
+        return 3;
+    }
+    if (JOY_REPT(DPAD_DOWN))
+    {
+        sOptionMenuPtr->cursorPos = sOptionMenuPtr->cursorPos == count - 1 ? 0 : sOptionMenuPtr->cursorPos + 1;
+        return 3;
+    }
+    if (JOY_NEW(B_BUTTON) || (JOY_NEW(A_BUTTON) && row->kind == PCROW_BACK))
+    {
+        PcSettingsSave();
+        return PcSwitchPage(0);
+    }
+    return 0;
+}
+#endif
+
 static u8 OptionMenu_ProcessInput(void)
-{ 
+{
     u16 current;
     u16 *curr;
+#ifdef PLATFORM_PC
+    if (sOptionMenuPtr->page != 0)
+        return PcOptionMenu_ProcessInput();
+    // The last row opens PC SETTINGS (it was CANCEL, which A/B already do).
+    if (JOY_NEW(A_BUTTON) && sOptionMenuPtr->cursorPos == MENUITEM_CANCEL)
+        return PcSwitchPage(1);
+#endif
     if (JOY_REPT(DPAD_RIGHT))
     {
         current = sOptionMenuPtr->option[(sOptionMenuPtr->cursorPos)];
@@ -474,6 +721,21 @@ static void BufferOptionMenuString(u8 selection)
     x = 0x82;
     y = ((GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT) - 1) * selection) + 2;
     FillWindowPixelRect(1, 1, x, y, 0x46, GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT));
+#ifdef PLATFORM_PC
+    if (sOptionMenuPtr->page != 0)
+    {
+        if (selection < PcPageRowCount(sOptionMenuPtr->page))
+        {
+            PcRowValueString(&sPcPages[sOptionMenuPtr->page][selection], str);
+            AddTextPrinterParameterized3(1, FONT_NORMAL, x, y, dst, -1, str);
+        }
+        PutWindowTilemap(1);
+        CopyWindowToVram(1, COPYWIN_FULL);
+        return;
+    }
+    if (selection == MENUITEM_CANCEL)
+        AddTextPrinterParameterized3(1, FONT_NORMAL, x, y, dst, -1, sText_More);
+#endif
 
     switch (selection)
     {
@@ -517,6 +779,9 @@ static void CloseAndSaveOptionMenu(u8 taskId)
     gSaveBlock2Ptr->optionsButtonMode = sOptionMenuPtr->option[MENUITEM_BUTTONMODE];
     gSaveBlock2Ptr->optionsWindowFrameType = sOptionMenuPtr->option[MENUITEM_FRAMETYPE];
     SetPokemonCryStereo(gSaveBlock2Ptr->optionsSound);
+#ifdef PLATFORM_PC
+    PcSettingsSave();
+#endif
     FREE_AND_SET_NULL(sOptionMenuPtr);
     DestroyTask(taskId);
 }
@@ -524,6 +789,15 @@ static void CloseAndSaveOptionMenu(u8 taskId)
 static void PrintOptionMenuHeader(void)
 {
     FillWindowPixelBuffer(0, PIXEL_FILL(1));
+#ifdef PLATFORM_PC
+    if (sOptionMenuPtr->page != 0)
+    {
+        AddTextPrinterParameterized(WIN_TEXT_OPTION, FONT_NORMAL, sOptionMenuPtr->page == 1 ? sText_PcDisplay : sText_PcAudio, 8, 1, TEXT_SKIP_DRAW, NULL);
+        PutWindowTilemap(0);
+        CopyWindowToVram(0, COPYWIN_FULL);
+        return;
+    }
+#endif
     AddTextPrinterParameterized(WIN_TEXT_OPTION, FONT_NORMAL, gText_Option, 8, 1, TEXT_SKIP_DRAW, NULL);
     PutWindowTilemap(0);
     CopyWindowToVram(0, COPYWIN_FULL);
@@ -558,6 +832,22 @@ static void LoadOptionMenuItemNames(void)
     u8 i;
     
     FillWindowPixelBuffer(1, PIXEL_FILL(1));
+#ifdef PLATFORM_PC
+    if (sOptionMenuPtr->page != 0)
+    {
+        u8 count = PcPageRowCount(sOptionMenuPtr->page);
+        for (i = 0; i < count; i++)
+            AddTextPrinterParameterized(WIN_OPTIONS, FONT_NORMAL, sPcPages[sOptionMenuPtr->page][i].name, 8,
+                                        (u8)((i * (GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT))) + 2) - i, TEXT_SKIP_DRAW, NULL);
+        return;
+    }
+    for (i = 0; i < MENUITEM_COUNT; i++)
+    {
+        const u8 *name = i == MENUITEM_CANCEL ? sText_PcSettings : sOptionMenuItemsNames[i];
+        AddTextPrinterParameterized(WIN_OPTIONS, FONT_NORMAL, name, 8, (u8)((i * (GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT))) + 2) - i, TEXT_SKIP_DRAW, NULL);
+    }
+    return;
+#endif
     for (i = 0; i < MENUITEM_COUNT; i++)
     {
         AddTextPrinterParameterized(WIN_OPTIONS, FONT_NORMAL, sOptionMenuItemsNames[i], 8, (u8)((i * (GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT))) + 2) - i, TEXT_SKIP_DRAW, NULL);    
