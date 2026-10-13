@@ -2042,7 +2042,19 @@ static bool32 ReturnToFieldLink(u8 *state)
 
 static void DoMapLoadLoop(u8 *state)
 {
+#ifdef PLATFORM_PC
+    // Some steps wait for VRAM copies that the VBlank handler performs; on the
+    // console VBlank interrupts this loop, here we let a frame pass instead.
+    u8 prev = *state;
+    while (!LoadMapInStepsLocal(state, FALSE))
+    {
+        if (*state == prev)
+            PcWaitForInterrupt(INTR_FLAG_VBLANK);
+        prev = *state;
+    }
+#else
     while (!LoadMapInStepsLocal(state, FALSE)) ;
+#endif
 }
 
 static void MoveSaveBlocks_ResetHeap_(void)
@@ -2239,8 +2251,18 @@ static void CB2_LoadMapForQLPlayback(void)
 
 static void DoLoadMap_QLPlayback(u8 *state)
 {
+#ifdef PLATFORM_PC
+    u8 prev = *state;
+    while (!LoadMap_QLPlayback(state))
+    {
+        if (*state == prev)
+            PcWaitForInterrupt(INTR_FLAG_VBLANK); // see DoMapLoadLoop
+        prev = *state;
+    }
+#else
     while (!LoadMap_QLPlayback(state))
         ;
+#endif
 }
 
 static bool32 LoadMap_QLPlayback(u8 *state)

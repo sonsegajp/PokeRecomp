@@ -12,6 +12,7 @@
  * engine's CgbSound driver writes each frame — duty squares with sweep and
  * envelopes, the 4-bit wave channel, and the LFSR noise channel. */
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "global.h"
@@ -334,6 +335,14 @@ void PcMixerVBlank(struct SoundInfo *si)
     memset(psg_r, 0, n * sizeof(float));
     psg_update_registers();
     mix_psg(n, psg_l, psg_r);
+
+    /* Debug: PC_MIX_ONLY=ds|psg renders one path. */
+    {
+        static const char *only = (const char *)-1;
+        if (only == (const char *)-1) only = getenv("PC_MIX_ONLY");
+        if (only && !strcmp(only, "ds")) { memset(psg_l, 0, n * sizeof(float)); memset(psg_r, 0, n * sizeof(float)); }
+        if (only && !strcmp(only, "psg")) { memset(ds_left, 0, n * sizeof(float)); memset(ds_right, 0, n * sizeof(float)); }
+    }
 
     /* Both paths in the GBA's 10-bit DAC units (+-512), then soft-clip. */
     for (int i = 0; i < n; i++) {

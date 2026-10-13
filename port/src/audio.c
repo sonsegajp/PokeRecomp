@@ -62,6 +62,7 @@ void PcAudioInit(void)
 
 void PcAudioPush(const float *stereo, int frames)
 {
+    PcTestCaptureAudio(stereo, frames);
     if (!device)
         return;
     SDL_LockAudioDevice(device);

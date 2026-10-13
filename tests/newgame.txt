@@ -1,0 +1,17 @@
+# Title -> New Game -> through the professor's intro (frame numbers).
+2400 START
+2600 A
+2800 A
+3000 A
+3100 A
+3200 A
+3300 A
+3400 A
+3500 A
+3600 A
+3700 A
+3800 A
+3900 A
+4000 A
+4100 A
+4200 A

@@ -22,7 +22,7 @@ GAME_DEFS := -D PLATFORM_PC -D MODERN=1 -D FIRERED=1 -D REVISION=0 -D ENGLISH=1 
 GAME_CPPFLAGS := -iquote include -I ../port/include -Wno-trigraphs $(GAME_DEFS)
 # Struct layouts must match the ARM build the data was assembled for.
 GAME_CFLAGS := -pipe -m32 -O2 -g -std=gnu17 -fshort-enums -mno-ms-bitfields -fno-strict-aliasing -fwrapv \
-               -fno-builtin-memcpy -w
+               -fno-builtin-memcpy -fno-toplevel-reorder -w
 PORT_CFLAGS := -pipe -m32 -O2 -g -std=gnu17 -Wall -Wno-unused-function -I port/include -iquote $(GAME)/include \
                $(GAME_DEFS) $(shell sdl2-config --cflags)
 LDFLAGS := -m32 -g
@@ -77,4 +77,4 @@ clean:
 
 -include $(GAME_OBJS:.o=.o.d) $(PORT_OBJS:.o=.d)
 .PHONY: all assets clean
-.SECONDARY:
+.PRECIOUS: $(BUILD)/data/%.s

@@ -37,6 +37,16 @@ uint16_t PcInputPoll(int *quit);   /* returns KEYINPUT (active-low) */
 void PcAudioInit(void);
 void PcAudioFrame(void);           /* after each VBlank */
 
+/* nullguard.c */
+void PcNullGuardInstall(void);
+
+/* testing.c */
+int PcTestLoadInput(const char *path);
+uint16_t PcTestInput(int frame);
+int PcTestOpenWav(const char *path);
+void PcTestCaptureAudio(const float *stereo, int frames);
+void PcTestCloseWav(void);
+
 /* save.c */
 void PcSaveLoad(void);
 void PcSaveFlush(void);

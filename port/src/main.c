@@ -143,23 +143,44 @@ static void run_vblank(void)
     PcIoWrite16(REG_VCOUNT, 0);
 }
 
+static void save_frame(const char *path)
+{
+    SDL_Surface *shot = SDL_CreateRGBSurfaceWithFormatFrom(frame, frame_width, GBA_HEIGHT, 32,
+                                                           frame_width * 4, SDL_PIXELFORMAT_ABGR8888);
+    if (shot) {
+        SDL_SaveBMP(shot, path);
+        SDL_FreeSurface(shot);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     uint64_t freq, next_frame;
     int headless = 0, max_frames = 0;
     const char *dump_path = NULL;
+    int scripted = 0, shot_every = 0;
+    const char *shot_dir = NULL;
 
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "--headless")) headless = 1;
         else if (!strcmp(argv[i], "--frames") && i + 1 < argc) max_frames = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--dump") && i + 1 < argc) dump_path = argv[++i];
+        else if (!strcmp(argv[i], "--input") && i + 1 < argc) {
+            if (PcTestLoadInput(argv[++i]) == 0) scripted = 1;
+        } else if (!strcmp(argv[i], "--wav") && i + 1 < argc) PcTestOpenWav(argv[++i]);
+        else if (!strcmp(argv[i], "--shots") && i + 2 < argc) {
+            shot_every = atoi(argv[++i]);
+            shot_dir = argv[++i];
+        }
     }
 
+    PcNullGuardInstall();
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS) != 0)
         PcFatal("SDL_Init: %s", SDL_GetError());
     if (!headless && PcVideoInit("FireRed PC") != 0)
         PcFatal("could not open the game window");
-    PcAudioInit();
+    if (!headless)
+        PcAudioInit();   /* headless runs are silent (use --wav to capture) */
     PcSaveLoad();
     PcIoWrite16(REG_KEYINPUT, 0x03FF);
 
@@ -175,13 +196,21 @@ int main(int argc, char *argv[])
         if (getenv("PC_TRACE_FRAMES") && frames % 60 == 0) fprintf(stderr, "frame %d\n", frames);
 
         PcRenderFrame(frame, frame_width, on_hblank);
+        if (shot_every && frames % shot_every == 0) {
+            char path[512];
+            snprintf(path, sizeof path, "%s/f%06d.bmp", shot_dir, frames);
+            save_frame(path);
+        }
         run_vblank();
         PcAudioFrame();
         PcSaveFlush();
 
+        if (scripted)
+            PcIoWrite16(REG_KEYINPUT, PcTestInput(frames + 1));
         if (!headless) {
             PcVideoPresent(frame, frame_width, GBA_HEIGHT);
-            PcIoWrite16(REG_KEYINPUT, PcInputPoll(&quit_requested));
+            uint16_t keys = PcInputPoll(&quit_requested);
+            if (!scripted) PcIoWrite16(REG_KEYINPUT, keys);
 
             next_frame += (uint64_t)(FRAME_SECONDS * freq);
             uint64_t now = SDL_GetPerformanceCounter();
@@ -195,14 +224,9 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (dump_path) {
-        SDL_Surface *shot = SDL_CreateRGBSurfaceWithFormatFrom(frame, frame_width, GBA_HEIGHT, 32,
-                                                               frame_width * 4, SDL_PIXELFORMAT_ABGR8888);
-        if (shot) {
-            SDL_SaveBMP(shot, dump_path);
-            SDL_FreeSurface(shot);
-        }
-    }
+    if (dump_path)
+        save_frame(dump_path);
+    PcTestCloseWav();
     PcSaveFlush();
     if (!headless) PcVideoShutdown();
     SDL_Quit();
