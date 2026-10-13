@@ -1249,9 +1249,12 @@ bool32 IsInvalidBg32(u8 bg)
 
 bool32 IsTileMapOutsideWram(u8 bg)
 {
+#ifndef PLATFORM_PC // a PC buffer can be anywhere (the game is a DLL loaded high): only NULL is "none"
     if (sGpuBgConfigs2[bg].tilemap > (void *)IWRAM_END)
         return TRUE;
-    else if (sGpuBgConfigs2[bg].tilemap == NULL)
+    else
+#endif
+    if (sGpuBgConfigs2[bg].tilemap == NULL)
         return TRUE;
     else
         return FALSE;
