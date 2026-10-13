@@ -21,7 +21,7 @@
 #define CONNECT_TIMEOUT_MS 6000
 #define CREDENTIALS_PATH "online.dat"
 #define CONFIG_PATH "online.ini"
-#define DEFAULT_MASTER "74.208.169.223:27100"   /* online.ini "master = host:port" overrides */
+#define DEFAULT_MASTER "74.208.169.223:25565"   /* online.ini "master = host:port" overrides */
 
 enum {
     M_HELLO = 0x01, M_REGISTER = 0x02, M_LOGIN = 0x03, M_LIST_SERVERS = 0x04, M_RENAME = 0x07,
@@ -252,7 +252,7 @@ static void master_address(char *host, int size, int *port)
         fclose(f);
     }
     char *colon = strrchr(addr, ':');
-    *port = colon ? atoi(colon + 1) : 27100;
+    *port = colon ? atoi(colon + 1) : 25565;
     if (colon) *colon = 0;
     snprintf(host, size, "%s", addr);
 }

@@ -8,7 +8,7 @@ StartLimitBurst=5
 User=firered
 WorkingDirectory=/opt/firered-server
 Environment=PYTHONUNBUFFERED=1 PYTHONIOENCODING=utf-8
-ExecStart=/usr/bin/python3 master.py --port 27100
+ExecStart=/usr/bin/python3 master.py --port 25565
 Restart=always
 UMask=0077
 RestartSec=3

@@ -31,7 +31,7 @@ from world import World
 
 # The PokeRecomp master every world registers with (and players log in to).
 # Not printed anywhere: hosts and players only ever see world names.
-OFFICIAL_MASTER = "74.208.169.223:27100"
+OFFICIAL_MASTER = "74.208.169.223:25565"
 
 TICK = 1 / 60
 MAX_QUEUE = 600          # commands a client may have waiting (10 s) before it is cut off
