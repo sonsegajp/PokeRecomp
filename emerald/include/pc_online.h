@@ -9,6 +9,7 @@ bool8 Online_OutbreakMon(u16 *species, u8 *level);
 u8 Online_ShinyRerolls(u16 species);
 
 extern const u8 Online_EventScript_TalkToPlayer[];
+extern const u8 Online_EventScript_Guide[];
 extern const u8 Online_EventScript_IncomingRequest[];
 extern const u8 Online_EventScript_DebugRequest[];
 extern const u8 Online_EventScript_DebugAccept[];

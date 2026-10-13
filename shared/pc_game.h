@@ -15,6 +15,14 @@
 #define ItemId_GetName       GetItemName
 #endif
 
+// save flag: NURSE JOY has met this trainer on a Pokemon Center 2F (a flag
+// both games leave unused)
+#if defined(EMERALD)
+#define PC_FLAG_ONLINE_GUIDE FLAG_UNUSED_0x020
+#else
+#define PC_FLAG_ONLINE_GUIDE FLAG_UNUSED_0x4A7
+#endif
+
 #ifndef LAND_WILD_COUNT
 #define LAND_WILD_COUNT 12   // every Gen 3 game: 12 grass slots
 #endif

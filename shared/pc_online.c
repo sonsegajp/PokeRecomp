@@ -28,6 +28,7 @@
 #include "new_menu_helpers.h"
 #include "text_window_graphics.h"
 #include "mail_data.h"
+#include "quest_log.h"
 #endif
 #include "event_data.h"
 #include "event_object_movement.h"
@@ -46,6 +47,8 @@
 #include "constants/event_object_movement.h"
 #include "constants/songs.h"
 #include "constants/maps.h"
+#include "constants/layouts.h"
+#include "script_movement.h"
 #include "link.h"
 #include "field_weather.h"
 #include "m4a.h"
@@ -2797,6 +2800,20 @@ static bool8 InCableClubRoom(void)
 // ---- other trainers in the field --------------------------------------------------------------
 
 #define AVATAR_LOCALID_BASE 0xE0
+#define GUIDE_LOCALID 0xDF   // NURSE JOY, the online guide on every Pokemon Center 2F (pc_online.inc)
+// The 2F floor plan (same in every Pokemon Center of both regions): the desks
+// are at x = 2 / 6 / 10 behind the counter; y = 4 is the row in front of it,
+// rows 5 and 6 are open floor and the stairs down are at (1, 6).
+#define GUIDE_DESK_ROW 4
+#define GUIDE_WALK_ROW 5     // she walks here...
+#define GUIDE_FOLLOW_ROW 6   // ...and the player alongside, a row lower
+#define GUIDE_STAIRS_X 1
+#define GUIDE_STAIRS_Y 6
+#define GUIDE_REST_X 4       // where she waits if she can't take the stairs
+static const u8 sGuideDeskX[] = {2, 6, 10};   // ONLINE CLUB, GLOBAL TRADE, POKEMON MARKET
+#define GUIDE_WALK_LEAVE 3
+#define GUIDE_WALK_APPROACH 4
+static EWRAM_DATA u8 sGuideMoves[2][48] = {0};
 #define MAX_AVATARS 10
 
 static EWRAM_DATA s8 sAvatarSlot[MAX_AVATARS] = {0};    // net player slot + 1, 0 = free
@@ -3057,6 +3074,134 @@ static void DebugNetHooks(void)
     }
 }
 
+static bool8 OnPokemonCenter2F(void)
+{
+#ifdef EMERALD
+    return gMapHeader.mapLayoutId == LAYOUT_POKEMON_CENTER_2F;
+#else
+    return gMapHeader.mapLayoutId == LAYOUT_POKEMON_CENTER_2F
+        || gMapHeader.mapLayoutId == LAYOUT_ONE_ISLAND_POKEMON_CENTER_2F;
+#endif
+}
+
+// The first time a trainer comes up to a Pokemon Center 2F, NURSE JOY is
+// standing there. She spots them (!), comes over, walks them through each
+// online desk with the player following her, then leaves downstairs. Once
+// per save (PC_FLAG_ONLINE_GUIDE).
+static void UpdateGuide(void)
+{
+    static u8 sSettled;   // frames the field has been free: the arrival (fade, map name, ...) is over
+    u8 objId;
+
+    if (!OnPokemonCenter2F() || FlagGet(PC_FLAG_ONLINE_GUIDE))
+    {
+        sSettled = 0;
+        return;
+    }
+    if (TryGetObjectEventIdByLocalIdAndMap(GUIDE_LOCALID, gSaveBlock1Ptr->location.mapNum,
+                                           gSaveBlock1Ptr->location.mapGroup, &objId) != 0)
+        SpawnSpecialObjectEventParameterized(OBJ_EVENT_GFX_NURSE, MOVEMENT_TYPE_FACE_DOWN, GUIDE_LOCALID,
+                                             GUIDE_REST_X + MAP_OFFSET, GUIDE_WALK_ROW + MAP_OFFSET,
+                                             gObjectEvents[gPlayerAvatar.objectEventId].currentElevation);
+    if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || gPaletteFade.active
+#ifndef EMERALD
+     || gQuestLogState != 0
+#endif
+     )
+    {
+        sSettled = 0;
+        return;
+    }
+    if (++sSettled < 30)
+        return;
+    sSettled = 0;
+    FlagSet(PC_FLAG_ONLINE_GUIDE);
+    gSpecialVar_LastTalked = GUIDE_LOCALID;
+    ScriptContext_SetupScript(Online_EventScript_Guide);
+}
+
+static u8 *GuideSteps(u8 *m, int n, u8 action)
+{
+    while (n-- > 0)
+        *m++ = action;
+    return m;
+}
+
+// A walk across the 2F floor: up/down to `row`, along it to x = tx, then
+// up/down to ty, ending facing `face`. (Script movement doesn't collide; the
+// rows used are open floor in every Pokemon Center.)
+static void GuidePath(u8 *m, s16 x, s16 y, s16 row, s16 tx, s16 ty, u8 face)
+{
+    m = GuideSteps(m, row > y ? row - y : y - row, row > y ? MOVEMENT_ACTION_WALK_NORMAL_DOWN : MOVEMENT_ACTION_WALK_NORMAL_UP);
+    m = GuideSteps(m, tx > x ? tx - x : x - tx, tx > x ? MOVEMENT_ACTION_WALK_NORMAL_RIGHT : MOVEMENT_ACTION_WALK_NORMAL_LEFT);
+    m = GuideSteps(m, ty > row ? ty - row : row - ty, ty > row ? MOVEMENT_ACTION_WALK_NORMAL_DOWN : MOVEMENT_ACTION_WALK_NORMAL_UP);
+    *m++ = face;
+    *m = MOVEMENT_ACTION_STEP_END;
+}
+
+static struct ObjectEvent *GuideObject(void)
+{
+    u8 objId;
+    if (TryGetObjectEventIdByLocalIdAndMap(GUIDE_LOCALID, gSaveBlock1Ptr->location.mapNum,
+                                           gSaveBlock1Ptr->location.mapGroup, &objId))
+        return NULL;
+    return &gObjectEvents[objId];
+}
+
+// special Online_GuideWalk (then waitmovement on both), VAR_0x8004:
+//   GUIDE_WALK_APPROACH: NURSE JOY comes over to stand beside the player;
+//   0 / 1 / 2: to the ONLINE CLUB / GLOBAL TRADE / MARKET desk. She stops in
+//     front of it, turned to the player, who follows and stops behind her;
+//   GUIDE_WALK_LEAVE: she goes down the stairs (or aside, if the player is
+//     standing on them).
+void Online_GuideWalk(void)
+{
+    struct ObjectEvent *guide = GuideObject();
+    struct ObjectEvent *player = &gObjectEvents[gPlayerAvatar.objectEventId];
+    s16 gx, gy, px = player->currentCoords.x - MAP_OFFSET, py = player->currentCoords.y - MAP_OFFSET;
+    u8 mapNum = gSaveBlock1Ptr->location.mapNum, mapGroup = gSaveBlock1Ptr->location.mapGroup;
+
+    if (guide == NULL)
+        return;
+    gx = guide->currentCoords.x - MAP_OFFSET;
+    gy = guide->currentCoords.y - MAP_OFFSET;
+    if (gSpecialVar_0x8004 == GUIDE_WALK_APPROACH)
+    {
+        s16 tx = px < 12 ? px + 1 : px - 1;
+        u8 *m = sGuideMoves[1];
+        GuidePath(sGuideMoves[0], gx, gy, gy, tx, py, tx > px ? MOVEMENT_ACTION_FACE_LEFT : MOVEMENT_ACTION_FACE_RIGHT);
+        *m++ = tx > px ? MOVEMENT_ACTION_FACE_RIGHT : MOVEMENT_ACTION_FACE_LEFT;   // the player turns to her
+        *m = MOVEMENT_ACTION_STEP_END;
+        ScriptMovement_StartObjectMovementScript(LOCALID_PLAYER, mapNum, mapGroup, sGuideMoves[1]);
+    }
+    else if (gSpecialVar_0x8004 < ARRAY_COUNT(sGuideDeskX))
+    {
+        s16 desk = sGuideDeskX[gSpecialVar_0x8004];
+        GuidePath(sGuideMoves[0], gx, gy, GUIDE_WALK_ROW, desk, GUIDE_DESK_ROW, MOVEMENT_ACTION_FACE_DOWN);
+        GuidePath(sGuideMoves[1], px, py, GUIDE_FOLLOW_ROW, desk, GUIDE_WALK_ROW, MOVEMENT_ACTION_FACE_UP);
+        ScriptMovement_StartObjectMovementScript(LOCALID_PLAYER, mapNum, mapGroup, sGuideMoves[1]);
+    }
+    else if (px == GUIDE_STAIRS_X && py == GUIDE_STAIRS_Y)
+    {
+        GuidePath(sGuideMoves[0], gx, gy, GUIDE_WALK_ROW, GUIDE_REST_X, GUIDE_WALK_ROW, MOVEMENT_ACTION_FACE_DOWN);
+    }
+    else
+    {
+        // step aside from the player behind her, then along the open floor to the stairs
+        u8 *m = GuideSteps(sGuideMoves[0], 1, gx < 12 ? MOVEMENT_ACTION_WALK_NORMAL_RIGHT : MOVEMENT_ACTION_WALK_NORMAL_LEFT);
+        GuidePath(m, gx < 12 ? gx + 1 : gx - 1, gy, GUIDE_FOLLOW_ROW, GUIDE_STAIRS_X, GUIDE_STAIRS_Y, MOVEMENT_ACTION_FACE_LEFT);
+    }
+    ScriptMovement_StartObjectMovementScript(GUIDE_LOCALID, mapNum, mapGroup, sGuideMoves[0]);
+}
+
+// special Online_GuideRemove: she went down the stairs.
+void Online_GuideRemove(void)
+{
+    struct ObjectEvent *guide = GuideObject();
+    if (guide && guide->currentCoords.x - MAP_OFFSET == GUIDE_STAIRS_X && guide->currentCoords.y - MAP_OFFSET == GUIDE_STAIRS_Y)
+        RemoveObjectEventByLocalIdAndMap(GUIDE_LOCALID, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup);
+}
+
 // Called every overworld frame (CB1_Overworld).
 void Online_OverworldUpdate(void)
 {
@@ -3064,6 +3209,8 @@ void Online_OverworldUpdate(void)
     u8 kind;
 
     DebugNetHooks();
+    if (PcFieldIsOnScreen())
+        UpdateGuide();
 
     if (!PcNetConnected())
     {
@@ -3129,6 +3276,8 @@ const u8 *Online_GetAvatarScript(u8 localId)
 {
     int a = localId - AVATAR_LOCALID_BASE;
     const struct PcNetPlayer *p;
+    if (localId == GUIDE_LOCALID && OnPokemonCenter2F())
+        return Online_EventScript_Guide;
     if (localId < AVATAR_LOCALID_BASE || a >= MAX_AVATARS || !(p = AvatarPlayer(a)))
         return NULL;
     sTargetPlayerId = p->id;

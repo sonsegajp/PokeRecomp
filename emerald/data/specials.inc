@@ -561,3 +561,5 @@ gSpecials::
 	def_special Online_GtsWithdraw
 	def_special Online_AddFriend
 	def_special Online_OpenMarket
+	def_special Online_GuideWalk
+	def_special Online_GuideRemove

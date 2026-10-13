@@ -612,3 +612,98 @@ Online_Text_MarketWelcome::
 Online_Text_FriendAdded::
 	.string "{STR_VAR_1} is now on your\n"
 	.string "FRIENDS list!$"
+
+@ NURSE JOY, the online guide: the first time a trainer comes up to a
+@ Pokemon Center 2F she is standing there (pc_online.c, local id 0xDF). She
+@ spots them, comes over, walks to each desk with the player following and
+@ explains it, then goes back downstairs.
+Online_EventScript_Guide::
+	lockall
+	playse SE_PIN
+	applymovement 0xDF, Online_Movement_GuideNotice
+	waitmovement 0xDF
+	setvar VAR_0x8004, 4
+	call Online_EventScript_GuideWalk
+	msgbox Online_Text_GuideHello
+	closemessage
+	setvar VAR_0x8004, 0
+	call Online_EventScript_GuideWalk
+	msgbox Online_Text_GuideClub
+	closemessage
+	setvar VAR_0x8004, 1
+	call Online_EventScript_GuideWalk
+	msgbox Online_Text_GuideTrade
+	closemessage
+	setvar VAR_0x8004, 2
+	call Online_EventScript_GuideWalk
+	msgbox Online_Text_GuideMarket
+	msgbox Online_Text_GuideTips
+	closemessage
+	setvar VAR_0x8004, 3
+	special Online_GuideWalk
+	waitmovement 0xDF
+	special Online_GuideRemove
+	releaseall
+	end
+
+Online_Movement_GuideNotice:
+	emote_exclamation_mark
+	delay_16
+	step_end
+
+@ both walk to the desk in VAR_0x8004: NURSE JOY in front, the player behind
+Online_EventScript_GuideWalk::
+	special Online_GuideWalk
+	waitmovement 0xDF
+	waitmovement LOCALID_PLAYER
+	return
+
+Online_Text_GuideHello::
+	.string "Oh! Is this your first time up\n"
+	.string "on the second floor?\p"
+	.string "I'm NURSE JOY, the ONLINE guide.\p"
+	.string "Up here, you can play with real\n"
+	.string "trainers from all over.\p"
+	.string "Let me show you around!\n"
+	.string "Follow me, please!$"
+
+Online_Text_GuideClub::
+	.string "This is the ONLINE CLUB.\p"
+	.string "Pick a server here to join a world\n"
+	.string "full of real trainers.\p"
+	.string "Everyone you see around HOENN is\n"
+	.string "a real player. Their name floats\l"
+	.string "above their head.\p"
+	.string "Talk to one to battle or trade!$"
+
+Online_Text_GuideTrade::
+	.string "This is the GLOBAL TRADE desk.\p"
+	.string "WONDER TRADE swaps a POKéMON with\n"
+	.string "a random trainer, anywhere.\p"
+	.string "The GTS lets you ask for exactly\n"
+	.string "the POKéMON you want.\p"
+	.string "Trades that finish while you're\n"
+	.string "away wait for you in the mailbox.$"
+
+Online_Text_GuideMarket::
+	.string "This is the POKéMON MARKET.\p"
+	.string "Trainers buy and sell items here\n"
+	.string "for money, even while they're away.$"
+
+Online_Text_GuideTips::
+	.string "A few more tips!\p"
+	.string "Press T to chat with everyone on\n"
+	.string "your server, and ENTER to send.\p"
+	.string "Add FRIENDS and start a GUILD from\n"
+	.string "the ONLINE CLUB's menu.\p"
+	.string "Each day, one type of POKéMON is\n"
+	.string "more likely to be shiny. And mass\l"
+	.string "outbreaks pop up on the routes!\p"
+	.string "If you own a KANTO game too, you\n"
+	.string "can visit KANTO's servers as\l"
+	.string "yourself, party and all!\p"
+	.string "When you leave a server, it\n"
+	.string "remembers where you were, so you\l"
+	.string "come back to the same spot.\p"
+	.string "That's everything! Have fun out\n"
+	.string "there, and good luck!$"
