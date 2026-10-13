@@ -1,0 +1,36 @@
+﻿/* Pokemon Box-inspired composition; the selected logo and official art remain untouched. */
+.logo{filter:none}
+.logo-sheen{position:absolute;pointer-events:none;overflow:hidden;-webkit-mask:url('logo.png') center/contain no-repeat;mask:url('logo.png') center/contain no-repeat}
+.logo-sheen:after{content:"";position:absolute;inset:-20% -55%;background:linear-gradient(112deg,transparent 41%,#ffffff18 45%,#ffffffaa 48%,#ffffffed 50%,#ffffff70 52%,transparent 57%);transform:translateX(-70%);animation:logo-sheen 5.4s ease-in-out infinite}
+#stage[data-screen="title"]{background:#fff4db;color:#fff}
+#stage[data-screen="title"][data-title-theme="leaf"]{background:#efffee}
+#stage[data-screen="notice"]{background:#080a10}
+[data-screen="title"] .shade,[data-screen="notice"] .shade{display:none}
+[data-screen="title"] #screen,[data-screen="notice"] #screen{position:relative;isolation:isolate}
+.title-field{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,#740910 0%,#ce281a 34%,#ffb14b 73%,#fff4db 100%)}
+[data-title-theme="leaf"] .title-field{background:linear-gradient(180deg,#0b5447 0%,#238d5b 34%,#b8e47b 73%,#f4ffdf 100%)}
+#title-effects{position:absolute;inset:0;pointer-events:none;z-index:0}
+.title-art{position:absolute;object-fit:contain;pointer-events:none;z-index:2;filter:drop-shadow(0 10px 8px #20123345)}
+[data-title-theme="leaf"] .title-art{filter:drop-shadow(0 10px 8px #082e2e45)}
+.title-art.title-charizard{width:530px;height:530px;left:112px;top:205px;bottom:auto}
+.title-art.title-venusaur{width:550px;height:550px;right:105px;top:190px;bottom:auto}
+.title-logo{top:8px;left:265px;width:750px;height:313px;z-index:4}
+[data-screen="title"] .press-start{bottom:127px;z-index:5;color:#101018;font-family:'Arial Black',Arial,sans-serif;font-size:31px;font-weight:900;letter-spacing:1px;line-height:1.1;padding:10px 18px;text-shadow:none;-webkit-text-stroke:5px #fff;paint-order:stroke fill;animation:title-prompt 2s ease-in-out infinite}
+[data-screen="title"] .press-start:after{display:none}
+.title-copyright{position:absolute;left:0;right:0;bottom:24px;text-align:center;font:700 14px/1.45 Arial,sans-serif;z-index:5;color:#fff;text-shadow:1px 1px #191728,-1px -1px #191728,1px -1px #191728,-1px 1px #191728,0 2px #191728}
+.main-logo{top:30px;left:56px;width:522px;height:218px}
+.main-edition{top:260px;letter-spacing:6px;font-size:20px}
+.opening-notice{position:absolute;inset:142px 202px 120px;text-align:center;color:#dedfe6}
+.opening-notice h1{margin:0 0 42px;font-size:20px;font-weight:normal;letter-spacing:4px;color:#fff}
+.opening-notice>p{margin:0 0 27px;font-size:16px;line-height:1.65}
+.opening-notice .notice-copyright{margin:32px 0 0;font-size:13px;line-height:1.6;color:#9b9da9}
+.notice-continue{position:absolute;left:50%;bottom:73px;transform:translateX(-50%);padding:12px 20px;background:none;border:0;color:#d7dbe5;letter-spacing:2px;font-size:14px}
+.notice-continue span{margin-left:22px;font-size:12px;color:#888e9d;letter-spacing:1px}
+.notice-continue:hover,.notice-continue:focus-visible{color:#fff;outline:1px solid #9ea8bd;outline-offset:4px}
+#screen-transition{position:absolute;inset:0;z-index:100;background:#03050a;opacity:1;pointer-events:auto}
+#screen{animation:none}
+.dialog-shade{animation:dialog-reveal .18s ease-out}
+@keyframes title-prompt{0%,35%,100%{opacity:1}65%,80%{opacity:.3}}
+@keyframes logo-sheen{0%,8%{transform:translateX(-70%);opacity:0}12%{opacity:1}42%{transform:translateX(70%);opacity:1}45%,100%{transform:translateX(70%);opacity:0}}
+@keyframes dialog-reveal{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){[data-screen="title"] .press-start,.dialog-shade{animation:none}.logo-sheen:after{animation:none;opacity:0}}

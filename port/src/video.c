@@ -7,6 +7,7 @@
  * picture doesn't jump in size when the field widens. */
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <SDL_syswm.h>
 #include <stdio.h>
 
 #include "pc_port.h"
@@ -18,6 +19,56 @@ static SDL_GLContext gl;
 static GLuint program, vao, texture, overlay_texture;
 static GLint u_tex, u_tex_size, u_out_size, u_filter, u_color;
 static int tex_w, tex_h;
+static HWND launcher_parent, native_window;
+static int parent_width, parent_height;
+
+void PcVideoSetParent(uintptr_t parent) { launcher_parent = (HWND)parent; }
+int PcVideoIsEmbedded(void) { return launcher_parent != NULL; }
+void PcVideoRequestLauncherExit(void)
+{
+    if (launcher_parent && IsWindow(launcher_parent))
+        PostMessage(GetAncestor(launcher_parent, GA_ROOT), WM_APP + 0x31, 0, 0);
+}
+
+/* The host owns the outside window. Keep the real SDL/OpenGL game drawable
+ * inside its panel even while the user resizes or maximizes that host. */
+int PcVideoMaintainParent(void)
+{
+    RECT rect;
+    if (!launcher_parent) return 1;
+    if (!IsWindow(launcher_parent) || !GetClientRect(launcher_parent, &rect)) return 0;
+    int width = rect.right - rect.left, height = rect.bottom - rect.top;
+    if (native_window && width > 0 && height > 0 &&
+        (width != parent_width || height != parent_height)) {
+        SetWindowPos(native_window, NULL, 0, 0, width, height,
+                     SWP_NOACTIVATE | SWP_NOZORDER);
+        parent_width = width;
+        parent_height = height;
+    }
+    return 1;
+}
+
+static int embed_window(void)
+{
+    SDL_SysWMinfo info;
+    SDL_VERSION(&info.version);
+    if (!SDL_GetWindowWMInfo(window, &info)) return -1;
+    native_window = info.info.win.window;
+    LONG_PTR style = GetWindowLongPtr(native_window, GWL_STYLE);
+    style &= ~(WS_POPUP | WS_CAPTION | WS_THICKFRAME | WS_SYSMENU |
+               WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
+    style |= WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+    SetWindowLongPtr(native_window, GWL_STYLE, style);
+    LONG_PTR extended = GetWindowLongPtr(native_window, GWL_EXSTYLE);
+    extended &= ~(WS_EX_APPWINDOW | WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE);
+    SetWindowLongPtr(native_window, GWL_EXSTYLE, extended);
+    SetLastError(0);
+    if (!SetParent(native_window, launcher_parent) && GetLastError()) return -1;
+    SetWindowPos(native_window, NULL, 0, 0, 0, 0,
+                 SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOSIZE | SWP_FRAMECHANGED);
+    if (!PcVideoMaintainParent()) return -1;
+    return 0;
+}
 
 #define GLFN(ret, name, args) static ret (APIENTRY *name) args;
 GLFN(GLuint, p_glCreateShader, (GLenum))
@@ -196,6 +247,11 @@ int PcVideoDisplayWidth(void) { return logical_width(); }
 void PcSettingsApplyVideo(void)
 {
     if (!window) return;
+    if (launcher_parent) {
+        PcVideoMaintainParent();
+        SDL_GL_SetSwapInterval(gPcSettings.vsync ? 1 : 0);
+        return;
+    }
     SDL_SetWindowFullscreen(window, gPcSettings.fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
     if (!gPcSettings.fullscreen) {
         /* AUTO keeps the window's current shape (16:9 the first time). */
@@ -214,8 +270,10 @@ int PcVideoInit(const char *title)
 
     window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                               logical_width() * gPcSettings.window_scale, GBA_HEIGHT * gPcSettings.window_scale,
-                              SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+                              SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI |
+                              (launcher_parent ? SDL_WINDOW_HIDDEN : 0));
     if (!window) return -1;
+    if (launcher_parent && embed_window() != 0) return -1;
     gl = SDL_GL_CreateContext(window);
     if (!gl) return -1;
     load_gl();
@@ -243,6 +301,10 @@ int PcVideoInit(const char *title)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     PcSettingsApplyVideo();
+    if (launcher_parent) {
+        SDL_ShowWindow(window);
+        SetFocus(native_window);
+    }
     return 0;
 }
 
@@ -341,6 +403,10 @@ void PcVideoDumpScreen(const char *path)
 int PcVideoVsyncPaces(void)
 {
     SDL_DisplayMode mode;
+
+    /* A child drawable can be composited without blocking SwapBuffers, even
+     * with swap interval 1. Always use the host's explicit 59.73 Hz clock. */
+    if (launcher_parent) return 0;
 
     if (!gPcSettings.vsync || SDL_GetWindowDisplayMode(window, &mode) != 0)
         return 0;

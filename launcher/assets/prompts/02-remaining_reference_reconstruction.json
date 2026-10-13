@@ -1,0 +1,25 @@
+﻿{
+  "stage": "remaining_reference_reconstruction",
+  "prompts": [
+    [
+      "main",
+      "Use case: stylized-concept. Create one 16:9 illustration for a Pokemon fan launcher background, matching the top right panel of the six-panel reference. Evening professor's laboratory, gray polished countertop, large blue windows with town outside, tall concrete columns. A beige CRT computer with blue screen and a friendly Pikachu sitting beside it are positioned on left half of frame. A couple of pokeballs on the countertop. A map and books in background on right. Soft cinematic 3D painterly render matching the reference. Keep right half quiet and darker for later menu overlay. Fill entire image with scene. No words, no logos, no interface, no borders, no menus."
+    ],
+    [
+      "gifts",
+      "Use case: stylized-concept. Asset type: production game launcher MYSTERY GIFTS BACKGROUND ONLY. Reference: the original six-panel launcher concept, use its BOTTOM LEFT PANEL as visual reference; two other images are style companions only. Produce a single clean full-bleed 16:9 landscape illustration. In a modern professor's laboratory at blue twilight, a friendly translucent holographic Mew floats over a circular dark metal emitter platform on countertop, positioned left third. Pale pink/lavender body, long curling slender tail, blue volumetric triangular projection beams, sparkling blue light at base. Soft blurred concrete pillars, shelves, maps, boxes and windows in background. The right half should be dark quiet negative space for independent menus. Gray countertop reflects blue light. Match reference stylized painterly 3D render material and composition. NO words, NO logos, NO menus, NO buttons, NO interface, NO panels, NO black bars, NO border, NO watermark. Only the clean environmental background with hologram. 16:9 aspect ratio."
+    ],
+    [
+      "options",
+      "Use case: stylized-concept. Asset type: production game launcher OPTIONS BACKGROUND ONLY. Reference: original six-panel launcher concept, use its BOTTOM RIGHT PANEL as exact visual reference, other scenes are style companions. Produce a single clean full-bleed 16:9 landscape artwork. In a modern professor's laboratory at blue twilight: an open red hinged handheld game console with dark blue screen on a low black rectangular display plinth, placed on lower left third of polished gray tabletop; stack of yellow and pastel books and a small green potted plant directly behind it; a small red-and-white pokeball to center-right. Large window on far left looks out to a colorful town at dusk. Beige concrete walls, subtle blank framed vertical poster behind books, soft light. Keep upper/right half dark and quiet, enough negative space for a separately rendered options menu. Match reference cinematic painterly stylized 3D aesthetic and composition. The poster must be BLANK, no words or logo. NO text anywhere, NO UI, NO menus, NO buttons except physical console hardware, NO border, NO watermark. 16:9 full-bleed."
+    ],
+    [
+      "games",
+      "Use case: stylized-concept. Asset type: production game launcher GAME SELECT clean background. Reference: original six-panel launcher concept, use the MIDDLE LEFT PANEL laboratory countertop as visual reference; others style companions. Produce single clean full-bleed 16:9 landscape artwork. A quiet modern Pokemon professor's laboratory at blue evening, broad empty polished stone tabletop occupying lower half and stretching edge to edge, soft reflected light, dark concrete columns and large blue windows behind, gentle depth of field. Empty space across center and upper-middle for five individual game cases to be independently rendered later. Keep table horizon low around 60% height, room perspective frontal at tabletop height. Match reference cinematic painterly stylized 3D style, subdued charcoal-blue slate tones with faint amber light. REMOVE ALL game cases from reference and reconstruct empty scene. NO cases, NO characters, NO text, NO logos, NO menus, NO buttons, NO interface, NO panels, NO border, NO watermark. Full-bleed 16:9."
+    ],
+    [
+      "logo",
+      "Use case: logo-brand. Asset type: isolated transparent launcher logo. Reference: original six-panel launcher concept; extract/reconstruct ONLY its large title logo in top left panel, no background. Exact headline text: \"PoKeRecomp\" (P o K e R e c o m p). Playful bold chunky yellow-gold lettering with thick dark royal-blue outline and slight dimensional drop shadow, arched energy and tilted letters like the reference; circular red/white pokeball behind top center with blue outline. Beneath it two clean subtitle lines: first \"FIRERED & LEAFGREEN\", with FIRERED dark red, ampersand deep blue, LEAFGREEN dark green, second line \"PC EDITION\" in smaller spaced dark charcoal capitals. Faithfully match supplied logo's layout and proportions. Actual transparent alpha background, entire logo fully visible with small transparent margin, wide horizontal 2:1 composition. NO scene, NO background, NO checkerboard drawn into image, NO extra text, NO border. Crisp production asset."
+    ]
+  ]
+}

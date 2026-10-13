@@ -1,0 +1,20 @@
+﻿{
+  "stage": "unsuccessful_character_style_edits",
+  "prompts": [
+    [
+      "title",
+      "Use case: style-transfer. Redraw supplied scene as a low-polygon pre-rendered 2003 Nintendo GameCube-era game background. Preserve exactly the reference subjects and broad placement: orange winged character on left coastal rock, green flower-backed character on right rock, lighthouse upper left, ocean and sunset in center, broad empty sky in upper half. Make ALL geometry simple and low polygon, broad visibly faceted rocks, box-shaped simple town houses, low-resolution painted flat diffuse textures, basic vertex shading, simple plastic character materials. Characters have simple smooth low-poly surfaces, no skin texture. Sunset is a plain orange-pink gradient with few broad clouds; sea is a flat blue plane with a few repeating horizontal golden highlights. Low detail like original Pokémon Colosseum/XD prerendered scenery. No microscopic detail, no cinematic realism, no photographic lighting, no blur, no film grain, no lens effects, no 2D illustrated look. Full-bleed 16:9 composition. No text, no logos, no UI.",
+      "C:\\Users\\hyper\\FireRedPC\\launcher\\assets\\source-v1\\title.png"
+    ],
+    [
+      "pikachu_gc",
+      "Use case: style-transfer. Create a transparent standalone character render of the Pikachu in supplied official reference. Preserve character's identity, yellow color, red cheeks, black ear tips, lightning tail, proportions. Transform from 2D illustration into an authentic low-polygon 2003 GameCube-era 3D character model like Pokémon Colosseum: simple smooth shading, broad polygon forms, flat basic yellow material with no fur or surface detail, simple texture-mapped black eyes. Pose sitting comfortably, three-quarter front view, looking slightly toward right, feet visible grounded at bottom. Friendly small mouth. Entire character including ears and tail fully inside frame. True transparent alpha background; no background, no floor, no shadow plane. No text, no logos. Single isolated usable game asset.",
+      "C:\\Users\\hyper\\FireRedPC\\launcher\\assets\\characters\\pikachu.png"
+    ],
+    [
+      "mew_gc",
+      "Use case: style-transfer. Create a transparent standalone character render of the Mew in supplied official reference. Preserve identity, proportions, large blue eyes, pale pink color and long curved thin tail. Transform from 2D illustration into an authentic low-polygon 2003 GameCube-era 3D character model like Pokémon Colosseum: simple smooth shading, broad polygon forms, flat basic pale-pink material, no fur or skin texture, simple mapped eyes. Pose floating upright in three-quarter front view with tail curling around body, feet visible and hands softly open. Render opaque pale pink model, later code will apply hologram transparency and blue glow. Entire character and tail inside frame. True transparent alpha background; no background, no floor, no blue beam, no extra elements. No text, no logos. Single isolated game asset.",
+      "C:\\Users\\hyper\\FireRedPC\\launcher\\assets\\characters\\mew.png"
+    ]
+  ]
+}

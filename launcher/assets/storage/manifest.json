@@ -1,0 +1,87 @@
+{
+  "source": "Local pret pokefirered decompilation",
+  "species": 386,
+  "wallpapers": [
+    {
+      "id": 0,
+      "name": "forest",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\forest"
+    },
+    {
+      "id": 1,
+      "name": "city",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\city"
+    },
+    {
+      "id": 2,
+      "name": "desert",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\desert"
+    },
+    {
+      "id": 3,
+      "name": "savanna",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\savanna"
+    },
+    {
+      "id": 4,
+      "name": "crag",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\crag"
+    },
+    {
+      "id": 5,
+      "name": "volcano",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\volcano"
+    },
+    {
+      "id": 6,
+      "name": "snow",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\snow"
+    },
+    {
+      "id": 7,
+      "name": "cave",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\cave"
+    },
+    {
+      "id": 8,
+      "name": "beach",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\beach"
+    },
+    {
+      "id": 9,
+      "name": "seafloor",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\seafloor"
+    },
+    {
+      "id": 10,
+      "name": "river",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\river"
+    },
+    {
+      "id": 11,
+      "name": "sky",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\sky"
+    },
+    {
+      "id": 12,
+      "name": "stars",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\stars"
+    },
+    {
+      "id": 13,
+      "name": "pokecenter",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\pokecenter"
+    },
+    {
+      "id": 14,
+      "name": "tiles",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\tiles"
+    },
+    {
+      "id": 15,
+      "name": "simple",
+      "source": "game\\graphics\\pokemon_storage\\wallpapers\\simple"
+    }
+  ],
+  "method": "Original tile order, original BGR555 palettes, original tilemap flip bits. Palette index zero is transparent for sprites."
+}

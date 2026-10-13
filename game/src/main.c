@@ -16,6 +16,9 @@
 #include "save_failed_screen.h"
 #include "quest_log.h"
 #include "sloopsvc.h"
+#ifdef PLATFORM_PC
+#include "pc_launcher.h"
+#endif
 
 extern u32 intr_main[];
 
@@ -176,6 +179,10 @@ void AgbMain()
 #endif
 
     gLinkTransferringData = FALSE;
+
+#ifdef PLATFORM_PC
+    PcLauncherBoot();
+#endif
 
     for (;;)
     {

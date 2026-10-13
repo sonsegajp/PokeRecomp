@@ -1,0 +1,73 @@
+{
+  "fire": {
+    "url": "fire.png",
+    "frameWidth": 32,
+    "frameHeight": 32,
+    "frames": 8,
+    "columns": 8,
+    "sequence": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "frameMs": 50.228118896484375,
+    "gameFrameDuration": 3,
+    "fps": 19.909166856535276,
+    "loop": true,
+    "transparentIndex": 0,
+    "originalAnimation": "sAnim_LargeFlame",
+    "animationSource": "game/src/battle_anim_fire.c",
+    "tileOffsets": [
+      0,
+      16,
+      32,
+      48,
+      64,
+      80,
+      96,
+      112
+    ]
+  },
+  "leaf": {
+    "url": "leaf.png",
+    "frameWidth": 16,
+    "frameHeight": 16,
+    "frames": 9,
+    "columns": 9,
+    "sequence": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      4,
+      3,
+      2,
+      1
+    ],
+    "frameMs": 83.71353149414062,
+    "gameFrameDuration": 5,
+    "fps": 11.945500113921167,
+    "loop": true,
+    "transparentIndex": 0,
+    "originalAnimation": "sRazorLeafParticleAnimCmds1",
+    "animationSource": "game/src/battle_anim_effects_1.c",
+    "tileOffsets": [
+      0,
+      4,
+      8,
+      12,
+      16,
+      20,
+      24,
+      28,
+      32
+    ]
+  }
+}

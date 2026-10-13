@@ -1,0 +1,208 @@
+{
+  "url": "title-fire.png",
+  "frameWidth": 16,
+  "frameHeight": 16,
+  "frames": 10,
+  "columns": 10,
+  "sequence": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "gameFrameDurations": [
+    3,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6
+  ],
+  "frameDurationsMs": [
+    50.228118896484375,
+    100.45623779296875,
+    100.45623779296875,
+    100.45623779296875,
+    100.45623779296875,
+    100.45623779296875,
+    100.45623779296875,
+    100.45623779296875,
+    100.45623779296875,
+    100.45623779296875
+  ],
+  "durationMs": 954.3342590332031,
+  "loop": false,
+  "transparentIndex": 0,
+  "sourceAnimation": "sSpriteAnim_Flame",
+  "source": "game/src/title_screen.c",
+  "originalSpawner": {
+    "name": "Task_FlameSpawner",
+    "gbaResolution": [
+      240,
+      160
+    ],
+    "intervalGameFrames": 18,
+    "intervalMs": 301.36871337890625,
+    "fixedX": [
+      4,
+      16,
+      26,
+      32,
+      48,
+      200,
+      216,
+      224,
+      232,
+      60,
+      76,
+      92,
+      108,
+      128,
+      144
+    ],
+    "offsetXCycle": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "randomExtraX": [
+      0,
+      239
+    ],
+    "randomExtraVisibleChance": 0.5,
+    "spawnY": [
+      116,
+      117,
+      118
+    ],
+    "horizontalSpeedSubpixels": [
+      -2,
+      -1,
+      0,
+      1
+    ],
+    "verticalSpeedSubpixels": [
+      -16,
+      -15,
+      -14,
+      -13,
+      -12,
+      -11,
+      -10,
+      -9
+    ],
+    "subpixelsPerPixel": 16,
+    "horizontalUpdate": "x -= horizontalSpeedSubpixels/16",
+    "verticalUpdate": "y += verticalSpeedSubpixels/16",
+    "removeWhen": "Animation ended, x < -8, or y <16 or y >200"
+  },
+  "paletteRGBA": [
+    [
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      255
+    ],
+    [
+      255,
+      255,
+      189,
+      255
+    ],
+    [
+      255,
+      246,
+      139,
+      255
+    ],
+    [
+      255,
+      213,
+      65,
+      255
+    ],
+    [
+      255,
+      172,
+      0,
+      255
+    ],
+    [
+      197,
+      164,
+      49,
+      255
+    ],
+    [
+      115,
+      180,
+      139,
+      255
+    ],
+    [
+      98,
+      189,
+      156,
+      255
+    ],
+    [
+      90,
+      197,
+      164,
+      255
+    ],
+    [
+      0,
+      0,
+      0,
+      255
+    ],
+    [
+      0,
+      0,
+      0,
+      255
+    ],
+    [
+      0,
+      0,
+      0,
+      255
+    ],
+    [
+      0,
+      0,
+      0,
+      255
+    ],
+    [
+      0,
+      0,
+      0,
+      255
+    ],
+    [
+      82,
+      205,
+      180,
+      255
+    ]
+  ]
+}

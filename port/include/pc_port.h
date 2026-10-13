@@ -31,6 +31,10 @@ int PcFieldIsOnScreen(void);
 
 /* video.c */
 int PcVideoInit(const char *title);
+void PcVideoSetParent(uintptr_t parent);
+int PcVideoIsEmbedded(void);
+void PcVideoRequestLauncherExit(void);
+int PcVideoMaintainParent(void);
 void PcVideoPresent(const uint32_t *frame, int width, int height);
 void PcVideoShutdown(void);
 int PcVideoDisplayWidth(void);   /* logical width for the widescreen setting */
@@ -57,6 +61,8 @@ void PcTestCaptureAudio(const float *stereo, int frames);
 void PcTestCloseWav(void);
 
 /* save.c */
+int PcSaveSetPath(const char *path);  /* NULL selects data-dir/firered.sav */
+const char *PcSaveGetPath(void);
 void PcSaveLoad(void);
 void PcSaveFlush(void);
 

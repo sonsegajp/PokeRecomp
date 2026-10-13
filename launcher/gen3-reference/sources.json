@@ -1,0 +1,23 @@
+{
+  "pokeruby": {
+    "commit": "5784633ce4ef7ade1a7f2d2d0c288e3d5e6cdd7f",
+    "files": {
+      "src/save.c": "https://raw.githubusercontent.com/pret/pokeruby/5784633ce4ef7ade1a7f2d2d0c288e3d5e6cdd7f/src/save.c",
+      "include/global.h": "https://raw.githubusercontent.com/pret/pokeruby/5784633ce4ef7ade1a7f2d2d0c288e3d5e6cdd7f/include/global.h",
+      "include/pokemon.h": "https://raw.githubusercontent.com/pret/pokeruby/5784633ce4ef7ade1a7f2d2d0c288e3d5e6cdd7f/include/pokemon.h",
+      "include/pokemon_storage_system.h": "https://raw.githubusercontent.com/pret/pokeruby/5784633ce4ef7ade1a7f2d2d0c288e3d5e6cdd7f/include/pokemon_storage_system.h",
+      "include/constants/items.h": "https://raw.githubusercontent.com/pret/pokeruby/5784633ce4ef7ade1a7f2d2d0c288e3d5e6cdd7f/include/constants/items.h"
+    }
+  },
+  "pokeemerald": {
+    "commit": "731ad5bfd6e6f265508d0efcca0ba42f9dcf5881",
+    "files": {
+      "src/save.c": "https://raw.githubusercontent.com/pret/pokeemerald/731ad5bfd6e6f265508d0efcca0ba42f9dcf5881/src/save.c",
+      "include/global.h": "https://raw.githubusercontent.com/pret/pokeemerald/731ad5bfd6e6f265508d0efcca0ba42f9dcf5881/include/global.h",
+      "include/pokemon.h": "https://raw.githubusercontent.com/pret/pokeemerald/731ad5bfd6e6f265508d0efcca0ba42f9dcf5881/include/pokemon.h",
+      "include/pokemon_storage_system.h": "https://raw.githubusercontent.com/pret/pokeemerald/731ad5bfd6e6f265508d0efcca0ba42f9dcf5881/include/pokemon_storage_system.h",
+      "include/constants/items.h": "https://raw.githubusercontent.com/pret/pokeemerald/731ad5bfd6e6f265508d0efcca0ba42f9dcf5881/include/constants/items.h",
+      "src/data/items.h": "https://raw.githubusercontent.com/pret/pokeemerald/731ad5bfd6e6f265508d0efcca0ba42f9dcf5881/src/data/items.h"
+    }
+  }
+}

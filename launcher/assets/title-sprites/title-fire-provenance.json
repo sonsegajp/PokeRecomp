@@ -1,0 +1,18 @@
+{
+  "asset": "title-fire.png",
+  "source": "Original FireRed title screen sprites, not battle sprites.",
+  "sourcePixelImage": "game/graphics/title_screen/firered/flames.png",
+  "sourceTiles": "game/graphics/title_screen/firered/flames.4bpp",
+  "sourcePalette": "game/graphics/title_screen/firered/flames.gbapal",
+  "bindings": "game/src/title_screen.c:87",
+  "animation": "game/src/title_screen.c:106",
+  "spawner": "game/src/title_screen.c:1019",
+  "method": "Original 4bpp tile decode, original BGR555 palette. Every index and opaque RGB value verified against original indexed PNG. Index0 transparent. Horizontal repacking only; no redraw, filter, recolor, interpolation, or generated imagery.",
+  "visualDescription": "Small rising flame flares. Jagged yellow-white tongues evolve to orange, then diminish through muted olive and teal as the original title palette fades them toward its backdrop. Original spawning produces overlapping rows, unlike the larger ball-shaped battle animation. There is no continuous flame-wave texture.",
+  "sha256": {
+    "flames.png": "2afa2c1a13e6c65c621172f2912ed9a864d506f7595dddb3a603de1e7aedb7e8",
+    "flames.4bpp": "cdfd07131d9c8f8b97847980d65084e1a63d9a15b61c4a12b2b466aa81430a0b",
+    "flames.gbapal": "130b0430d369ea4f48d23c77651730b5f2d4ec61583fe35d658684e0c60c1840"
+  },
+  "exportSHA256": "c6a4e063ddc1c1d429839fd37353cbecb073dd8c8fb0b8ebe4b9a6cb80510683"
+}

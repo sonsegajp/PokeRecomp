@@ -19,6 +19,7 @@
 #include "pc_chat.h"
 #include "pc_rompack.h"
 #include "pc_travel.h"
+#include "pc_launcher.h"
 
 #define REG_DISPSTAT 0x04
 #define REG_VCOUNT   0x06
@@ -39,6 +40,40 @@ void AgbMain(void);
 
 static void *host_fiber, *game_fiber;
 static int quit_requested;
+static int launcher_exit_code;
+static HANDLE save_mutex;
+int gPcLauncherMode;
+int gPcLauncherBoxOption = 2; /* native OPTION_MOVE_MONS */
+
+void PcLauncherFinish(int exitCode, const char *message)
+{
+    launcher_exit_code = exitCode;
+    quit_requested = 1;
+    if (message) fprintf(stderr, "%s\n", message);
+}
+
+/* Lock the actual save path, including for ordinary gameplay. Independent
+ * --data-dir profiles can run together; a shared cartridge cannot. */
+static int lock_save_path(void)
+{
+    const char *path = PcSaveGetPath();
+    char name[96];
+    unsigned long hash = 2166136261u;
+    for (const char *p = path; *p; ++p) {
+        unsigned char c = (unsigned char)*p;
+        if (c >= 'A' && c <= 'Z') c += 'a' - 'A';
+        hash = (hash ^ c) * 16777619u;
+    }
+    snprintf(name, sizeof name, "Local\\FireRedPC.Save.%08lx", hash);
+    save_mutex = CreateMutexA(NULL, TRUE, name);
+    if (!save_mutex) return 0;
+    if (GetLastError() == ERROR_ALREADY_EXISTS) {
+        CloseHandle(save_mutex);
+        save_mutex = NULL;
+        return 0;
+    }
+    return 1;
+}
 static uint32_t frame[GBA_WIDTH * GBA_HEIGHT * 4];
 static int frame_width = GBA_WIDTH;
 
@@ -152,6 +187,12 @@ void PcRestartGame(void)
     PROCESS_INFORMATION pi;
 
     PcSaveFlush();
+    /* The replacement process must be able to acquire this save lock. */
+    if (save_mutex) {
+        ReleaseMutex(save_mutex);
+        CloseHandle(save_mutex);
+        save_mutex = NULL;
+    }
     GetModuleFileNameA(NULL, path, sizeof path);
     if (CreateProcessA(path, GetCommandLineA(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
         CloseHandle(pi.hThread);
@@ -220,6 +261,7 @@ int main(int argc, char *argv[])
     uint64_t freq, next_frame;
     int headless = 0, max_frames = 0;
     const char *dump_path = NULL;
+    const char *save_file = NULL;
     int scripted = 0, shot_every = 0, muted = 0;
     const char *gl_dump = NULL;
     const char *shot_dir = NULL;
@@ -237,6 +279,29 @@ int main(int argc, char *argv[])
             if (PcTestLoadInput(argv[++i]) == 0) scripted = 1;
         } else if (!strcmp(argv[i], "--wav") && i + 1 < argc) PcTestOpenWav(argv[++i]);
         else if (!strcmp(argv[i], "--mute")) muted = 1;
+        else if (!strcmp(argv[i], "--pc-boxes")) {
+            gPcLauncherMode = PC_LAUNCHER_BOXES;
+            if (i + 1 < argc && argv[i + 1][0] != '-') {
+                const char *mode = argv[++i];
+                if (!strcmp(mode, "withdraw")) gPcLauncherBoxOption = 0;
+                else if (!strcmp(mode, "deposit")) gPcLauncherBoxOption = 1;
+                else if (!strcmp(mode, "items")) gPcLauncherBoxOption = 3;
+                else if (strcmp(mode, "view") && strcmp(mode, "organize") && strcmp(mode, "move") && strcmp(mode, "details")) {
+                    fprintf(stderr, "Unknown PC Boxes mode: %s\n", mode);
+                    return 2;
+                }
+            }
+        }
+        else if (!strcmp(argv[i], "--mystery-gift")) gPcLauncherMode = PC_LAUNCHER_MYSTERY_GIFT;
+        else if (!strcmp(argv[i], "--launcher-parent") && i + 1 < argc) {
+            char *end;
+            unsigned long long parent = strtoull(argv[++i], &end, 10);
+            if (!parent || *end || parent > UINTPTR_MAX || !IsWindow((HWND)(uintptr_t)parent)) {
+                fprintf(stderr, "The launcher parent window is not valid.\n");
+                return 2;
+            }
+            PcVideoSetParent((uintptr_t)parent);
+        }
         else if (!strcmp(argv[i], "--gl-dump") && i + 1 < argc) gl_dump = argv[++i];
         else if (!strcmp(argv[i], "--warp") && i + 4 < argc) {
             gPcDebugWarp.group = atoi(argv[++i]);
@@ -258,10 +323,20 @@ int main(int argc, char *argv[])
         else if (!strcmp(argv[i], "--net-chat") && i + 1 < argc) snprintf(gPcDebugNet.chat, sizeof gPcDebugNet.chat, "%s", argv[++i]);
         else if (!strcmp(argv[i], "--net-request") && i + 1 < argc) gPcDebugNet.request_kind = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--paced")) paced = 1; /* test: headless at real speed (online) */
+        else if (!strcmp(argv[i], "--save-file")) {
+            if (i + 1 >= argc || !*argv[i + 1] || argv[i + 1][0] == '-') {
+                fprintf(stderr, "--save-file requires a cartridge save path.\n");
+                return 2;
+            }
+            save_file = argv[++i];
+        }
         else if (!strcmp(argv[i], "--data-dir") && i + 1 < argc) {
             /* save, settings and online account live here (test: two clients) */
             CreateDirectoryA(argv[i + 1], NULL);
-            SetCurrentDirectoryA(argv[++i]);
+            if (!SetCurrentDirectoryA(argv[++i])) {
+                fprintf(stderr, "Could not open save directory: %s\n", argv[i]);
+                return 2;
+            }
         }
         else if (!strcmp(argv[i], "--give-item") && i + 2 < argc) {
             gPcDebugGiveItem.item = atoi(argv[++i]);
@@ -283,11 +358,23 @@ int main(int argc, char *argv[])
         }
     }
 
+    if (!PcSaveSetPath(save_file)) {
+        fprintf(stderr, "Could not resolve the save file or its parent directory: %s\n",
+                save_file ? save_file : "firered.sav");
+        return 2;
+    }
+    if (!lock_save_path()) {
+        fprintf(stderr, "This save is already open in another FireRed PC process, or its lock could not be created.\n");
+        return 4;
+    }
     PcNullGuardInstall();
     PcSettingsLoad();
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS) != 0)
         PcFatal("SDL_Init: %s", SDL_GetError());
-    if (!headless && PcVideoInit("PokeRecomp") != 0)
+    const char *window_title = gPcLauncherMode == PC_LAUNCHER_BOXES
+        ? "PokeRecomp - PC Boxes | Z: Back / save and return, X: Confirm"
+        : gPcLauncherMode == PC_LAUNCHER_MYSTERY_GIFT ? "PokeRecomp - Mystery Gift" : "PokeRecomp";
+    if (!headless && PcVideoInit(window_title) != 0)
         PcFatal("could not open the game window");
     /* headless runs are silent (use --wav to capture) */
     PcAudioInit(headless || muted);
@@ -305,7 +392,9 @@ int main(int argc, char *argv[])
     freq = SDL_GetPerformanceFrequency();
     next_frame = SDL_GetPerformanceCounter();
     for (int frames = 0; !quit_requested && (!max_frames || frames < max_frames); frames++) {
+        if (!headless && !PcVideoMaintainParent()) break;
         SwitchToFiber(game_fiber);   /* game logic until it waits for VBlank */
+        if (quit_requested) break;
         InterlockedIncrement(&frames_done);
         spin_count = 0;
         if (getenv("PC_TRACE_FRAMES") && frames % 60 == 0) fprintf(stderr, "frame %d\n", frames);
@@ -337,6 +426,7 @@ int main(int argc, char *argv[])
                 PcVideoPresent(frame, frame_width, GBA_HEIGHT);
             }
             uint16_t keys = PcInputPoll(&quit_requested, &turbo);
+            if (turbo && PcNetConnected()) turbo = 0;   /* on a server everyone plays at the same speed */
             if (!scripted) PcIoWrite16(REG_KEYINPUT, keys);
 
             if (gl_dump) {
@@ -369,6 +459,10 @@ int main(int argc, char *argv[])
     PcSaveFlush();
     if (!headless) PcVideoShutdown();
     SDL_Quit();
+    if (save_mutex) {
+        ReleaseMutex(save_mutex);
+        CloseHandle(save_mutex);
+    }
     game_over = 1;
-    return 0;
+    return launcher_exit_code;
 }

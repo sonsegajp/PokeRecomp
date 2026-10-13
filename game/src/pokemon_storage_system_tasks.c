@@ -25,6 +25,9 @@
 #include "constants/items.h"
 #include "constants/help_system.h"
 #include "constants/songs.h"
+#ifdef PLATFORM_PC
+#include "pc_launcher.h"
+#endif
 
 EWRAM_DATA struct PokemonStorageSystemData *gStorage = NULL;
 static EWRAM_DATA bool8 sInPartyMenu = 0;
@@ -2767,6 +2770,11 @@ static void SetPokeStorageQuestLogEvent(u8 action)
         questLogData->box2 = box2;
         break;
     }
+#ifdef PLATFORM_PC
+    /* Launcher storage has no live overworld scene to record. */
+    if (gPcLauncherMode == PC_LAUNCHER_BOXES)
+        return;
+#endif
     SetQuestLogEvent(event, (const u16 *)questLogData);
 }
 

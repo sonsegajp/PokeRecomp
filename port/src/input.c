@@ -55,7 +55,9 @@ uint16_t PcInputPoll(int *quit, int *fast_forward)
             SDL_StartTextInput();
         }
         else if (e.type == SDL_KEYDOWN && !e.key.repeat) {
-            if (e.key.keysym.scancode == SDL_SCANCODE_F11) {
+            if (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE && PcVideoIsEmbedded()) {
+                PcVideoRequestLauncherExit();
+            } else if (e.key.keysym.scancode == SDL_SCANCODE_F11) {
                 gPcSettings.fullscreen ^= 1;
                 PcSettingsApplyVideo();
                 PcSettingsSave();

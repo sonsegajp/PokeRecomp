@@ -1,0 +1,13 @@
+﻿{
+  "stage": "first_scene_edits",
+  "prompts": [
+    [
+      "main",
+      "Use case: precise-object-edit. Edit the supplied laboratory background into the MAIN MENU environment. Preserve the art style, room, evening lighting, 16:9 composition and colors. Replace the tall storage-PC tower and circular pedestal on the left countertop with a normal beige retro desktop CRT computer and keyboard, angled slightly right, with simple blue screen showing a white pokeball icon. Place a small friendly Pikachu beside the computer on the countertop. Keep right half of scene unobstructed for real menu. Remove the little Mew monitor at far right. No letters, no words, no logos, no interfaces, no borders. Clean full-bleed background artwork."
+    ],
+    [
+      "gifts",
+      "Use case: precise-object-edit. Edit supplied laboratory background into MYSTERY GIFTS environment. Keep room, cinematic painterly 3D art style, evening colors, countertop, and overall 16:9 composition. Replace the left tower PC with a small circular holographic emitter on the same pedestal. Over it, place a floating translucent pale lavender Mew hologram with long curved tail and blue light projections, matching the friendly character. Show hologram in left third of frame at same overall height as previous computer. Remove background Pikachu and rightmost monitor. Right half stays quiet dim lab background for later real menu. No words, no labels, no logos, no interface, no borders. Only clean full-bleed environmental artwork."
+    ]
+  ]
+}

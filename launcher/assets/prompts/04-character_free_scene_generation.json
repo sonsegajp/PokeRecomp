@@ -1,0 +1,13 @@
+﻿{
+  "stage": "character_free_scene_generation",
+  "prompts": [
+    [
+      "main",
+      "Use case: stylized-concept. Make one clean 16:9 video game launcher background, with NO interface. Cinematic stylized 3D painted professor's laboratory at evening, tall concrete pillars, deep blue windows revealing coastal town dusk lights, back-wall map and books, gray polished stone countertop along lower foreground. On left third, a beige 1990s desktop CRT computer, angled slightly right, a thick curved-glass blue monitor with a simple white circle-and-bar emblem, keyboard and mouse. Leave a clear area on tabletop immediately to right of monitor (around horizontal 40%) for a character to be independently composited later. A couple of small red-white toy balls in lower left. Dimly lit lab background on entire right half, lots of quiet negative space for real menu UI. Warm gold overhead lamp against cool blue room, detailed softly painted surfaces, slightly low-poly shapes, gentle depth of field. Frontal countertop-height view. No characters or creatures. NO text anywhere, NO logo, NO menus, NO buttons, NO UI, NO interface, NO border, NO watermark. Full bleed 16:9."
+    ],
+    [
+      "gifts",
+      "Use case: stylized-concept. Make one clean 16:9 video game launcher background, with NO interface. Cinematic stylized 3D painted professor's laboratory at evening, concrete pillars, deep blue windows, maps and books in softly blurred background, gray polished stone tabletop in lower quarter. On left third of image, a broad short circular dark-metal holographic projector pedestal on the table. Its blue glowing circular emitter projects soft translucent blue light rays upward into an EMPTY cone of light against dim room background; leave that entire illuminated area empty for a character overlay to be added independently later. The projector lies low around y=78%, and empty blue hologram area extends up to 25% height. Right half is dim and quiet lab background with negative space for menu overlay. Match a cozy cinematic low-poly painterly 3D adventure game style with restrained blue-gray tones. No characters or creatures. No projected objects. NO text anywhere, NO logos, NO menus, NO UI, NO border, NO watermark. Full bleed 16:9."
+    ]
+  ]
+}

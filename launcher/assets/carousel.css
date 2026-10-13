@@ -1,0 +1,35 @@
+/* GEN 3 branding and the independently rendered 3D game library. */
+.title-logo{top:14px;left:286px;width:708px;height:265px}
+.subtitle.recompiled{top:279px;color:#f5eac8;font:30px Consolas,"Courier New",monospace;font-weight:bold;letter-spacing:3px;text-shadow:2px 3px 0 #263046,0 0 12px #0008}
+.main-logo{top:29px;left:46px;width:536px;height:236px}
+.main-edition{top:267px;left:80px;width:455px;font-size:24px;letter-spacing:2px;color:#f6edda;text-shadow:2px 2px #18233b}
+#game-carousel{position:absolute;inset:90px 5px auto;height:454px;display:flex;align-items:center;justify-content:center}
+#game-carousel canvas{display:block;width:100%;height:100%;cursor:pointer;outline:0}
+.game-tabs{position:absolute;left:90px;right:90px;top:533px;display:flex;justify-content:center;gap:10px}
+.game-tab{width:202px;border:1px solid #8c97a159;background:#090f1bcc;padding:9px 14px;color:#d1d6dd;font-size:17px;transition:color .16s,border-color .16s,background .16s;border-radius:4px;line-height:1.15}
+.game-tab span{display:block;font-size:10px;letter-spacing:1.5px;margin-top:6px;color:#a8b3c4}
+.game-tab.selected{border-color:#f2c890;background:#5c2d20d9;color:#fff3d7;box-shadow:inset 0 0 0 1px #e1964345}
+.game-tab.selected span{color:#f5d9a9}
+.game-tab.disabled{color:#6b717a;border-color:#4a505959;background:#0a0d14b3}
+.game-tab.disabled.selected{color:#9aa0a8;border-color:#7a808a;background:#262a31d9;box-shadow:none}
+.game-caption.disabled{filter:grayscale(1);opacity:.55}
+.game-tab:focus-visible{outline:2px solid #ffe2ae;outline-offset:3px}
+.game-caption{top:610px;left:305px;right:305px}
+.game-title{font-size:21px;padding:9px 15px}
+.game-caption p{font-size:11px;letter-spacing:1px;margin:9px -60px}
+[data-screen="games"] .footer{bottom:23px;right:30px;font-size:15px;padding:10px 14px;gap:17px}
+[data-screen="games"] .library-action{bottom:26px;left:25px;gap:7px}
+[data-screen="games"] .small-action{font-size:12px;padding:9px 11px}
+.carousel-arrow{top:303px;background:#11172383;border:1px solid #8a909b75;border-radius:5px;padding:15px 10px}
+.carousel-arrow.prev{left:20px}.carousel-arrow.next{right:20px}
+.cover-fallback{width:16%;margin:1%;height:auto;box-shadow:8px 8px 15px #0007}
+.options-panel{top:99px}
+.options-panel .option-row{padding:9px 0}
+.options-panel h2{margin-bottom:12px}
+.options-panel .panel-actions{margin-top:17px}
+.scene-character{position:absolute;pointer-events:none;object-fit:contain;z-index:-1}
+.title-charizard{width:390px;height:390px;left:5px;bottom:78px;filter:brightness(.84) sepia(.14) drop-shadow(4px 16px 7px #33202188)}
+.title-venusaur{width:347px;height:347px;right:0;bottom:72px;filter:brightness(.8) sepia(.16) drop-shadow(4px 15px 8px #35202388)}
+.main-pikachu{width:239px;height:239px;left:501px;bottom:115px;filter:brightness(.8) drop-shadow(2px 13px 6px #06111e88)}
+.gift-mew{width:286px;height:286px;left:119px;top:197px;opacity:.87;filter:hue-rotate(33deg) saturate(.65) brightness(1.42) drop-shadow(0 0 12px #4c8fff);animation:hologram 4s ease-in-out infinite}
+@keyframes hologram{50%{transform:translateY(-9px);opacity:.73}}

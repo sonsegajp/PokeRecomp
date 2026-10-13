@@ -22,6 +22,9 @@
 #include "constants/cable_club.h"
 #include "constants/songs.h"
 #include "constants/union_room.h"
+#ifdef PLATFORM_PC
+#include "pc_launcher.h"
+#endif
 
 EWRAM_DATA u8 sDownArrowCounterAndYCoordIdx[8] = {};
 EWRAM_DATA bool8 gGiftIsFromEReader = FALSE;
@@ -460,6 +463,10 @@ void MainCB_FreeAllBuffersAndReturnToInitTitleScreen(void)
     Free(GetBgTilemapBuffer(1));
     Free(GetBgTilemapBuffer(2));
     Free(GetBgTilemapBuffer(3));
+#ifdef PLATFORM_PC
+    if (PcLauncherExitMysteryGift())
+        return;
+#endif
     SetMainCallback2(CB2_InitTitleScreen);
 }
 

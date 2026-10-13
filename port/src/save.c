@@ -1,4 +1,4 @@
-/* save.c — the cartridge's 128 KB flash chip, backed by firered.sav.
+/* save.c — the cartridge's 128 KB flash chip, backed by the selected cartridge save.
  *
  * Replaces pret's flash drivers (agb_flash*.c), which speak the chip's
  * command protocol over the cartridge bus. The game's own save logic
@@ -8,9 +8,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
+#include <io.h>
 
 #include "pc_hw.h"
 #include "pc_port.h"
+#include "pc_launcher.h"
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -18,8 +20,35 @@ typedef uint32_t u32;
 
 #define SECTOR_SIZE  0x1000
 #define SECTOR_COUNT 32
-#define SAVE_PATH    "firered.sav"
-#define SAVE_TMP     "firered.sav.tmp"
+/* Always resolve before locking/loading. Settings keep their own data directory. */
+static char save_path[MAX_PATH] = "firered.sav";
+static char save_temp[MAX_PATH] = "firered.sav.tmp";
+static char save_backup[MAX_PATH] = "firered.sav.launcher.bak";
+
+int PcSaveSetPath(const char *path)
+{
+    char resolved[MAX_PATH], parent[MAX_PATH], *file_part;
+    DWORD count, attributes;
+    if (!path) path = "firered.sav";
+    if (!*path) return 0;
+    count = GetFullPathNameA(path, sizeof resolved, resolved, &file_part);
+    if (!count || count >= sizeof resolved || !file_part || !*file_part ||
+        count + sizeof ".launcher.bak" > sizeof save_backup) return 0;
+    strcpy(parent, resolved);
+    parent[file_part - resolved] = 0;
+    attributes = GetFileAttributesA(parent);
+    if (attributes == INVALID_FILE_ATTRIBUTES || !(attributes & FILE_ATTRIBUTE_DIRECTORY)) return 0;
+    attributes = GetFileAttributesA(resolved);
+    if (attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY)) return 0;
+    strcpy(save_path, resolved);
+    memcpy(save_temp, resolved, count);
+    memcpy(save_temp + count, ".tmp", sizeof ".tmp");
+    memcpy(save_backup, resolved, count);
+    memcpy(save_backup + count, ".launcher.bak", sizeof ".launcher.bak");
+    return 1;
+}
+
+const char *PcSaveGetPath(void) { return save_path; }
 
 static int dirty;
 
@@ -121,7 +150,7 @@ u32 ProgramFlashSectorAndVerifyNBytes(u16 sector, void *src, u32 n)
 
 void PcSaveLoad(void)
 {
-    FILE *f = fopen(SAVE_PATH, "rb");
+    FILE *f = fopen(save_path, "rb");
 
     memset(gPcFlash, 0xFF, sizeof gPcFlash);
     if (f) {
@@ -132,15 +161,28 @@ void PcSaveLoad(void)
 }
 
 /* Write to a temp file and swap it in, so a crash never leaves a torn save. */
-void PcSaveFlush(void)
+int PcSaveFlushChecked(void)
 {
     FILE *f;
 
-    if (!dirty) return;
-    f = fopen(SAVE_TMP, "wb");
-    if (!f) return;
+    if (!dirty) return 1;
+    f = fopen(save_temp, "wb");
+    if (!f) return 0;
     int ok = fwrite(gPcFlash, 1, sizeof gPcFlash, f) == sizeof gPcFlash;
+    if (ok) ok = fflush(f) == 0;
+    if (ok) ok = _commit(_fileno(f)) == 0;
     ok = (fclose(f) == 0) && ok;
-    if (ok && MoveFileExA(SAVE_TMP, SAVE_PATH, MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+    if (ok && MoveFileExA(save_temp, save_path, MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
         dirty = 0;
+    return !dirty;
+}
+
+void PcSaveFlush(void)
+{
+    (void)PcSaveFlushChecked();
+}
+
+int PcLauncherBackupSave(void)
+{
+    return CopyFileA(save_path, save_backup, FALSE) != 0;
 }

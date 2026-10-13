@@ -16,3 +16,15 @@ EmeraldPC.exe
 *.pkmn
 games/
 PokeRecompGame.exe
+
+# local state, caches, logs
+launcher/state/
+__pycache__/
+settings.ini
+nullguard.log
+hang.log
+online.dat
+online.ini
+travel.dat
+*World Settings.ini
+build/

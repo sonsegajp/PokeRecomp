@@ -1,0 +1,114 @@
+{
+  "source": "Original local FireRed/LeafGreen pret game assets. No generated or redrawn artwork.",
+  "method": "Decode uncompressed original GBA 4bpp tile data using the original 16-entry BGR555 palette. Palette index zero becomes transparent. RGB channel conversion n*255//31 equals all original source PNG palette colors. Export horizontal sheets preserving each original frame pixel.",
+  "verification": "Every decoded pixel index was checked against the corresponding original indexed source PNG; every opaque exported RGB color equals its original source palette entry. Alpha values are exactly zero or 255.",
+  "paletteBindingSource": "game/src/data/battle_anim.h",
+  "graphicsBindingSource": "game/src/graphics.c",
+  "animations": {
+    "fire": {
+      "url": "fire.png",
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "frames": 8,
+      "columns": 8,
+      "sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "frameMs": 50.228118896484375,
+      "gameFrameDuration": 3,
+      "fps": 19.909166856535276,
+      "loop": true,
+      "transparentIndex": 0,
+      "originalAnimation": "sAnim_LargeFlame",
+      "animationSource": "game/src/battle_anim_fire.c",
+      "tileOffsets": [
+        0,
+        16,
+        32,
+        48,
+        64,
+        80,
+        96,
+        112
+      ]
+    },
+    "leaf": {
+      "url": "leaf.png",
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "frames": 9,
+      "columns": 9,
+      "sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        4,
+        3,
+        2,
+        1
+      ],
+      "frameMs": 83.71353149414062,
+      "gameFrameDuration": 5,
+      "fps": 11.945500113921167,
+      "loop": true,
+      "transparentIndex": 0,
+      "originalAnimation": "sRazorLeafParticleAnimCmds1",
+      "animationSource": "game/src/battle_anim_effects_1.c",
+      "tileOffsets": [
+        0,
+        4,
+        8,
+        12,
+        16,
+        20,
+        24,
+        28,
+        32
+      ]
+    }
+  },
+  "files": [
+    {
+      "source": "game/graphics/battle_anims/sprites/fire.png",
+      "sha256": "6d547fd21ab13be12e64c7a40689dc9941cea28e77ff032238627f0e3dc27e82"
+    },
+    {
+      "source": "game/graphics/battle_anims/sprites/fire.4bpp",
+      "sha256": "e7e96a22ed3ca2ff14b952199f08e2c847d482fa172582c2ab817f3c7d6391f9"
+    },
+    {
+      "source": "game/graphics/battle_anims/sprites/fire.gbapal",
+      "sha256": "45010a06ea027673b62cb75613bf9cd892ad2d7ef7ddafab50f57a1684a274c7"
+    },
+    {
+      "export": "fire.png",
+      "sha256": "28d9171a51483a90d2052a6d1ae6f01a45d37568835952ff9232f9daae14e264"
+    },
+    {
+      "source": "game/graphics/battle_anims/sprites/leaf.png",
+      "sha256": "3d5157878012e1a14a75c5c8f9b3c777a2b8c0bd54de39d308708da306c6b7d3"
+    },
+    {
+      "source": "game/graphics/battle_anims/sprites/leaf.4bpp",
+      "sha256": "f9ccab655bc49e375074ca1c07877433e66aa9c8f38c72d14ea7b21afe3f33d4"
+    },
+    {
+      "source": "game/graphics/battle_anims/sprites/leaf.gbapal",
+      "sha256": "786d7de1a127b968dec2f4712f87c316eb8f8ad0cd30dde98a8a24fe51efe94e"
+    },
+    {
+      "export": "leaf.png",
+      "sha256": "ec5c3bfe8d706c1eeafb62baebf799473d00bd4273c3065de06b70206b48052d"
+    }
+  ]
+}

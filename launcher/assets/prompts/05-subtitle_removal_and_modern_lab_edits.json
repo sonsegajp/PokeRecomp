@@ -1,0 +1,20 @@
+﻿{
+  "stage": "subtitle_removal_and_modern_lab_edits",
+  "prompts": [
+    [
+      "logo",
+      "Use case: precise-object-edit. Edit target: supplied transparent logo PNG. Remove ONLY ALL small subtitles below the large yellow and blue headline, including entire FIRERED & LEAFGREEN line and entire PC EDITION line. Replace removed pixels with actual transparent alpha. Keep the large yellow-blue 'PoKeRecomp' wordmark and red-white pokeball emblem unchanged in shape, lettering, color, bevel, outline, position. Final image should contain ONLY the large wordmark and pokeball backdrop. No subtitles, no tagline, no new text. Crop transparent bottom padding after removing subtitles to tightly frame the remaining logo with small clean transparent margin. Preserve true alpha transparency, no solid background, no checkerboard.",
+      "C:\\Users\\hyper\\FireRedPC\\launcher\\assets\\logo.png"
+    ],
+    [
+      "main",
+      "Use case: precise-object-edit. Supplied image is the exact target laboratory environment. Preserve its modern flat concrete lab walls, wide rectangular windows, books, blue dusk, gray countertop, camera angle, and painterly 3D style exactly. Change only the tall storage-PC tower and circular display pedestal on left: replace with standard beige retro desktop CRT computer and keyboard resting directly on the same countertop. Blue screen with simple white circle-and-bar symbol. Reserve clear tabletop to right of computer around 42% across frame for separate character overlay. Remove the distant yellow character and rightmost character monitor. Keep clean subdued right half. No new objects elsewhere. NO characters, NO words, NO logo, NO interface, NO borders. Modern laboratory with rectangular windows, preserve architecture; no arches, no antique library. 16:9.",
+      "C:\\Users\\hyper\\FireRedPC\\launcher\\assets\\backgrounds\\boxes.png"
+    ],
+    [
+      "gifts",
+      "Use case: precise-object-edit. Supplied image is the exact target laboratory environment. Preserve its modern flat concrete lab walls, wide rectangular windows, books, blue dusk, gray countertop, camera angle, and painterly 3D style exactly. Change only the tall storage-PC tower on left: REMOVE the tower completely, leaving the same circular display pedestal. Transform top of that pedestal into a blue glowing hologram emitter with several soft blue light rays going upward into EMPTY air. This is background-only, so no character appears in blue light; I will overlay it separately. Pedestal location left third unchanged. Remove the distant yellow character and rightmost character monitor. Right half clean subdued room. NO characters, NO words, NO logo, NO interface, NO borders. Modern laboratory with rectangular windows, preserve architecture; no arches, no antique library. 16:9.",
+      "C:\\Users\\hyper\\FireRedPC\\launcher\\assets\\backgrounds\\boxes.png"
+    ]
+  ]
+}

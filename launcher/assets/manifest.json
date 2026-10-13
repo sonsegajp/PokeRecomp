@@ -1,0 +1,839 @@
+{
+  "schemaVersion": 1,
+  "artDirection": "Active title: research-based classic Pokemon title composition with the selected two-line logo, dynamic official FRLG cover illustrations, and a softly filtered energy texture animated with dual waves and moving gradient lighting. Fire renders warm red/orange with original FireRed title flame rows; leaf renders teal/lime with 44 original FRLG leaf sprite instances in back/front layers. Interior screens retain the approved GameCube-inspired low-poly lab backgrounds.",
+  "provenanceNote": "The active title-energy texture is an OpenAI built-in imagegen reconstruction based on an actual Pokemon Box title screenshot, not an original Pokemon Box asset. Its installed violet/pink PNG is unchanged; WebGL supplies dual-sample wave motion, theme recoloring, and lighting. Active Charizard/Venusaur illustrations are official FRLG cover artwork downloaded unchanged from press-kit-sourced Bulbagarden files. The selected logo is copied unchanged; its sheen is a separate masked UI layer. Interior backgrounds remain generated layout-reference reconstructions. UI, characters, logo, and cover art are separate assets.",
+  "backgrounds": {
+    "title": {
+      "path": "backgrounds/title-energy.png",
+      "method": "OpenAI built-in imagegen reference-based texture reconstruction, copied unchanged; renderer supplies dual-sample waves, fire/leaf recoloring, and gradient lighting",
+      "active": true,
+      "logicalDimensions": [
+        1280,
+        720
+      ],
+      "css": "title.css",
+      "animationModule": "title-effects.js",
+      "spriteDirectory": "title-sprites/",
+      "spriteMetadata": "title-sprites/metadata.json",
+      "spriteProvenance": "title-sprites/provenance.json",
+      "colors": {
+        "fireFallback": "#fff4db",
+        "leafFallback": "#efffee"
+      },
+      "themes": [
+        "fire",
+        "leaf"
+      ],
+      "themeSelection": "Selected once per opening, retained when returning to title. Successive openings alternate when localStorage is available; the initial choice uses a random seed.",
+      "foregroundCharacters": [
+        "characters/charizard-boxart-official.png",
+        "characters/venusaur-boxart-official.png"
+      ],
+      "logo": "logo.png",
+      "hasBakedUI": false,
+      "note": "Generated texture contains no logo, characters, controls, or text. These are independent layers. Original FireRed title flames are active in overlapping rows; the original battle-flame sheet and earlier title raster/procedural experiments remain inactive.",
+      "effectRenderDimensions": [
+        1280,
+        720
+      ],
+      "effectScaling": "Linear texture filtering on a full-screen WebGL quad with aspect-preserving cover crop and two animated texture samples; up to 30 rendered frames per second",
+      "effects": {
+        "fire": "Warm red/orange shader recoloring, dual texture waves, moving gradient illumination, and overlapping rising rows from the original FireRed title flame frames",
+        "leaf": "Teal/lime shader recoloring preserving whites; 44 original FRLG leaf sprite instances split into 24 back and 20 foreground instances with drift, rotation, and foreground shadows",
+        "reducedMotion": "Static backdrop and sprite composition; a stationary subset of leaves; logo sheen disabled",
+        "fallback": "Animated Canvas 2D fallback uses a 640 x 360 intermediate canvas, two warped texture passes, theme recoloring, and moving gradient lighting; independent sprite layers remain available",
+        "depth": "Mascot illustration shadows and separate foreground/background sprite canvases",
+        "logoSheen": "Separate white CSS gradient masked to the unchanged logo PNG; 5.4-second cycle",
+        "provenance": "Reference-based generated reconstruction; no original Pokemon Box background texture or animation code is used"
+      },
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sourceFile": "C:\\Users\\hyper\\.codex\\generated_images\\01a134b4-567c-7160-9183-d2a17cb648fe\\exec-71b75764-30f7-46f2-8218-62f55ed75817.png",
+      "sha256": "34b9e420cb32a72aa50b96c03f0affbd757071ab4da90d752762b0769137bbd8",
+      "modified": false,
+      "promptFile": "backgrounds/title-energy.prompt.txt",
+      "generationReference": "build/reference/pokemon-box-title/pokemon-box-title-listal.jpg",
+      "referenceSource": "https://www.listal.com/viewimage/571199",
+      "sourceTextureColors": "Original installed PNG remains violet, cobalt, and pink; warm fire and teal/lime variants are runtime color transformations.",
+      "spriteMetadataFiles": [
+        "title-sprites/metadata.json",
+        "title-sprites/title-fire.json"
+      ],
+      "spriteProvenanceFiles": [
+        "title-sprites/provenance.json",
+        "title-sprites/title-fire-provenance.json"
+      ],
+      "fallbackRenderDimensions": [
+        640,
+        360
+      ]
+    },
+    "main": {
+      "path": "backgrounds/main.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "method": "OpenAI built-in imagegen",
+      "prompt": "Use case: style-transfer. Asset: one full-bleed 16:9 PRE-RENDERED GAMECUBE-ERA VIDEOGAME BACKGROUND. Art direction mandatory: look like an actual 2003-2005 Nintendo GameCube Pokémon Colosseum or XD environment render. Low polygon geometry with clear broad faces, modest smooth shading on simple models, flat/simple low-resolution baked diffuse textures, broad clean color areas, subdued vertex lighting, basic soft shadow blobs, simple plastic materials. This must look like a 2004 console game screenshot at 640x360 resolution enlarged cleanly, with limited early-2000s polygon budgets. NO modern cinematic realism, NO physically based materials, NO granular surface microdetail, NO photoreal texture, NO painterly brushwork, NO ray tracing, NO glossy raytraced reflections, NO depth of field, NO blur, NO film grain. Every surface simple and graphic. Reference image is COMPOSITION ONLY, change the rendering style completely to early GameCube. NO text, NO logos, NO UI, NO menu, NO border or bars. Preserve reference's main layout but simplify entire room: modern professor laboratory with large rectangular blue windows, plain gray concrete pillars, blocky bookcase and simple map. Beige box-shaped desktop CRT and simple keyboard on left third of blue-gray counter, blue monitor with simple white pokeball symbol. Two small red-white pokeballs. Countertop is solid smooth blue-gray with faint fake baked reflection, no marble texture. Reserve space immediately right of PC for independently layered Pikachu. Right half quiet dim wall/books for menu. No characters in this background.",
+      "hasBakedUI": false,
+      "foregroundCharacters": [
+        "characters/pikachu-3d.png"
+      ]
+    },
+    "games": {
+      "path": "backgrounds/games.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "method": "OpenAI built-in imagegen",
+      "prompt": "Use case: style-transfer. Asset: one full-bleed 16:9 PRE-RENDERED GAMECUBE-ERA VIDEOGAME BACKGROUND. Art direction mandatory: look like an actual 2003-2005 Nintendo GameCube Pokémon Colosseum or XD environment render. Low polygon geometry with clear broad faces, modest smooth shading on simple models, flat/simple low-resolution baked diffuse textures, broad clean color areas, subdued vertex lighting, basic soft shadow blobs, simple plastic materials. This must look like a 2004 console game screenshot at 640x360 resolution enlarged cleanly, with limited early-2000s polygon budgets. NO modern cinematic realism, NO physically based materials, NO granular surface microdetail, NO photoreal texture, NO painterly brushwork, NO ray tracing, NO glossy raytraced reflections, NO depth of field, NO blur, NO film grain. Every surface simple and graphic. Reference image is COMPOSITION ONLY, change the rendering style completely to early GameCube. NO text, NO logos, NO UI, NO menu, NO border or bars. Preserve broad reference laboratory layout: large EMPTY wide blue-gray countertop in foreground for later interactive game boxes, rectangular blue windows at rear left, blocky modern concrete pillars, simple shelf of books at rear right, framed Kanto map reduced to flat colored shapes. Camera frontal to counter. Table spans lower 40%, is a flat simple material with faint baked highlights. Center is empty and unobstructed for independent game cases. No cases, no characters, no complex details.",
+      "hasBakedUI": false,
+      "foregroundCharacters": []
+    },
+    "boxes": {
+      "path": "backgrounds/boxes.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "method": "OpenAI built-in imagegen",
+      "prompt": "Use case: style-transfer. Asset: one full-bleed 16:9 PRE-RENDERED GAMECUBE-ERA VIDEOGAME BACKGROUND. Art direction mandatory: look like an actual 2003-2005 Nintendo GameCube Pokémon Colosseum or XD environment render. Low polygon geometry with clear broad faces, modest smooth shading on simple models, flat/simple low-resolution baked diffuse textures, broad clean color areas, subdued vertex lighting, basic soft shadow blobs, simple plastic materials. This must look like a 2004 console game screenshot at 640x360 resolution enlarged cleanly, with limited early-2000s polygon budgets. NO modern cinematic realism, NO physically based materials, NO granular surface microdetail, NO photoreal texture, NO painterly brushwork, NO ray tracing, NO glossy raytraced reflections, NO depth of field, NO blur, NO film grain. Every surface simple and graphic. Reference image is COMPOSITION ONLY, change the rendering style completely to early GameCube. NO text, NO logos, NO UI, NO menu, NO border or bars. Preserve reference broad layout: simple beige vertical storage computer tower on circular platform, positioned left third of a modern professor lab. Tower made from three chunky rectangular segments, blue square monitor bearing white pokeball symbol, simple green physical button below. Modern lab plain gray pillars, rectangular deep blue windows, blocky desks and books. Right half quiet for later UI. Make computer exactly like low-poly early GameCube prop, with simple beige plastic surfaces. No visible words or character pictures.",
+      "hasBakedUI": false,
+      "foregroundCharacters": []
+    },
+    "gifts": {
+      "path": "backgrounds/gifts.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "method": "OpenAI built-in imagegen",
+      "prompt": "Use case: style-transfer. Asset: one full-bleed 16:9 PRE-RENDERED GAMECUBE-ERA VIDEOGAME BACKGROUND. Art direction mandatory: look like an actual 2003-2005 Nintendo GameCube Pokémon Colosseum or XD environment render. Low polygon geometry with clear broad faces, modest smooth shading on simple models, flat/simple low-resolution baked diffuse textures, broad clean color areas, subdued vertex lighting, basic soft shadow blobs, simple plastic materials. This must look like a 2004 console game screenshot at 640x360 resolution enlarged cleanly, with limited early-2000s polygon budgets. NO modern cinematic realism, NO physically based materials, NO granular surface microdetail, NO photoreal texture, NO painterly brushwork, NO ray tracing, NO glossy raytraced reflections, NO depth of field, NO blur, NO film grain. Every surface simple and graphic. Reference image is COMPOSITION ONLY, change the rendering style completely to early GameCube. NO text, NO logos, NO UI, NO menu, NO border or bars. Use reference only for positions, but REPLACE antique architecture entirely with a simple modern gray professor lab from Pokémon XD on GameCube, rectangular blue windows and boxy concrete columns. At horizontal 27%, a low circular hologram emitter platform rests on flat blue-gray counter. Emitter glows cyan and projects several simple translucent BLUE TRIANGLES upward into empty air. Leave hologram volume empty so Mew is a separate overlay. Room made of simple low-poly geometry, flat basic textures, solid color modern cabinets and books. Right half dim and empty enough for menu. Counter occupies lower third. No character, no creature, no arches, no antiques, no complicated details.",
+      "hasBakedUI": false,
+      "foregroundCharacters": [
+        "characters/mew-3d.png"
+      ]
+    },
+    "options": {
+      "path": "backgrounds/options.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "method": "OpenAI built-in imagegen",
+      "prompt": "Use case: style-transfer. Asset: one full-bleed 16:9 PRE-RENDERED GAMECUBE-ERA VIDEOGAME BACKGROUND. Art direction mandatory: look like an actual 2003-2005 Nintendo GameCube Pokémon Colosseum or XD environment render. Low polygon geometry with clear broad faces, modest smooth shading on simple models, flat/simple low-resolution baked diffuse textures, broad clean color areas, subdued vertex lighting, basic soft shadow blobs, simple plastic materials. This must look like a 2004 console game screenshot at 640x360 resolution enlarged cleanly, with limited early-2000s polygon budgets. NO modern cinematic realism, NO physically based materials, NO granular surface microdetail, NO photoreal texture, NO painterly brushwork, NO ray tracing, NO glossy raytraced reflections, NO depth of field, NO blur, NO film grain. Every surface simple and graphic. Reference image is COMPOSITION ONLY, change the rendering style completely to early GameCube. NO text, NO logos, NO UI, NO menu, NO border or bars. Preserve reference broad layout: an open RED handheld console on low black plinth in lower left third of modern lab desk. Console shape simple low-poly clamshell with dark blue screen and basic controls. Behind it a short stack of colored blocky books and a low-poly green plant. Small red-white pokeball center. Tall plain gray walls and rectangular window to left with flat-color coastal town outside at blue dusk. No writing on blank wall poster. Right half quiet for menu. Solid blue-gray countertop, no marble or surface detail.",
+      "hasBakedUI": false,
+      "foregroundCharacters": []
+    }
+  },
+  "logo": {
+    "path": "logo.png",
+    "method": "Exact unmodified copy of the user-selected logo preview",
+    "sourceFile": "C:\\Users\\hyper\\.codex\\generated_images\\01a134b4-567c-7160-9183-d2a17cb648fe\\exec-4f04bac0-01df-480c-bfbd-e9209c19241b.png",
+    "sha256": "85aaf51844a6fc5394cec96f57a0fc2f97d9c8cd413d391c3dd39c60263714a5",
+    "dimensions": [
+      1942,
+      809
+    ],
+    "alpha": true,
+    "modified": false,
+    "wordmarkLines": [
+      "Pokémon",
+      "RECOMPILED"
+    ],
+    "containsSubtitles": false,
+    "note": "Exact user-selected flat two-line Pokemon RECOMPILED logo. White tall condensed arched RECOMPILED with black outline beneath yellow/blue Pokemon; no Pokeball. RECOMPILED is integrated into the wordmark, so the main menu companion line is GEN 3 only."
+  },
+  "covers": {
+    "ruby": {
+      "path": "covers/ruby.png",
+      "source": "https://thumbnails.libretro.com/Nintendo%20-%20Game%20Boy%20Advance/Named_Boxarts/Pokemon%20-%20Ruby%20Version%20(USA).png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "kind": "Official retail box cover scan from Libretro thumbnail archive",
+      "modified": false,
+      "attribution": "Nintendo / Game Freak / Creatures / The Pokémon Company"
+    },
+    "sapphire": {
+      "path": "covers/sapphire.png",
+      "source": "https://thumbnails.libretro.com/Nintendo%20-%20Game%20Boy%20Advance/Named_Boxarts/Pokemon%20-%20Sapphire%20Version%20(USA).png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "kind": "Official retail box cover scan from Libretro thumbnail archive",
+      "modified": false,
+      "attribution": "Nintendo / Game Freak / Creatures / The Pokémon Company"
+    },
+    "firered": {
+      "path": "covers/firered.png",
+      "source": "https://thumbnails.libretro.com/Nintendo%20-%20Game%20Boy%20Advance/Named_Boxarts/Pokemon%20-%20FireRed%20Version%20(USA).png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "kind": "Official retail box cover scan from Libretro thumbnail archive",
+      "modified": false,
+      "attribution": "Nintendo / Game Freak / Creatures / The Pokémon Company"
+    },
+    "leafgreen": {
+      "path": "covers/leafgreen.png",
+      "source": "https://thumbnails.libretro.com/Nintendo%20-%20Game%20Boy%20Advance/Named_Boxarts/Pokemon%20-%20LeafGreen%20Version%20(USA).png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "kind": "Official retail box cover scan from Libretro thumbnail archive",
+      "modified": false,
+      "attribution": "Nintendo / Game Freak / Creatures / The Pokémon Company"
+    },
+    "emerald": {
+      "path": "covers/emerald.png",
+      "source": "https://thumbnails.libretro.com/Nintendo%20-%20Game%20Boy%20Advance/Named_Boxarts/Pokemon%20-%20Emerald%20Version%20(USA%2C%20Europe).png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "kind": "Official retail box cover scan from Libretro thumbnail archive",
+      "modified": false,
+      "attribution": "Nintendo / Game Freak / Creatures / The Pokémon Company"
+    }
+  },
+  "characters": {
+    "charizard": {
+      "path": "characters/charizard-boxart-official.png",
+      "source": "https://archives.bulbagarden.net/media/upload/8/86/Boxart_Charizard.png",
+      "sourcePage": "https://archives.bulbagarden.net/wiki/File:Boxart_Charizard.png",
+      "pressKitSource": "https://archive.org/details/redump-id-67934",
+      "provenance": "Official Ken Sugimori FireRed/LeafGreen art; current Bulbagarden upload dated June 5, 2026 cites a 2004 Australian press kit.",
+      "dimensions": [
+        2442,
+        2442
+      ],
+      "kind": "Official Ken Sugimori FireRed/LeafGreen cover illustration",
+      "alpha": true,
+      "alphaBounds": [
+        0,
+        135,
+        2442,
+        2296
+      ],
+      "modified": false,
+      "sha256": "2e2b3b1ec9e6e4714035529a5f5b2809d69eaa98eecf72e7c9fd93898b892131",
+      "active": true,
+      "verification": "Pose and linework visually checked against the retail cover; PNG transparency checked in Chromium; installed file hash matches downloaded source",
+      "note": "Unmodified source PNG; not generated, traced, or redrawn."
+    },
+    "venusaur": {
+      "path": "characters/venusaur-boxart-official.png",
+      "source": "https://archives.bulbagarden.net/media/upload/6/63/Boxart_Venusaur.png",
+      "sourcePage": "https://archives.bulbagarden.net/wiki/File:Boxart_Venusaur.png",
+      "pressKitSource": "https://archive.org/details/redump-id-67934",
+      "provenance": "Official Ken Sugimori FireRed/LeafGreen art; current Bulbagarden upload dated June 5, 2026 cites a 2004 Australian press kit.",
+      "dimensions": [
+        1932,
+        1932
+      ],
+      "kind": "Official Ken Sugimori FireRed/LeafGreen cover illustration",
+      "alpha": true,
+      "alphaBounds": [
+        0,
+        144,
+        1932,
+        1816
+      ],
+      "modified": false,
+      "sha256": "82bbb1629a5bce577fd307fb3914d6393161fe312c982fc7669eb37a252ca127",
+      "active": true,
+      "verification": "Pose and linework visually checked against the retail cover; PNG transparency checked in Chromium; installed file hash matches downloaded source",
+      "note": "Unmodified source PNG; not generated, traced, or redrawn."
+    },
+    "pikachu": {
+      "path": "characters/pikachu-3d.png",
+      "source": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/25.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "kind": "Official Pokemon HOME 3D render distributed in PokeAPI sprites repository",
+      "alpha": true,
+      "modified": false,
+      "note": "A separate 3D foreground render; not claimed to be an original GameCube model/rip."
+    },
+    "mew": {
+      "path": "characters/mew-3d.png",
+      "source": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/151.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "kind": "Official Pokemon HOME 3D render distributed in PokeAPI sprites repository",
+      "alpha": true,
+      "modified": false,
+      "note": "A separate 3D foreground render; not claimed to be an original GameCube model/rip."
+    }
+  },
+  "supplementaryCharacters": {
+    "pikachu": {
+      "path": "characters/pikachu.png",
+      "source": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png"
+    },
+    "mew": {
+      "path": "characters/mew.png",
+      "source": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/151.png"
+    }
+  },
+  "retainedPreviousVersion": {
+    "path": "source-v1/",
+    "note": "Earlier detailed background reconstructions retained for comparison, not launcher defaults."
+  },
+  "reconstructionLimitations": "The title-energy texture is generated from a screenshot reference, not extracted Pokemon Box artwork or original animation code. WebGL supplies synthesized waves, lighting, and fire/leaf recoloring. Interior props remain baked into raster environments rather than interactive 3D scenes. Earlier title rasters, general official character illustrations, and the original FRLG battle-flame export remain inactive alternatives. Active official cover illustrations, selected logo, original leaf sprite frames, and original FireRed title flame frames are separate assets; launcher motion, layering, opacity, and shadows are composed at runtime.",
+  "promptHistoryFiles": [
+    "prompts/01-initial_reference_reconstruction.json",
+    "prompts/02-remaining_reference_reconstruction.json",
+    "prompts/03-first_scene_edits.json",
+    "prompts/04-character_free_scene_generation.json",
+    "prompts/05-subtitle_removal_and_modern_lab_edits.json",
+    "prompts/06-gamecube_scene_style_edits.json",
+    "prompts/07-unsuccessful_character_style_edits.json",
+    "backgrounds/title-energy.prompt.txt"
+  ],
+  "logoHistory": [
+    {
+      "path": "logo.png",
+      "method": "OpenAI built-in imagegen reference reconstruction and subtitle removal",
+      "alpha": true,
+      "containsSubtitles": false,
+      "prompt": "Use case: precise-object-edit. Edit target: supplied transparent logo PNG. Remove ONLY ALL small subtitles below the large yellow and blue headline, including entire FIRERED & LEAFGREEN line and entire PC EDITION line. Replace removed pixels with actual transparent alpha. Keep the large yellow-blue 'PoKeRecomp' wordmark and red-white pokeball emblem unchanged in shape, lettering, color, bevel, outline, position. Final image should contain ONLY the large wordmark and pokeball backdrop. No subtitles, no tagline, no new text. Crop transparent bottom padding after removing subtitles to tightly frame the remaining logo with small clean transparent margin. Preserve true alpha transparency, no solid background, no checkerboard.",
+      "note": "Large PokeRecomp wordmark and Pokeball only. GEN 3: Recompiled is drawn once by application typography.",
+      "archivedPath": "source-v1/logo-pokerecomp-before-selected-recompiled.png"
+    }
+  ],
+  "retainedCharacterAlternatives": {
+    "charizard-3d": {
+      "path": "characters/charizard-3d.png",
+      "source": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/6.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "kind": "Official Pokemon HOME 3D render distributed in PokeAPI sprites repository",
+      "alpha": true,
+      "modified": false,
+      "note": "A separate 3D foreground render; not claimed to be an original GameCube model/rip."
+    },
+    "venusaur-3d": {
+      "path": "characters/venusaur-3d.png",
+      "source": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/3.png",
+      "dimensions": [
+        512,
+        512
+      ],
+      "kind": "Official Pokemon HOME 3D render distributed in PokeAPI sprites repository",
+      "alpha": true,
+      "modified": false,
+      "note": "A separate 3D foreground render; not claimed to be an original GameCube model/rip."
+    },
+    "charizard-general-official": {
+      "path": "characters/charizard-official.png",
+      "source": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png",
+      "dimensions": [
+        475,
+        475
+      ],
+      "kind": "Official 2D Pokemon illustration distributed in PokeAPI sprites official-artwork directory",
+      "alpha": true,
+      "modified": false,
+      "sha256": "b6d5b8ee9fb05dc6f53294b2cae660dec770b92762cdb19d16bcbd679e1ba43a",
+      "note": "Previous general official 2D illustration retained as an inactive alternative; active title uses the original FRLG cover pose.",
+      "active": false
+    },
+    "venusaur-general-official": {
+      "path": "characters/venusaur-official.png",
+      "source": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png",
+      "dimensions": [
+        475,
+        475
+      ],
+      "kind": "Official 2D Pokemon illustration distributed in PokeAPI sprites official-artwork directory",
+      "alpha": true,
+      "modified": false,
+      "sha256": "106d0040aa775f95871706c30ddd4abaef2c962215f5e8bd4141e0caef0ef8e4",
+      "note": "Previous general official 2D illustration retained as an inactive alternative; active title uses the original FRLG cover pose.",
+      "active": false
+    }
+  },
+  "inactiveBackgrounds": {
+    "coastalTitle": {
+      "path": "backgrounds/title.png",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "method": "OpenAI built-in imagegen",
+      "prompt": "Use case: stylized-concept. Create one clean pre-rendered Nintendo GameCube-era title-screen BACKGROUND environment, circa 2003-2005 console graphics. Full 16:9. Scene: sunset over ocean seen from cliff, simple angular broad-faced rock ledges in left and right lower foreground are EMPTY and wide enough for separately rendered characters. A simple white lighthouse with dark pointed roof on far upper-left hill, small coastal town of simple colored cube houses below left, rock stacks out in ocean right, low orange sun around 65% across horizon, broad pink-orange gradient sky filling upper half. Art direction must be original Pokémon Colosseum/XD kind of low polygon 3D world: simple broad geometry, flat low-resolution diffuse textures, basic vertex lighting, simple shadow blobs, ocean as flat plane with a few broad repeating painted highlights. Clear nostalgic 2004 console image. NOT modern realistic graphics, NOT painterly illustration. No microtexture, no granular stones, no photographic waves, no realism, no modern ray traced reflections, no depth of field, no film grain. NO characters or creatures, I will composite separate character assets later. NO words, NO logo, NO UI. Clean simple colorful game environment.",
+      "hasBakedUI": false,
+      "foregroundCharacters": [
+        "characters/charizard-official.png",
+        "characters/venusaur-official.png"
+      ],
+      "active": false,
+      "note": "Earlier coastal title raster retained on disk as an inactive reference. It is not used by the active title card."
+    }
+  },
+  "titleSprites": {
+    "method": "Decode original GBA 4bpp tiles with original BGR555 palettes; preserve source frame pixels and transparent index zero",
+    "path": "title-sprites/",
+    "metadata": "title-sprites/metadata.json",
+    "provenance": "title-sprites/provenance.json",
+    "renderer": "title-effects.js",
+    "animations": {
+      "fire": {
+        "url": "fire.png",
+        "frameWidth": 32,
+        "frameHeight": 32,
+        "frames": 8,
+        "columns": 8,
+        "sequence": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "frameMs": 50.228118896484375,
+        "gameFrameDuration": 3,
+        "fps": 19.909166856535276,
+        "loop": true,
+        "transparentIndex": 0,
+        "originalAnimation": "sAnim_LargeFlame",
+        "animationSource": "game/src/battle_anim_fire.c",
+        "tileOffsets": [
+          0,
+          16,
+          32,
+          48,
+          64,
+          80,
+          96,
+          112
+        ],
+        "active": false,
+        "usage": "Original FRLG battle-flame export retained for provenance; not loaded or drawn by the current title renderer"
+      },
+      "leaf": {
+        "url": "leaf.png",
+        "frameWidth": 16,
+        "frameHeight": 16,
+        "frames": 9,
+        "columns": 9,
+        "sequence": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "frameMs": 83.71353149414062,
+        "gameFrameDuration": 5,
+        "fps": 11.945500113921167,
+        "loop": true,
+        "transparentIndex": 0,
+        "originalAnimation": "sRazorLeafParticleAnimCmds1",
+        "animationSource": "game/src/battle_anim_effects_1.c",
+        "tileOffsets": [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20,
+          24,
+          28,
+          32
+        ],
+        "active": true,
+        "usage": "Leaf title variant: 44 instances, split 24 back and 20 foreground; reduced motion draws a stationary subset"
+      },
+      "titleFire": {
+        "url": "title-fire.png",
+        "frameWidth": 16,
+        "frameHeight": 16,
+        "frames": 10,
+        "columns": 10,
+        "sequence": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "gameFrameDurations": [
+          3,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6
+        ],
+        "frameDurationsMs": [
+          50.228118896484375,
+          100.45623779296875,
+          100.45623779296875,
+          100.45623779296875,
+          100.45623779296875,
+          100.45623779296875,
+          100.45623779296875,
+          100.45623779296875,
+          100.45623779296875,
+          100.45623779296875
+        ],
+        "durationMs": 954.3342590332031,
+        "loop": false,
+        "transparentIndex": 0,
+        "sourceAnimation": "sSpriteAnim_Flame",
+        "source": "game/src/title_screen.c",
+        "originalSpawner": {
+          "name": "Task_FlameSpawner",
+          "gbaResolution": [
+            240,
+            160
+          ],
+          "intervalGameFrames": 18,
+          "intervalMs": 301.36871337890625,
+          "fixedX": [
+            4,
+            16,
+            26,
+            32,
+            48,
+            200,
+            216,
+            224,
+            232,
+            60,
+            76,
+            92,
+            108,
+            128,
+            144
+          ],
+          "offsetXCycle": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "randomExtraX": [
+            0,
+            239
+          ],
+          "randomExtraVisibleChance": 0.5,
+          "spawnY": [
+            116,
+            117,
+            118
+          ],
+          "horizontalSpeedSubpixels": [
+            -2,
+            -1,
+            0,
+            1
+          ],
+          "verticalSpeedSubpixels": [
+            -16,
+            -15,
+            -14,
+            -13,
+            -12,
+            -11,
+            -10,
+            -9
+          ],
+          "subpixelsPerPixel": 16,
+          "horizontalUpdate": "x -= horizontalSpeedSubpixels/16",
+          "verticalUpdate": "y += verticalSpeedSubpixels/16",
+          "removeWhen": "Animation ended, x < -8, or y <16 or y >200"
+        },
+        "paletteRGBA": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            255
+          ],
+          [
+            255,
+            255,
+            189,
+            255
+          ],
+          [
+            255,
+            246,
+            139,
+            255
+          ],
+          [
+            255,
+            213,
+            65,
+            255
+          ],
+          [
+            255,
+            172,
+            0,
+            255
+          ],
+          [
+            197,
+            164,
+            49,
+            255
+          ],
+          [
+            115,
+            180,
+            139,
+            255
+          ],
+          [
+            98,
+            189,
+            156,
+            255
+          ],
+          [
+            90,
+            197,
+            164,
+            255
+          ],
+          [
+            0,
+            0,
+            0,
+            255
+          ],
+          [
+            0,
+            0,
+            0,
+            255
+          ],
+          [
+            0,
+            0,
+            0,
+            255
+          ],
+          [
+            0,
+            0,
+            0,
+            255
+          ],
+          [
+            0,
+            0,
+            0,
+            255
+          ],
+          [
+            82,
+            205,
+            180,
+            255
+          ]
+        ],
+        "active": true,
+        "metadata": "title-sprites/title-fire.json",
+        "provenance": "title-sprites/title-fire-provenance.json",
+        "usage": "Fire title variant: overlapping rising rows in separate back/front canvases. Source frame order/durations/colors are preserved; row composition, opacity, scale, and shadows are supplied by the launcher. Late olive/teal frames fade rather than being recolored."
+      }
+    },
+    "sourceGraphics": [
+      "game/graphics/battle_anims/sprites/fire.4bpp",
+      "game/graphics/battle_anims/sprites/fire.gbapal",
+      "game/graphics/battle_anims/sprites/leaf.4bpp",
+      "game/graphics/battle_anims/sprites/leaf.gbapal",
+      "game/graphics/title_screen/firered/flames.png",
+      "game/graphics/title_screen/firered/flames.4bpp",
+      "game/graphics/title_screen/firered/flames.gbapal"
+    ],
+    "pixelVerification": "Export provenance records original indexed-pixel and opaque-palette-color equivalence for the battle leaf/fire sheets and the separate title-fire export. This applies to exported sprites, not the generated title-energy texture or runtime opacity/shadows.",
+    "motion": "Separate 1280 x 720 Canvas 2D back/front layers draw original leaf and title-flame frames. Leaf variant uses 24 back and 20 front instances. Fire variant composes overlapping rising rows using original title animation timing. Hidden pages pause; reduced motion freezes composition and reduces leaf instances. The original battle-flame sheet is inactive."
+  },
+  "openingNotice": {
+    "source": "launcher/app.js",
+    "style": "title.css",
+    "durationMs": 8000,
+    "skipControls": [
+      "Enter",
+      "controller A",
+      "Continue button"
+    ],
+    "owners": [
+      "Nintendo",
+      "GAME FREAK",
+      "Creatures Inc.",
+      "The Pokemon Company"
+    ],
+    "message": "Unofficial fan project, not affiliated with or endorsed by the rights owners. No games or ROM downloads are provided through the launcher; use your own game files and saves.",
+    "presentation": "Plain centered text on a dark screen, without artwork panels or animated sprites",
+    "audio": "Silent; title music begins on the title route after the notice"
+  },
+  "screenTransitions": {
+    "module": "screen-transitions.js",
+    "overlay": "#screen-transition",
+    "fadeToBlackMs": 160,
+    "fadeFromBlackMs": 240,
+    "openingRevealMs": 350,
+    "swapBehavior": "Wait for the synchronous or asynchronous screen-swap callback while fully covered, then two render frames before revealing. The launcher render promise includes title-effect readiness and rendered image decoding.",
+    "reducedMotion": "No fade animation; swap and cleanup still run",
+    "lifecycle": "Reject overlapping transitions, block pointer input during transitions, and clear overlay/input blocking after completion, cancellation, disposal, or errors",
+    "nativeReturnReset": "The launcher-game-return event and status-poll exit path call the shared return routine. It clears pending launch/navigation/controller repeat state, invalidates older asynchronous generations, and calls the transition reset to cancel animation, resolve pending render-frame waits, and remove overlay input blocking."
+  },
+  "branding": {
+    "nativeWindowTitle": "Pokémon Recompiled · GEN 3",
+    "sources": [
+      "launcher/native/LauncherHost.cs",
+      "launcher/index.html"
+    ],
+    "mainCompanionLine": "GEN 3"
+  },
+  "titleResearchReferences": [
+    {
+      "game": "Pokemon Box Ruby & Sapphire",
+      "page": "https://www.listal.com/viewimage/571199",
+      "image": "https://iv1.lisimg.com/image/571199/608full-pokemon-box-ruby-%26-sapphire-screenshot.jpg",
+      "localReference": "build/reference/pokemon-box-title/pokemon-box-title-listal.jpg",
+      "inspection": "Downloaded and visually inspected; also supplied as imagegen style reference",
+      "informed": "Saturated softly filtered violet/pink vertical energy into white, compact overlapping logo/mascot hierarchy, outlined PRESS START"
+    },
+    {
+      "game": "Pokemon Box Ruby & Sapphire",
+      "page": "https://www.mobygames.com/game/15746/pokemon-box-ruby-sapphire/screenshots/gamecube/592417/",
+      "localReference": "build/reference/pokemon-box-title/pokemon-box-title-mobygames-retailer.png",
+      "image": "https://classicgamestore.ch/media/a8/90/22/1760808292/592417-pokemon-box-ruby-sapphire-gamecube-screenshot-title-screenoi0zjq8hradfr.png?ts=1766778076",
+      "inspection": "Downloaded retail-site mirror of the identified title screenshot and visually inspected",
+      "informed": "Corroborating title layout and background appearance at a different animation phase"
+    },
+    {
+      "game": "Pokemon FireRed",
+      "page": "https://www.retrogamingstores.com/pokemon-fire-red-gameboy-advance",
+      "image": "https://www.retrogamingstores.com/image/cache/data/gameboy_advance/pokemon_fire_red_title_screenshot-800x800.png",
+      "inspection": "Reviewed in image-search results",
+      "informed": "Prominent game logo and mascot with sparse start prompt"
+    },
+    {
+      "game": "Pokemon LeafGreen",
+      "page": "https://www.vooks.net/pokemon-fire-redleaf-green/",
+      "image": "https://www.vooks.net/img/1970/01/Pok%C3%A9mon-Leaf-Green-646x431.jpg",
+      "inspection": "Reviewed in image-search results",
+      "informed": "Simple title hierarchy and game-specific color identity"
+    },
+    {
+      "game": "Pokemon Emerald",
+      "page": "https://retrocatalog.com/games/pokemon-emerald-version",
+      "image": "https://images.igdb.com/igdb/image/upload/t_1080p/c77bodnkwu73gs2jwhw4.jpg",
+      "inspection": "Reviewed in image-search results",
+      "informed": "Logo/mascot/start-prompt hierarchy"
+    }
+  ],
+  "titleResearchNote": "Reference research informed the title composition and classic presentation. The plain centered ownership notice and screen fades are launcher UI, not copied ownership text or original game transition code.",
+  "audio": {
+    "module": "audio.js",
+    "provenance": "User-supplied MP3 files; playback uses the supplied recordings directly.",
+    "files": {
+      "title_screen.mp3": {
+        "path": "sounds/title_screen.mp3",
+        "source": "user-supplied",
+        "role": "Title screen music",
+        "loop": true,
+        "bytes": 1451089,
+        "sha256": "cb94618e13576c6d6ad73b87ee9d23ffd3eab1a437e09a465763a10a4ba2f6a3",
+        "playback": "Direct HTMLAudioElement playback"
+      },
+      "menus_music.mp3": {
+        "path": "sounds/menus_music.mp3",
+        "source": "user-supplied",
+        "role": "Interior menu music, including standalone storage",
+        "loop": true,
+        "bytes": 1667794,
+        "sha256": "8cb974b7d07cfd44dd6cb00be50401d42ae543adb0594d1990ab8f0f90ca09cd",
+        "playback": "Direct HTMLAudioElement playback",
+        "continuity": "One persistent HTMLAudioElement across main, games, boxes, storage, gifts, options, and their submenus"
+      },
+      "select.mp3": {
+        "path": "sounds/select.mp3",
+        "source": "user-supplied",
+        "role": "Navigation and selection sound",
+        "loop": false,
+        "bytes": 27095,
+        "sha256": "f4adbfa4cc051af9a495fa8b13d8ddb4103a9d70f56fe730bd0102ea52e543c1",
+        "playback": "Direct HTMLAudioElement playback"
+      }
+    },
+    "openingNotice": "Silent",
+    "masterVolume": "Shared volume setting from 0 to 10, with immediate audio-panel preview; leaving the panel restores the saved value unless saved",
+    "routeTransitions": {
+      "differentTrackFadeOutMs": 160,
+      "differentTrackFadeInMs": 1200,
+      "sameTrack": "Uninterrupted menu track across all interior screens and submenus; no restart or navigation volume dip"
+    },
+    "pauseConditions": [
+      "Native game starting or running",
+      "Hidden page",
+      "Page lifecycle suspension",
+      "Zero master volume"
+    ],
+    "browserPlayback": "Retries on pointer, keyboard, and controller interaction if autoplay is restricted",
+    "nativeAutoplayArgument": "--autoplay-policy=no-user-gesture-required",
+    "gain": {
+      "musicMasterMultiplier": 0.25,
+      "selectionMasterMultiplier": 0.55,
+      "musicEnvelope": "Music gain additionally follows the current fade envelope; selection gain is immediate"
+    },
+    "initialAndResumeFadeInMs": 1200
+  },
+  "nativeGameReturn": {
+    "event": "launcher-game-return",
+    "nativeSource": "launcher/native/LauncherHost.cs",
+    "browserSource": "launcher/app.js",
+    "transitionSource": "launcher/assets/screen-transitions.js",
+    "nativeBehavior": "ShowLauncher hides the game panel, shows and focuses WebView, then explicitly dispatches the browser event and focuses WebView again if no new game has started.",
+    "browserBehavior": "Shared restore routine clears pending, launchingGame, navigationPending, lastPadAction, and lastPadTime; increments navigation/state/game generations; resets screen transitions; refreshes backend state and audio; preserves existing error/confirmation dialogs.",
+    "pollingFallback": "A running-to-idle backend status transition invokes the same restore routine."
+  }
+}

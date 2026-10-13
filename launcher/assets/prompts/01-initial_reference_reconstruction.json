@@ -1,0 +1,17 @@
+﻿{
+  "stage": "initial_reference_reconstruction",
+  "prompts": [
+    [
+      "title",
+      "Use case: stylized-concept. Asset type: production video game launcher title screen BACKGROUND ONLY. Reference image: the attached six-panel launcher concept, use the TOP LEFT PANEL as the exact visual reference. Produce a single clean full-bleed 16:9 landscape artwork, no panels. Reconstruct and expand that scene: golden orange sunset over ocean and rocky coastal town, lighthouse on the far upper left, Charizard sitting on a rock in the left foreground with wings open and tail glowing, Venusaur resting on right foreground rock with large pink plant, sun just above ocean center-right, warm atmospheric stylized 3D painted render matching reference. Camera and broad composition faithful to top left panel. Keep upper center sky uncluttered as negative space for an independently rendered logo. NO TEXT, NO LOGOS, NO UI, NO buttons, NO black bars, NO copyright, NO border, NO watermarks. All text/logo from the reference must be absent and replaced with sky. The scene fills entire image. 16:9 aspect ratio."
+    ],
+    [
+      "main",
+      "Use case: stylized-concept. Asset type: production game launcher MAIN MENU BACKGROUND ONLY. Reference image: attached six-panel launcher concept, exact TOP RIGHT PANEL setting and style. Produce a single clean full-bleed 16:9 landscape artwork, no panels. A warmly rendered modern Pokemon professor lab at evening; large blue dusk windows and concrete pillars, polished gray countertop lower foreground, beige retro computer on left with blue screen and simple white pokeball symbol, small Pikachu sitting beside computer left of center, two pokeballs on counter. On right rear wall framed colorful Kanto region map and low books; keep RIGHT HALF dark and quiet with lots of negative space for independently rendered menu buttons. Stylized low-poly cinematic 3D-painted aesthetic, restrained blue evening tones with soft amber room light, matching reference closely. NO logos, NO TEXT, NO menus, NO interface elements, NO buttons, NO border, NO watermark. Reconstruct areas behind menu and logo. 16:9 aspect ratio."
+    ],
+    [
+      "boxes",
+      "Use case: stylized-concept. Asset type: production game launcher PC BOXES BACKGROUND ONLY. Reference image: attached six-panel launcher concept, exact MIDDLE RIGHT PANEL setting and style. Produce a single clean full-bleed 16:9 landscape scene. A gray beige vertical retro Pokemon storage PC tower on a circular brushed-metal pedestal on left third, tall squared top casing, blue monitor showing a simple pokeball symbol, horizontal seams and green circular button on lower casing. Professor lab interior, soft evening blue windows behind left, books and lab desk deep background, gray polished countertop foreground with reflections. Right half deliberately darker and quiet for real menu UI overlays. Match reference stylized 3D painterly cinematic material, slight depth of field, same floor-standing computer proportions. NO WORDS whatsoever on computer case, NO logo, NO UI, NO menus, NO buttons outside the physical machine, NO banners, NO border, NO watermark. Reconstruct full scene behind reference menu. 16:9 aspect ratio."
+    ]
+  ]
+}
