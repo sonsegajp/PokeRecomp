@@ -510,7 +510,12 @@ bool8 IsDma3ManagerBusyWithBgCopy(void)
         {
             s8 reqSpace = WaitDma3Request(i);
             if (reqSpace == -1)
+            {
+#ifdef PLATFORM_PC
+                PcSpinWait(); // menus spin on this until VBlank drains the queue
+#endif
                 return TRUE;
+            }
             sDmaBusyBitfield[div] &= ~(1 << mod);
         }
     }

@@ -38,6 +38,47 @@ static int quit_requested;
 static uint32_t frame[GBA_WIDTH * GBA_HEIGHT * 4];
 static int frame_width = GBA_WIDTH;
 
+/* Hang watchdog: if no frame completes for 5 s, sample where the game thread
+ * is and append it to hang.log (exe-relative addresses; map with nm). Only
+ * logs — a dragged window or a breakpoint can trip it harmlessly. */
+static volatile LONG frames_done;
+static HANDLE main_thread;
+
+static DWORD WINAPI watchdog(void *arg)
+{
+    LONG last = -1;
+    int still = 0;
+    uintptr_t base = (uintptr_t)GetModuleHandleA(NULL);
+
+    (void)arg;
+    for (;;) {
+        Sleep(1000);
+        if (frames_done != last) { last = frames_done; still = 0; continue; }
+        if (++still != 5) continue;
+        FILE *f = fopen("hang.log", "a");
+        if (!f) continue;
+        fprintf(f, "no frame for 5 s after frame %ld; game thread at:\n", last);
+        for (int i = 0; i < 8; i++) {
+            CONTEXT c;
+            c.ContextFlags = CONTEXT_CONTROL;
+            SuspendThread(main_thread);
+            if (GetThreadContext(main_thread, &c)) {
+                fprintf(f, "  rva=%08lx", (unsigned long)(c.Eip - base));
+                /* return addresses near the top of the stack (some will be stale) */
+                const DWORD *sp = (const DWORD *)c.Esp;
+                for (int k = 0; k < 64; k++)
+                    if (sp[k] - base < 0x2000000 && sp[k] > base)
+                        fprintf(f, " %08lx", (unsigned long)(sp[k] - base));
+                fprintf(f, "\n");
+            }
+            ResumeThread(main_thread);
+            Sleep(50);
+        }
+        fclose(f);
+    }
+    return 0;
+}
+
 uint16_t PcIoRead16(uint32_t off) { return *(uint16_t *)&gPcIo[off]; }
 void PcIoWrite16(uint32_t off, uint16_t v) { *(uint16_t *)&gPcIo[off] = v; }
 
@@ -75,6 +116,16 @@ void PcWaitForInterrupt(unsigned short mask)
 {
     (void)mask;
     SwitchToFiber(host_fiber);
+}
+
+static int spin_count;
+
+void PcSpinWait(void)
+{
+    if (++spin_count >= 256) {
+        spin_count = 0;
+        PcWaitForInterrupt(1); /* VBlank */
+    }
 }
 
 static void CALLBACK game_entry(void *arg)
@@ -191,6 +242,9 @@ int main(int argc, char *argv[])
     PcSaveLoad();
     PcIoWrite16(REG_KEYINPUT, 0x03FF);
 
+    DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &main_thread, 0, FALSE,
+                    DUPLICATE_SAME_ACCESS);
+    CreateThread(NULL, 0, watchdog, NULL, 0, NULL);
     host_fiber = ConvertThreadToFiber(NULL);
     game_fiber = CreateFiber(8 * 1024 * 1024, game_entry, NULL);
     if (!host_fiber || !game_fiber)
@@ -200,6 +254,8 @@ int main(int argc, char *argv[])
     next_frame = SDL_GetPerformanceCounter();
     for (int frames = 0; !quit_requested && (!max_frames || frames < max_frames); frames++) {
         SwitchToFiber(game_fiber);   /* game logic until it waits for VBlank */
+        InterlockedIncrement(&frames_done);
+        spin_count = 0;
         if (getenv("PC_TRACE_FRAMES") && frames % 60 == 0) fprintf(stderr, "frame %d\n", frames);
 
         /* Widescreen applies to the field; every other screen is the GBA's 240

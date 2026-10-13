@@ -79,7 +79,9 @@ static void log_site(uintptr_t ip, uintptr_t addr)
     if (logged_count < 256) logged[logged_count++] = ip;
     FILE *f = fopen("nullguard.log", "a");
     if (f) {
-        fprintf(f, "NULL access at eip=%08lx addr=%08lx\n", (unsigned long)ip, (unsigned long)addr);
+        /* rva = offset from the exe's load address, stable across runs (ASLR moves eip) */
+        fprintf(f, "NULL access at rva=%08lx addr=%08lx\n",
+                (unsigned long)(ip - (uintptr_t)GetModuleHandleA(NULL)), (unsigned long)addr);
         fclose(f);
     }
 }

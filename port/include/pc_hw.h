@@ -38,4 +38,11 @@ void PcDmaStop(int channel);
  * interrupt flags in `mask` has been raised by a handler. */
 void PcWaitForInterrupt(unsigned short mask);
 
+/* Call from a "still busy?" poll. On the GBA, code that spins on such a poll
+ * is released by an interrupt (VBlank drains the DMA queue, etc.); here the
+ * game only yields at VBlank waits. A poll that keeps failing many times in
+ * one frame is a spin, so this lets the frame end. One poll per frame (the
+ * normal "check again next frame" pattern) never yields. */
+void PcSpinWait(void);
+
 #endif
