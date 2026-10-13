@@ -309,7 +309,12 @@ void DrawDoorMetatileAt(int x, int y, const u16 *tiles)
 
 static void DrawMetatileAt(const struct MapLayout *mapLayout, u16 offset, int x, int y)
 {
+#ifdef PLATFORM_PC
+    u8 layerType;
+    u16 metatileId = PcFieldViewMetatileIdAt(x, y, &layerType);
+#else
     u16 metatileId = MapGridGetMetatileIdAt(x, y);
+#endif
     const u16 *metatiles;
 
     if (metatileId > NUM_METATILES_TOTAL)
@@ -321,7 +326,11 @@ static void DrawMetatileAt(const struct MapLayout *mapLayout, u16 offset, int x,
         metatiles = mapLayout->secondaryTileset->metatiles;
         metatileId -= NUM_METATILES_IN_PRIMARY;
     }
+#ifdef PLATFORM_PC
+    DrawMetatile(layerType, metatiles + metatileId * NUM_TILES_PER_METATILE, offset);
+#else
     DrawMetatile(MapGridGetMetatileLayerTypeAt(x, y), metatiles + metatileId * NUM_TILES_PER_METATILE, offset);
+#endif
 }
 
 static void DrawMetatile(s32 metatileLayerType, const u16 *tiles, u16 offset)

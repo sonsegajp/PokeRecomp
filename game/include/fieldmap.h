@@ -26,6 +26,9 @@ extern struct BackupMapLayout VMap;
 extern const struct MapLayout Route1_Layout;
 
 u32 MapGridGetMetatileIdAt(s32, s32);
+#ifdef PLATFORM_PC
+u32 PcFieldViewMetatileIdAt(s32 x, s32 y, u8 *layerType);
+#endif
 u32 MapGridGetMetatileBehaviorAt(s16, s16);
 u8 MapGridGetMetatileLayerTypeAt(s16 x, s16 y);
 void MapGridSetMetatileIdAt(s32, s32, u16);

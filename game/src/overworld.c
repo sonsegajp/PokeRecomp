@@ -1470,6 +1470,17 @@ static void DoCB1_Overworld_QuestLogPlayback(void)
 
 void CB1_Overworld(void)
 {
+#ifdef PLATFORM_PC
+    // Test hook (--warp): warp once the player can move.
+    if (gPcDebugWarp.pending && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked())
+    {
+        gPcDebugWarp.pending = 0;
+        SetWarpDestination(gPcDebugWarp.group, gPcDebugWarp.num, -1, gPcDebugWarp.x, gPcDebugWarp.y);
+        DoWarp();
+        ResetInitialPlayerAvatarState();
+        return;
+    }
+#endif
     if (gMain.callback2 == CB2_Overworld)
     {
         if (QL_GetPlaybackState() == QL_PLAYBACK_STATE_RUNNING || gQuestLogState == QL_STATE_PLAYBACK)

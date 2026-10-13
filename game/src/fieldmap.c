@@ -429,6 +429,62 @@ void MapGridSetMetatileImpassabilityAt(s32 x, s32 y, bool32 impassable)
     }
 }
 
+#ifdef PLATFORM_PC
+// Widescreen: the camera draws further out than the VMap's MAP_OFFSET margin
+// of connected maps. Out there, read the connected map itself rather than
+// repeating the border block. Drawing only; collision still uses the VMap.
+u32 PcFieldViewMetatileIdAt(s32 x, s32 y, u8 *layerType)
+{
+    const struct MapConnections *conns = gMapHeader.connections;
+    u32 metatileId;
+    s32 i;
+
+    metatileId = MapGridGetMetatileIdAt(x, y);
+    if (!AreCoordsWithinMapGridBounds(x, y) && conns != NULL)
+    {
+        for (i = 0; i < conns->count; i++)
+        {
+            const struct MapConnection *c = &conns->connections[i];
+            const struct MapHeader *m = GetMapHeaderFromConnection(c);
+            s32 offset = (s32)c->offset, w, h, cx, cy;
+
+            if (m == NULL)
+                continue;
+            w = m->mapLayout->width;
+            h = m->mapLayout->height;
+            switch (c->direction)
+            {
+            case CONNECTION_SOUTH:
+                cx = x - (offset + MAP_OFFSET);
+                cy = y - (gMapHeader.mapLayout->height + MAP_OFFSET);
+                break;
+            case CONNECTION_NORTH:
+                cx = x - (offset + MAP_OFFSET);
+                cy = y - (MAP_OFFSET - h);
+                break;
+            case CONNECTION_WEST:
+                cx = x - (MAP_OFFSET - w);
+                cy = y - (offset + MAP_OFFSET);
+                break;
+            case CONNECTION_EAST:
+                cx = x - (gMapHeader.mapLayout->width + MAP_OFFSET);
+                cy = y - (offset + MAP_OFFSET);
+                break;
+            default:
+                continue;
+            }
+            if (cx >= 0 && cx < w && cy >= 0 && cy < h)
+            {
+                metatileId = m->mapLayout->map[cx + cy * w] & MAPGRID_METATILE_ID_MASK;
+                break;
+            }
+        }
+    }
+    *layerType = GetAttributeByMetatileIdAndMapLayout(gMapHeader.mapLayout, metatileId, METATILE_ATTRIBUTE_LAYER_TYPE);
+    return metatileId;
+}
+#endif
+
 static u32 GetAttributeByMetatileIdAndMapLayout(const struct MapLayout *mapLayout, u16 metatile, u8 attributeType)
 {
     const u32 * attributes;

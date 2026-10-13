@@ -119,6 +119,7 @@ void PcWaitForInterrupt(unsigned short mask)
 }
 
 static int spin_count;
+struct PcDebugWarp gPcDebugWarp;
 
 void PcSpinWait(void)
 {
@@ -224,6 +225,13 @@ int main(int argc, char *argv[])
         } else if (!strcmp(argv[i], "--wav") && i + 1 < argc) PcTestOpenWav(argv[++i]);
         else if (!strcmp(argv[i], "--mute")) muted = 1;
         else if (!strcmp(argv[i], "--gl-dump") && i + 1 < argc) gl_dump = argv[++i];
+        else if (!strcmp(argv[i], "--warp") && i + 4 < argc) {
+            gPcDebugWarp.group = atoi(argv[++i]);
+            gPcDebugWarp.num = atoi(argv[++i]);
+            gPcDebugWarp.x = atoi(argv[++i]);
+            gPcDebugWarp.y = atoi(argv[++i]);
+            gPcDebugWarp.pending = 1;
+        }
         else if (!strcmp(argv[i], "--field-width") && i + 1 < argc) test_width = atoi(argv[++i]); /* test: widescreen field width */
         else if (!strcmp(argv[i], "--shots") && i + 2 < argc) {
             shot_every = atoi(argv[++i]);

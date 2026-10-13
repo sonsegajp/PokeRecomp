@@ -45,4 +45,9 @@ void PcWaitForInterrupt(unsigned short mask);
  * normal "check again next frame" pattern) never yields. */
 void PcSpinWait(void);
 
+/* Test hook (--warp GROUP NUM X Y): the overworld warps the player there as
+ * soon as they can move. */
+struct PcDebugWarp { int pending, group, num, x, y; };
+extern struct PcDebugWarp gPcDebugWarp;
+
 #endif
