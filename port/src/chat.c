@@ -9,6 +9,7 @@
 #include <windows.h>
 
 #include "pc_chat.h"
+#include "pc_mixer.h"
 #include "pc_controls.h"
 #include "pc_net.h"
 #include "pc_settings.h"
@@ -166,6 +167,8 @@ void PcChatReceive(const uint8_t *name, uint16_t tag, const uint8_t *text)
     for (i = 0; i < MAX_INPUT && text[i] != EOS; i++) l->text[i] = text[i];
     l->text[i] = EOS;
     l->when = GetTickCount64();
+    if (name)   /* a trainer said something (your own lines come back too) */
+        PcMixerChatBeep();
 }
 
 void PcChatReceiveGuild(const uint8_t *name, uint16_t tag, const uint8_t *text)

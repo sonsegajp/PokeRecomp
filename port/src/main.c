@@ -164,6 +164,7 @@ static int spin_count;
 struct PcDebugWarp gPcDebugWarp;
 struct PcDebugGiveMon gPcDebugGiveMon[6];
 struct PcDebugWild gPcDebugWild;
+int gPcDebugPlaySe;
 struct PcDebugGiveItem gPcDebugGiveItem;
 struct PcDebugNet gPcDebugNet;
 
@@ -354,6 +355,7 @@ int main(int argc, char *argv[])
             }
         }
         else if (!strcmp(argv[i], "--controls")) PcControlsToggle();   /* test: the controls panel open */
+        else if (!strcmp(argv[i], "--play-se") && i + 1 < argc) gPcDebugPlaySe = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--wild-battle") && i + 3 < argc) {
             gPcDebugWild.species = atoi(argv[++i]);
             gPcDebugWild.level = atoi(argv[++i]);

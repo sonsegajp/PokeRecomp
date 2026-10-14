@@ -11,6 +11,9 @@ struct SoundChannel;
 void PcMixerVBlank(struct SoundInfo *si);
 static inline void PcMixerChannelActive(int index, struct SoundChannel *chan) { (void)index; (void)chan; }
 
+/* The chat "pip": a short two-note blip mixed over the game's sound. */
+void PcMixerChatBeep(void);
+
 /* audio.c: hand rendered stereo frames to the audio device. */
 void PcAudioPush(const float *stereo, int frames);
 

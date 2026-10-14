@@ -1494,6 +1494,12 @@ void CB1_Overworld(void)
             gPcDebugGiveMon[i].species = 0;
         }
     }
+    if (gPcDebugPlaySe && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked() && gQuestLogState == 0)
+    {
+        m4aMPlayStop(&gMPlayInfo_BGM);   // heard on its own
+        PlaySE(gPcDebugPlaySe);
+        gPcDebugPlaySe = 0;
+    }
     if (gPcDebugWild.species && gMain.callback2 == CB2_Overworld && !ArePlayerFieldControlsLocked() && gQuestLogState == 0
      && (!gPcDebugNet.autojoin || PcNetConnected()))   // with --net-autojoin: once on the server
     {

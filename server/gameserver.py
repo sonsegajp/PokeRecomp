@@ -231,10 +231,12 @@ class GameServer:
                 if other is not player:
                     player.send(other.info())
             player.send(self.world.state_frame())
+            # the world's message of the day, then what's on, then everyone hears who arrived
+            player.send(system_chat(self.args.welcome or f"Welcome to {self.args.name}!"))
             for line in self.world.announcements():
                 player.send(line)
-            if self.args.welcome:
-                player.send(system_chat(self.args.welcome))
+            name = player.name.split(b"\xff")[0].rstrip(b"\0")
+            self.broadcast(frame(S_CHAT_FROM, struct.pack("<H", 0) + name + to_game(" has joined!")))
             print(f"game: player {player.id} joined ({len(self.players)} online)")
             while True:
                 msg = await read_frame(reader)

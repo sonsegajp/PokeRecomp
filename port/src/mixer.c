@@ -174,7 +174,10 @@ static void psg_trigger(int ch)
     u8 env = IO8(nrx2[ch]);
 
     p->on = 1;
-    p->phase = 0;
+    /* Squares keep their place in the duty cycle across a trigger (the engine
+       re-triggers on every volume step: resetting it clicked). The wave
+       channel starts its table over. */
+    if (ch == 2) p->phase = 0;
     if (ch == 2) {
         for (int i = 0; i < 16; i++) {
             p->wave[i * 2] = IO8(0x90 + i) >> 4;
@@ -195,6 +198,11 @@ static void psg_trigger(int ch)
         p->sweep_dir = (sw & 8) ? -1 : 1;
         p->sweep_shift = sw & 7;
         p->sweep_timer = p->sweep_period;
+        /* a trigger checks the sweep's next step at once: one that would
+           overflow silences the channel (the engine re-triggers on every
+           volume step, so a sweep that ran off the top stays quiet) */
+        if (p->sweep_shift && p->freq + p->sweep_dir * (p->freq >> p->sweep_shift) > 2047)
+            p->on = 0;
     }
 }
 
@@ -206,6 +214,8 @@ static void psg_update_registers(void)
 
     for (int ch = 0; ch < 4; ch++) {
         u8 hi = IO8(nrx4[ch]);
+        if (ch < 3)   /* before a trigger: it starts from the frequency just written */
+            psg[ch].freq = IO8(nrx4[ch] - 1) | ((hi & 7) << 8);
         if (hi & 0x80) {
             u8 len = IO8(nrx1[ch]);
             psg[ch].length = ch == 2 ? 256 - len : 64 - (len & 0x3F);
@@ -213,8 +223,6 @@ static void psg_update_registers(void)
             IO8(nrx4[ch]) = hi & 0x7F; /* the trigger bit reads back as 0 */
         }
         psg[ch].length_on = (hi & 0x40) != 0;
-        if (ch < 3)
-            psg[ch].freq = IO8(nrx4[ch] - 1) | ((hi & 7) << 8);
     }
     if (!(IO8(0x70) & 0x80)) psg[2].on = 0;
 }
@@ -245,6 +253,9 @@ static void psg_clock(int step)
                 psg[0].freq = f;
                 IO8(0x64) = (u8)f;
                 IO8(0x65) = (u8)((IO8(0x65) & ~7) | (f >> 8));
+                /* and checks the step after that straight away */
+                if (f + psg[0].sweep_dir * (f >> psg[0].sweep_shift) > 2047)
+                    psg[0].on = 0;
             }
         }
     }
@@ -253,7 +264,16 @@ static void psg_clock(int step)
 static double seq_phase;
 static int seq_step;
 
-/* Mix the PSG into out[] (already holding Direct Sound), in DAC units. */
+/* Mix the PSG into out[] (already holding Direct Sound), in DAC units.
+ *
+ * Like the hardware, each channel outputs 0..its volume (not a signal
+ * centred on zero): a note starting, stopping or stepping its volume moves
+ * the level, and the console's output capacitor turns that into the thump
+ * under a KO, a ledge hop or a door. The same capacitor (a DC blocker here)
+ * then lets the level settle back. */
+#define PSG_DC_BLOCK 0.998f   /* about 15 Hz at 48 kHz */
+static float dc_in_l, dc_in_r, dc_out_l, dc_out_r;
+
 static void mix_psg(int n, float *left, float *right)
 {
     u8 nr50 = IO8(0x80), nr51 = IO8(0x81);
@@ -261,6 +281,8 @@ static void mix_psg(int n, float *left, float *right)
     float ratio = (cnt_h & 3) == 0 ? 0.25f : (cnt_h & 3) == 1 ? 0.5f : 1.0f;
     float vol_r = ((nr50 & 7) + 1) * ratio, vol_l = (((nr50 >> 4) & 7) + 1) * ratio;
 
+    static int only = -1;   /* debug: PC_PSG_ONLY=1..4 renders one channel */
+    if (only < 0) only = getenv("PC_PSG_ONLY") ? atoi(getenv("PC_PSG_ONLY")) : 0;
     if (!(IO8(0x84) & 0x80))
         return;
     for (int i = 0; i < n; i++) {
@@ -276,7 +298,7 @@ static void mix_psg(int n, float *left, float *right)
         for (int ch = 0; ch < 4; ch++) {
             struct Psg *p = &psg[ch];
             float v = 0;
-            if (!p->on) continue;
+            if (!p->on || (only && ch != only - 1)) continue;
             if (ch < 2) {
                 double hz = 131072.0 / (2048 - p->freq);
                 int duty = IO8(ch == 0 ? 0x62 : 0x68) >> 6;
@@ -285,16 +307,16 @@ static void mix_psg(int n, float *left, float *right)
                 for (int k = 0; k < 4; k++) {
                     p->phase += hz / (PC_AUDIO_RATE * 4.0);
                     p->phase -= floor(p->phase);
-                    acc += p->phase < duty_table[duty] ? 1.0f : -1.0f;
+                    acc += p->phase < duty_table[duty] ? 1.0f : 0.0f;
                 }
-                v = acc * 0.25f * p->volume;
+                v = acc * 0.25f * 2.0f * p->volume;
             } else if (ch == 2) {
                 double hz = 2097152.0 / (2048 - p->freq);
                 int shift = (IO8(0x73) >> 5) & 3;
                 float level;
                 p->phase += hz / PC_AUDIO_RATE / 32.0;
                 p->phase -= floor(p->phase);
-                level = (p->wave[(int)(p->phase * 32) & 31] - 7.5f) * 2.0f;
+                level = p->wave[(int)(p->phase * 32) & 31] * 2.0f;
                 v = IO8(0x73) & 0x80 ? level * 0.75f : shift == 0 ? 0 : level / (1 << (shift - 1));
             } else {
                 u8 poly = IO8(0x7C);
@@ -307,13 +329,19 @@ static void mix_psg(int n, float *left, float *right)
                     p->lfsr = (u16)((p->lfsr >> 1) | (bit << 14));
                     if (poly & 8) p->lfsr = (u16)((p->lfsr & ~0x40) | (bit << 6));
                 }
-                v = (p->lfsr & 1) ? -(float)p->volume : (float)p->volume;
+                v = (p->lfsr & 1) ? 0.0f : 2.0f * p->volume;
             }
             if (nr51 & (1 << ch)) r += v;
             if (nr51 & (0x10 << ch)) l += v;
         }
-        left[i] += l * vol_l;
-        right[i] += r * vol_r;
+        l *= vol_l;
+        r *= vol_r;
+        dc_out_l = l - dc_in_l + PSG_DC_BLOCK * dc_out_l;
+        dc_out_r = r - dc_in_r + PSG_DC_BLOCK * dc_out_r;
+        dc_in_l = l;
+        dc_in_r = r;
+        left[i] += dc_out_l;
+        right[i] += dc_out_r;
     }
 }
 
@@ -335,6 +363,35 @@ static void gba_dac(struct SoundInfo *si, int n)
         }
         ds_left[i] = hold_l;
         ds_right[i] = hold_r;
+    }
+}
+
+/* ---- the chat pip ------------------------------------------------------------------- */
+
+/* Two quick square-wave notes, Game Boy style, each fading out. Mixed in DAC
+ * units like everything else, so the volume setting applies. */
+#define BEEP_NOTE (PC_AUDIO_RATE * 45 / 1000)
+static int beep_pos = -1;
+static double beep_phase;
+
+void PcMixerChatBeep(void)
+{
+    beep_pos = 0;
+    beep_phase = 0;
+}
+
+static void mix_beep(float *left, float *right, int n)
+{
+    for (int i = 0; i < n && beep_pos >= 0; i++, beep_pos++) {
+        int note = beep_pos / BEEP_NOTE;
+        float t, s;
+        if (note >= 2) { beep_pos = -1; break; }
+        beep_phase += (note ? 1760.0 : 1318.5) / PC_AUDIO_RATE;
+        beep_phase -= floor(beep_phase);
+        t = (float)(beep_pos % BEEP_NOTE) / BEEP_NOTE;
+        s = (beep_phase < 0.5 ? 1.0f : -1.0f) * 36.0f * (1.0f - t) * (1.0f - t);
+        left[i] += s;
+        right[i] += s;
     }
 }
 
@@ -368,6 +425,7 @@ void PcMixerVBlank(struct SoundInfo *si)
     memset(psg_r, 0, n * sizeof(float));
     psg_update_registers();
     mix_psg(n, psg_l, psg_r);
+    mix_beep(psg_l, psg_r, n);
 
     /* Debug: PC_MIX_ONLY=ds|psg renders one path. */
     {

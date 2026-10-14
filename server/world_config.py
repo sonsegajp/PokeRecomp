@@ -16,7 +16,7 @@ SETTINGS = [
     ("region", "region", str, "kanto (FireRed / LeafGreen) or hoenn (Emerald): set by the .bat you host with"),
     ("port", "port", int, "TCP port players connect to: forward it on your router"),
     ("max_players", "max", int, "how many trainers can be on at once (up to 200)"),
-    ("welcome", "welcome", str, "a chat line everyone sees when they arrive (empty = none)"),
+    ("welcome", "welcome", str, "the message of the day everyone sees when they arrive (empty = 'Welcome to <name>!')"),
     None,
     ("shiny_odds", "base_shiny_odds", int, "1 in N for every wild Pokemon (the games' own rate is 8192; best 32)"),
     ("boost_shiny_odds", "shiny_odds", int, "1 in N for the boosted type (best 32)"),

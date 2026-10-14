@@ -57,6 +57,8 @@ extern struct PcDebugGiveMon gPcDebugGiveMon[6];
  * soon as the player can move. */
 struct PcDebugWild { int species, level, shiny; };
 extern struct PcDebugWild gPcDebugWild;
+/* Test hook (--play-se N): sound effect N plays once the player can move. */
+extern int gPcDebugPlaySe;
 /* Test hook (--give-item ITEM COUNT): added to the bag the same way. */
 struct PcDebugGiveItem { int item, count; };
 extern struct PcDebugGiveItem gPcDebugGiveItem;
